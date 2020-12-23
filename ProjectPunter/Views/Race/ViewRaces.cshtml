@@ -1,0 +1,52 @@
+﻿@model ProjectPunter.ViewModels.RaceListViewModel
+
+@{
+    ViewBag.Title = "ViewRaces";
+}
+
+<div class="row race-list-container">
+    <table class="table table-dark">
+        <thead>
+            <tr class="table-header">
+                <th>ID</th>
+                <th>Date</th>
+                <th>Event Name</th>
+                <th>Class</th>
+                <th>Race Type</th>
+                <th>Number Of Horses</th>
+                <th>Is Complete</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var race in Model.RaceList)
+            {
+                if (race.isComplete)
+                {
+                    <tr class="completed-race">
+                        <td>@race.Race_Id</td>
+                        <td>@race.Date</td>
+                        <td>@race.Event_Name</td>
+                        <td>@race.Class_Number</td>
+                        <td>@race.Race_Type_Description</td>
+                        <td>@race.Number_Of_Horses</td>
+                        <td>@race.isComplete</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr class="incompleted-race">
+                        <td>@race.Race_Id</td>
+                        <td>@race.Date</td>
+                        <td>@race.Event_Name</td>
+                        <td>@race.Class_Number</td>
+                        <td>@race.Race_Type_Description</td>
+                        <td>@race.Number_Of_Horses</td>
+                        <td>@race.isComplete</td>
+                    </tr>
+                }
+            }
+        </tbody>
+
+    </table>
+</div>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="bcfe189ef6474a9ca285976cb6ae6942" Name="Diagram1">
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_country" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_horse" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_horse_tb_country" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_class" Width="1.5" PointX="0.75" PointY="8.75" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_event" Width="1.5" PointX="0.75" PointY="11.25" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_jockey" Width="1.5" PointX="3.375" PointY="9.5" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_race" Width="1.5" PointX="3" PointY="5.125" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_race_horse" Width="1.5" PointX="5.625" PointY="3" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_racetype" Width="1.5" PointX="0.75" PointY="13.625" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_surface" Width="1.5" PointX="0.75" PointY="16.75" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_trainer" Width="1.5" PointX="3.375" PointY="11.875" />
+        <EntityTypeShape EntityType="ProjectPunterModel.tb_weather" Width="1.5" PointX="0.75" PointY="5.75" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_tb_class" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_tb_event" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_horse_tb_horse" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_horse_tb_jockey" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_horse_tb_race" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_tb_racetype" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_tb_surface" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_tb_weather" />
+        <AssociationConnector Association="ProjectPunterModel.FK_tb_race_horse_tb_trainer" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

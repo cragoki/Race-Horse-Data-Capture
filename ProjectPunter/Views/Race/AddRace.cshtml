@@ -1,0 +1,118 @@
+﻿@model ProjectPunter.ViewModels.AddRaceViewModel
+@{
+    ViewBag.Title = "AddRace";
+}
+
+<div class="content-page-wrapper">
+
+    @using (Html.BeginForm("AddRace", "Race", FormMethod.Post))
+    {
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 mt-25-p">
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                    <label class="console-green-txt">Event: </label>
+                    <select id="eventId_input">
+                        <option selected="selected" disabled="disabled">Choose Event</option>
+                        @foreach (var item in Model.EventList)
+                        {
+                            <option value="@item.Event_Id"> @item.Event_Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                    <label class="console-green-txt">Race Type: </label>
+                    <select id="typeId_input">
+                        <option selected="selected" disabled="disabled">Choose Race Type</option>
+                        @foreach (var item in Model.RaceType)
+                        {
+                            <option value="@item.Race_Type_Id"> @item.Race_Type_Description</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                    <label class="console-green-txt">Weather: </label>
+                    <select id="weatherId_input">
+                        <option selected="selected" disabled="disabled">Choose Conditions</option>
+                        @foreach (var item in Model.WeatherList)
+                        {
+                            <option value="@item.Weather_Id"> @item.Weather_Description</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                    <label class="console-green-txt">Surface: </label>
+                    <select id="surfaceId_input">
+                        <option selected="selected" disabled="disabled">Choose Surface</option>
+                        @foreach (var item in Model.SurfaceType)
+                        {
+                            <option value="@item.Surface_Id"> @item.Surface_Description</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 btn_container">
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                    <label class="console-green-txt">Class: </label>
+                    <select id="classId_input">
+                        <option selected="selected" disabled="disabled">Choose Class</option>
+                        @foreach (var item in Model.ClassList)
+                        {
+                            <option value="@item.Class_Id"> @item.Class_Number</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3"><label class="console-green-txt">Date: </label><input type="date" id="date_input"/></div>
+                <div class="col-lg-3 col-md-3 col-sm-3"><label class="console-green-txt">No Of Horses: </label><input type="number" id="noOfHorses_input"/></div>
+                <div class="col-lg-3 col-md-3 col-sm-3">
+                    <button class="send_btn" type="button" onclick="AddRace()">Next</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 feedback_container">
+                <p id="feedBack" class="console-red-txt"> @Html.ValidationMessage("error")</p>
+
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+
+    function AddRace() {
+        //int eventId, int weatherId, int surfaceId, int typeId, int classId, DateTime date, int noOfHorses        
+        var newRaceData = {
+            eventId: $('#eventId_input').val(),
+            weatherId: $('#weatherId_input').val(),
+            surfaceId: $('#surfaceId_input').val(),
+            typeId: $('#typeId_input').val(),
+            classId: $('#classId_input').val(),
+            date: $('#date_input').val(),
+            noOfHorses: $('#noOfHorses_input').val()
+        };
+
+        $.ajax({
+            url: '/Race/AddRace',
+            type: 'POST',
+            data: JSON.stringify(newRaceData),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (result) {
+            },
+            success: function (result) {
+                var RaceId = result["message"];
+                @*location.href = '@Url.Action("AddRaceHorse", "Race", new { raceId= 'RaceId' })';*@
+                location.href = result.redirectUrl;
+            },
+            async: true,
+            processData: false
+        });
+    }
+
+</script>

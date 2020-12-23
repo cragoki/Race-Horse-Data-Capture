@@ -1,0 +1,123 @@
+﻿body {
+    background-color: #252525;
+}
+
+.bg-dark 
+{
+    background-color:#252525;
+}
+
+.border-none 
+{
+border:none;
+}
+
+.console-green-txt 
+{
+    font-family:'Lucida Console';
+    color:rgb(0, 255,51) !important;
+}
+
+.console-red-txt {
+    font-family: 'Lucida Console';
+    color:red !important;
+}
+
+.content-page-wrapper 
+{
+    width:90%;
+    float:right;
+    background-color:#252525;
+    background-size:cover;
+}
+
+
+.mt-25-p 
+{
+    margin-top:25%;
+}
+
+.send_btn {
+    padding: 5px;
+    background-color: #252525;
+    border: 1px solid white;
+    color: white;
+    width:50%;
+    margin-left:25%;
+    margin-top:25px;
+}
+
+.send_btn:hover {
+    background-color: white;
+    border: 1px solid rgb(0, 255,51);
+    color: rgb(0, 255,51) !important;
+}
+
+
+.admin_btn {
+    padding: 5px;
+    background-color: #252525;
+    border: 1px solid white;
+    color: white;
+    margin-left: 25%;
+    margin-top: 25px;
+}
+
+.admin_btn:hover {
+    background-color: white;
+    border: 1px solid rgb(0, 255,51);
+    color: rgb(0, 255,51) !important;
+}
+
+.btn_container 
+{
+    margin-top:20px;
+}
+
+
+.race-horse-container 
+{
+    width:70%;
+    margin-top: 50px;
+    float: left;
+}
+
+.race-list-container {
+    width: 80%;
+    margin-left: 20px;
+    margin-top: 50px;
+    float: left;
+}
+
+#admin-button-container 
+{
+    float:left;
+   width:70%;
+   margin-left:12px;
+   margin-top:12px;
+}
+
+.completed-race {
+    color: rgb(0, 150,51);
+}
+
+.race-list-header {
+    color: rgb(0, 255,51);
+}
+
+
+.incompleted-race {
+    color: rgb(0, 255,51);
+}
+
+.incompleted-race:hover {
+    background-color:white;
+    cursor:pointer;
+}
+
+.admin-content-box {
+    padding: 25px;
+    margin-top: 10px;
+    border: 2px solid rgb(0, 255,51);
+    height: 200px;
+}

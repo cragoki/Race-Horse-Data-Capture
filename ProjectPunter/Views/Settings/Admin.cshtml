@@ -1,0 +1,462 @@
+﻿@model ProjectPunter.ViewModels.AdminViewModel
+@{
+    ViewBag.Title = "AddHorse";
+}
+
+<div class="content-page-wrapper">
+    <div class="col-lg-12 col-md-12 col-sm-12 feedback_container">
+        <p id="feedBack" class="console-red-txt"> @Html.ValidationMessage("error")</p>
+    </div>
+
+    @*FIRST LINE STARTS*@
+
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <label class="console-green-txt">Horse Name:</label>
+            <input id="horseName_input" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <label class="console-green-txt">Horse DOB:</label>
+            <input type="date" id="dateOfBirth_input" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <br />
+            <label class="console-green-txt">Horse Country:</label>
+            <select id="countryId_input">
+                @foreach (var item in Model.CountryList)
+                {
+                    <option value="@item.Country_Id"> @item.Country_Code</option>
+                }
+
+            </select>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+            <button class="send_btn" type="button" onclick="AddHorse()">Send</button>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Jockey Name:</label>
+            <input id="jockeyName_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <br />
+            <button class="send_btn" type="button" onclick="AddJockey()">Send</button>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Trainer Name:</label>
+            <input id="trainerName_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <br />
+            <button class="send_btn" type="button" onclick="AddTrainer()">Send</button>
+        </div>
+    </div>
+    @*FIRST LINE ENDS*@
+
+    @*SECOND LINE STARTS*@
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Weather Type:</label>
+            <input id="weatherType_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <button class="send_btn" type="button" onclick="AddWeather()">Send</button>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Event Name:</label>
+            <input id="eventName_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <br />
+            <button class="send_btn" type="button" onclick="AddEvent()">Send</button>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Race Type:</label>
+            <input id="raceType_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Is Hurdle?</label>
+            <input type="checkbox" id="isHurdle_checkbox" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Number of hurdles:</label>
+            <input id="noOfHurdles_input" type="number" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Meters:</label>
+            <input id="meters_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Furlongs:</label>
+            <input id="furlongs_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <br />
+            <button class="send_btn" type="button" onclick="AddRaceType()">Send</button>
+        </div>
+    </div>
+    @*SECOND LINE ENDS*@
+    @*THIRD LINE STARTS*@
+    <div class="col-lg-4 col-md-4 col-sm-4 admin-content-box">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <label class="console-green-txt">Surface Type:</label>
+            <input id="surfaceType_input" />
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <br />
+            <button class="send_btn" type="button" onclick="AddSurface()">Send</button>
+        </div>
+    </div>
+    @*THIRD LINE ENDS*@
+
+</div>
+
+        <script>
+            var i = 0;
+            var message = ""; /* The text */
+            var speed = 25; /* The speed/duration of the effect in milliseconds */
+
+            function AddHorse() {
+                //horseName, dob, countryId
+                var newHorseData = {
+                    horseName: $('#horseName_input').val(),
+                    dob: $('#dateOfBirth_input').val(),
+                    countryId: $('#countryId_input').val()
+                };
+
+                $.ajax({
+                    url: '/Horse/AddHorse',
+                    type: 'POST',
+                    data: JSON.stringify(newHorseData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result)
+                    {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success)
+                        {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Horse Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else
+                        {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            document.getElementById("feedBack").innerHTML = "";
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function AddJockey() {
+                //JockeyName
+                var newJockeyData = {
+                    jockeyName: $('#jockeyName_input').val()
+                };
+
+                $.ajax({
+                    url: '/Horse/AddJockey',
+                    type: 'POST',
+                    data: JSON.stringify(newJockeyData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result) {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Jockey Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            document.getElementById("feedBack").innerHTML = "";
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function AddTrainer() {
+                //TrainerName
+                var newTrainerData = {
+                    trainerName: $('#trainerName_input').val()
+                };
+
+                $.ajax({
+                    url: '/Horse/AddTrainer',
+                    type: 'POST',
+                    data: JSON.stringify(newTrainerData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result) {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Trainer Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            document.getElementById("feedBack").innerHTML = "";
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function AddEvent() {
+                //TrainerName
+                var newEventData = {
+                    eventName: $('#eventName_input').val()
+                };
+
+                $.ajax({
+                    url: '/Race/AddEvent',
+                    type: 'POST',
+                    data: JSON.stringify(newEventData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result) {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Event Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            document.getElementById("feedBack").innerHTML = "";
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function AddWeather() {
+                //TrainerName
+                var newWeatherData = {
+                    weatherCondition: $('#weatherType_input').val()
+                };
+
+                $.ajax({
+                    url: '/Race/AddWeatherCondition',
+                    type: 'POST',
+                    data: JSON.stringify(newWeatherData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result) {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Weather Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            document.getElementById("feedBack").innerHTML = "";
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function AddSurface() {
+                //TrainerName
+                var newSurfaceData = {
+                    surfaceCondition: $('#surfaceType_input').val()
+                };
+
+                $.ajax({
+                    url: '/Race/AddSurfaceCondition',
+                    type: 'POST',
+                    data: JSON.stringify(newSurfaceData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result) {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Surface Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            document.getElementById("feedBack").innerHTML = "";
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function AddRaceType() {
+                //RaceTypeName
+                var checkbox = $("#isHurdle_checkbox");
+                checkbox.val(checkbox[0].checked ? "true" : "false");
+
+                console.log($('#raceType_input').val());
+                console.log($('#isHurdle_checkbox').val());
+                console.log($('#noOfHurdles_input').val());
+                console.log($('#meters_input').val());
+                console.log($('#furlongs_input').val());
+
+                var newRaceTypeData = {
+                    raceTypeName: $('#raceType_input').val(),
+                    isHurdle: $('#isHurdle_checkbox').val(),
+                    noOfHurdles: $('#noOfHurdles_input').val(),
+                    meters: $('#meters_input').val(),
+                    furlongs: $('#furlongs_input').val(),
+
+                };
+
+                $.ajax({
+                    url: '/Race/AddRaceType',
+                    type: 'POST',
+                    data: JSON.stringify(newRaceTypeData),
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (result) {
+                        message = result.error;
+                        document.getElementById("feedBack").innerHTML = "";
+                        i = 0;
+                        typeWriter();
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-red-txt");
+                            feedbackText.classList.add("console-green-txt");
+                            document.getElementById("feedBack").innerHTML = "";
+                            message = "Race Type Added";
+                            i = 0;
+                            typeWriter();
+                        }
+                        else {
+                            var feedbackText = document.getElementById("feedBack");
+                            feedbackText.classList.remove("console-green-txt");
+                            feedbackText.classList.add("console-red-txt");
+                            message = "ERROR " + result["responseText"];
+                            $("#feedBack").val('');
+                            i = 0;
+                            typeWriter();
+                        }
+
+                    },
+                    async: true,
+                    processData: false
+                });
+            }
+
+            function typeWriter() {
+                if (i < message.length) {
+                    document.getElementById("feedBack").innerHTML += message.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+        </script>

@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+                <div class="d-flex" id="wrapper">
+                    <!-- Sidebar -->
+                    <div class="bg-light border-right" id="sidebar-wrapper">
+                        <div class="sidebar-heading">Project Punter </div>
+                        <div class="list-group list-group-flush console-green-txt ">
+                            <a href="@Url.Action("Admin", "Settings")" class="menu-items  list-group-item-action bg-dark console-green-txt">Admin</a>
+                            <a href="@Url.Action("AddRace", "Race")" class="menu-items  list-group-item-action bg-dark console-green-txt ">Add Race</a>
+                            <a href="@Url.Action("ViewRaces", "Race")" class="menu-items  list-group-item-action bg-dark console-green-txt ">View Races</a>
+
+                        </div>
+                    </div>
+                    <!-- /#sidebar-wrapper -->
+                    <!-- Page Content -->
+                    <!-- /#page-content-wrapper -->
+                </div>
+
+        @RenderBody()
+    </div>
+        
+
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+</body>
+</html>

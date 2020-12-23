@@ -1,0 +1,219 @@
+﻿@model ProjectPunter.ViewModels.AddRaceHorseViewModel
+
+@{
+    ViewBag.Title = "AddRaceHorse";
+}
+<div class="row" id="admin-button-container">
+    <div class="col-lg-4"><button class="admin_btn" data-toggle="modal" data-target="#AddHorseModal">Add Horse</button></div>
+    <div class="col-lg-4"><button class="admin_btn" data-toggle="modal" data-target="#AddTrainerModal">Add Trainer</button></div>
+    <div class="col-lg-4"><button class="admin_btn" data-toggle="modal" data-target="#AddJockeyModal">Add Jockey</button></div>
+</div>
+<div class="row race-horse-container">
+
+    @using (Html.BeginForm("AddRaceHorse", "Race", FormMethod.Post))
+    {
+        for (int i = 0; i < Model.NoOfHorses; i++)
+        {
+            @Html.HiddenFor(x => x.Result[i].Race_Id,  new { Value = Model.RaceId });
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="col-lg-3 col-md-12 col-sm-12">
+                    <label class="console-green-txt">Horse: </label>
+                    @Html.DropDownListFor(m => m.Result[i].Horse_Id, new SelectList(Model.HorseList, "Horse_Id", "Horse_Name"));
+                </div>
+                <div class="col-lg-3 col-md-12 col-sm-12">
+                    <label class="console-green-txt">Weight: </label>
+                    @Html.EditorFor(m => m.Result[i].Weight);
+                </div>
+                <div class="col-lg-3 col-md-12 col-sm-12">
+                    <label class="console-green-txt">Jockey: </label>
+                    @Html.DropDownListFor(m => m.Result[i].Jockey_Id, new SelectList(Model.JockeyList, "Jockey_Id", "Jockey_Name"));
+                </div>
+                <div class="col-lg-3 col-md-12 col-sm-12">
+                    <label class="console-green-txt">Trainer: </label>
+                    @Html.DropDownListFor(m => m.Result[i].Trainer_Id, new SelectList(Model.TrainerList, "Trainer_Id", "Trainer_Name"));
+                </div>
+
+            </div>
+
+            <br />
+        }
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <button class="send_btn" type="submit" onclick="">Send</button>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 feedback_container">
+                <p id="feedBack" class="console-red-txt"> @Html.ValidationMessage("error")</p>
+            </div>
+        </div>
+
+    }
+</div>
+    @* Modal Area *@
+    <div class="modal fade" id="AddHorseModal" tabindex="-1" role="dialog" aria-labelledby="AddHorseModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddHorseModalLabel">Add Horse</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-form-item">
+                        <p>Horse Name: </p><input id="horseName_Input" />
+                    </div>
+                    <div class="modal-form-item">
+                        <p>Horse DOB: </p><input id="horseDob_Input" type="date" />
+                    </div>
+                    <div class="modal-form-item">
+                        <p>Horse Country: </p>
+                        <select id="country_select">
+                            <option selected="selected" disabled="disabled">Choose Country</option>
+
+                            @foreach (var item in Model.CountryList)
+                            {
+                                <option value="@item.Country_Id"> @item.Country_Code</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="addHorse_btn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="AddTrainerModal" tabindex="-1" role="dialog" aria-labelledby="AddTrainerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddHorseModalLabel">Add Trainer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-form-item">
+                        <p>Trainer Name: </p><input id="trainerName_Input" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="addTrainer_btn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="AddJockeyModal" tabindex="-1" role="dialog" aria-labelledby="AddJockeyModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddHorseModalLabel">Add Jockey</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-form-item">
+                        <p>Jockey Name: </p><input id="jockeyName_Input" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="addJockey_btn">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @* TAKE a look at this for the page refresh after using the admin buttons https://stackoverflow.com/questions/38930144/keep-input-value-after-refresh-page *@
+
+    <script>
+
+        //Button Area
+        $("#addHorse_btn").click(function () {
+            var name = document.getElementById('horseName_Input').value;
+            var dob = document.getElementById('horseDob_Input').value;
+            var country = $('#country_select').find(":selected").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/Horse/AddHorse",
+                data: {
+                    'horsename': name,
+                    'dob': dob,
+                    'countryId': country
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                    else {
+                        alert("something went wrong... Check the horse name doesn't already exist");
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("something went wrong... Check the horse name doesn't already exist");
+                }
+            });
+
+        });
+
+        $("#addTrainer_btn").click(function () {
+            var name = document.getElementById('trainerName_Input').value;
+
+
+            $.ajax({
+                type: "POST",
+                url: "/Horse/AddTrainer",
+                data: {
+                    'trainerName': name
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                    else {
+                        alert("something went wrong...");
+                    }
+                },
+                error: function () {
+                    alert("something went wrong...");
+                }
+            });
+
+        });
+
+        $("#addJockey_btn").click(function () {
+            var name = document.getElementById('jockeyName_Input').value;
+
+            $.ajax({
+                type: "POST",
+                url: "/Horse/AddJockey",
+                data: {
+                    'jockeyName': name
+                },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                    else {
+                        alert("something went wrong...");
+                    }
+                },
+                error: function () {
+                    alert("something went wrong...");
+                }
+            });
+
+        });
+
+
+    </script>

@@ -1,0 +1,739 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="ProjectPunterModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tb_class">
+          <Key>
+            <PropertyRef Name="Class_Id" />
+          </Key>
+          <Property Name="Class_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Class_Number" Type="int" Nullable="false" />
+          <Property Name="Class_Description" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="tb_country">
+          <Key>
+            <PropertyRef Name="Country_Id" />
+          </Key>
+          <Property Name="Country_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Country_Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Country_Code" Type="nchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="tb_event">
+          <Key>
+            <PropertyRef Name="Event_Id" />
+          </Key>
+          <Property Name="Event_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Event_Name" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_horse">
+          <Key>
+            <PropertyRef Name="Horse_Id" />
+          </Key>
+          <Property Name="Horse_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Horse_Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Date_Of_Birth" Type="datetime" />
+          <Property Name="IsRetired" Type="bit" Nullable="false" />
+          <Property Name="Notes" Type="varchar(max)" />
+          <Property Name="Age" Type="int" StoreGeneratedPattern="Computed" />
+          <Property Name="Country" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_jockey">
+          <Key>
+            <PropertyRef Name="Jockey_Id" />
+          </Key>
+          <Property Name="Jockey_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Jockey_Name" Type="varchar" MaxLength="100" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_race">
+          <Key>
+            <PropertyRef Name="Race_Id" />
+          </Key>
+          <Property Name="Race_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Event_Id" Type="int" Nullable="false" />
+          <Property Name="Weather_Id" Type="int" Nullable="false" />
+          <Property Name="Surface_Id" Type="int" Nullable="false" />
+          <Property Name="Race_Type_Id" Type="int" Nullable="false" />
+          <Property Name="Class_Id" Type="int" Nullable="false" />
+          <Property Name="Number_Of_Horses" Type="int" Nullable="false" />
+          <Property Name="IsComplete" Type="bit" Nullable="false" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_race_horse">
+          <Key>
+            <PropertyRef Name="Race_Id" />
+            <PropertyRef Name="Horse_Id" />
+          </Key>
+          <Property Name="Race_Id" Type="int" Nullable="false" />
+          <Property Name="Horse_Id" Type="int" Nullable="false" />
+          <Property Name="Weight" Type="int" Nullable="false" />
+          <Property Name="Age" Type="int" Nullable="false" />
+          <Property Name="Trainer_Id" Type="int" Nullable="false" />
+          <Property Name="Jockey_Id" Type="int" Nullable="false" />
+          <Property Name="Position" Type="int" />
+          <Property Name="DNF" Type="bit" />
+          <Property Name="Clean_Race" Type="bit" />
+        </EntityType>
+        <EntityType Name="tb_racetype">
+          <Key>
+            <PropertyRef Name="Race_Type_Id" />
+          </Key>
+          <Property Name="Race_Type_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Race_Type_Description" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Hurdle" Type="bit" Nullable="false" />
+          <Property Name="No_Of_Hurdles" Type="int" />
+          <Property Name="Meters" Type="int" Nullable="false" />
+          <Property Name="furlongs" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_surface">
+          <Key>
+            <PropertyRef Name="Surface_Id" />
+          </Key>
+          <Property Name="Surface_Id" Type="int" Nullable="false" />
+          <Property Name="Surface_Description" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tb_trainer">
+          <Key>
+            <PropertyRef Name="Trainer_Id" />
+          </Key>
+          <Property Name="Trainer_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Trainer_Name" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="tb_weather">
+          <Key>
+            <PropertyRef Name="Weather_Id" />
+          </Key>
+          <Property Name="Weather_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Weather_Description" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <Association Name="FK_tb_horse_tb_country">
+          <End Role="tb_country" Type="Self.tb_country" Multiplicity="1" />
+          <End Role="tb_horse" Type="Self.tb_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_country">
+              <PropertyRef Name="Country_Id" />
+            </Principal>
+            <Dependent Role="tb_horse">
+              <PropertyRef Name="Country" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_horse">
+          <End Role="tb_horse" Type="Self.tb_horse" Multiplicity="1" />
+          <End Role="tb_race_horse" Type="Self.tb_race_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_horse">
+              <PropertyRef Name="Horse_Id" />
+            </Principal>
+            <Dependent Role="tb_race_horse">
+              <PropertyRef Name="Horse_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_jockey">
+          <End Role="tb_jockey" Type="Self.tb_jockey" Multiplicity="1" />
+          <End Role="tb_race_horse" Type="Self.tb_race_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_jockey">
+              <PropertyRef Name="Jockey_Id" />
+            </Principal>
+            <Dependent Role="tb_race_horse">
+              <PropertyRef Name="Jockey_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_race">
+          <End Role="tb_race" Type="Self.tb_race" Multiplicity="1" />
+          <End Role="tb_race_horse" Type="Self.tb_race_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_race">
+              <PropertyRef Name="Race_Id" />
+            </Principal>
+            <Dependent Role="tb_race_horse">
+              <PropertyRef Name="Race_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_trainer">
+          <End Role="tb_trainer" Type="Self.tb_trainer" Multiplicity="1" />
+          <End Role="tb_race_horse" Type="Self.tb_race_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_trainer">
+              <PropertyRef Name="Trainer_Id" />
+            </Principal>
+            <Dependent Role="tb_race_horse">
+              <PropertyRef Name="Trainer_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_tb_class">
+          <End Role="tb_class" Type="Self.tb_class" Multiplicity="1" />
+          <End Role="tb_race" Type="Self.tb_race" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_class">
+              <PropertyRef Name="Class_Id" />
+            </Principal>
+            <Dependent Role="tb_race">
+              <PropertyRef Name="Class_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_tb_event">
+          <End Role="tb_event" Type="Self.tb_event" Multiplicity="1" />
+          <End Role="tb_race" Type="Self.tb_race" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_event">
+              <PropertyRef Name="Event_Id" />
+            </Principal>
+            <Dependent Role="tb_race">
+              <PropertyRef Name="Event_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_tb_racetype">
+          <End Role="tb_racetype" Type="Self.tb_racetype" Multiplicity="1" />
+          <End Role="tb_race" Type="Self.tb_race" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_racetype">
+              <PropertyRef Name="Race_Type_Id" />
+            </Principal>
+            <Dependent Role="tb_race">
+              <PropertyRef Name="Race_Type_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_tb_surface">
+          <End Role="tb_surface" Type="Self.tb_surface" Multiplicity="1" />
+          <End Role="tb_race" Type="Self.tb_race" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_surface">
+              <PropertyRef Name="Surface_Id" />
+            </Principal>
+            <Dependent Role="tb_race">
+              <PropertyRef Name="Surface_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_tb_weather">
+          <End Role="tb_weather" Type="Self.tb_weather" Multiplicity="1" />
+          <End Role="tb_race" Type="Self.tb_race" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_weather">
+              <PropertyRef Name="Weather_Id" />
+            </Principal>
+            <Dependent Role="tb_race">
+              <PropertyRef Name="Weather_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="pr_add_horse" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Horse_Name" Type="varchar" Mode="In" />
+          <Parameter Name="Date_Of_Birth" Type="datetime" Mode="In" />
+          <Parameter Name="Country" Type="int" Mode="In" />
+        </Function>
+        <Function Name="pr_get_countries" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="ProjectPunterModelStoreContainer">
+          <EntitySet Name="tb_class" EntityType="Self.tb_class" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_country" EntityType="Self.tb_country" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_event" EntityType="Self.tb_event" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_horse" EntityType="Self.tb_horse" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_jockey" EntityType="Self.tb_jockey" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_race" EntityType="Self.tb_race" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_race_horse" EntityType="Self.tb_race_horse" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_racetype" EntityType="Self.tb_racetype" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_surface" EntityType="Self.tb_surface" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_trainer" EntityType="Self.tb_trainer" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tb_weather" EntityType="Self.tb_weather" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_tb_horse_tb_country" Association="Self.FK_tb_horse_tb_country">
+            <End Role="tb_country" EntitySet="tb_country" />
+            <End Role="tb_horse" EntitySet="tb_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_horse" Association="Self.FK_tb_race_horse_tb_horse">
+            <End Role="tb_horse" EntitySet="tb_horse" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_jockey" Association="Self.FK_tb_race_horse_tb_jockey">
+            <End Role="tb_jockey" EntitySet="tb_jockey" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_race" Association="Self.FK_tb_race_horse_tb_race">
+            <End Role="tb_race" EntitySet="tb_race" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_trainer" Association="Self.FK_tb_race_horse_tb_trainer">
+            <End Role="tb_trainer" EntitySet="tb_trainer" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_class" Association="Self.FK_tb_race_tb_class">
+            <End Role="tb_class" EntitySet="tb_class" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_event" Association="Self.FK_tb_race_tb_event">
+            <End Role="tb_event" EntitySet="tb_event" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_racetype" Association="Self.FK_tb_race_tb_racetype">
+            <End Role="tb_racetype" EntitySet="tb_racetype" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_surface" Association="Self.FK_tb_race_tb_surface">
+            <End Role="tb_surface" EntitySet="tb_surface" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_weather" Association="Self.FK_tb_race_tb_weather">
+            <End Role="tb_weather" EntitySet="tb_weather" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ProjectPunterModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="tb_country">
+          <Key>
+            <PropertyRef Name="Country_Id" />
+          </Key>
+          <Property Name="Country_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Country_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Country_Code" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="tb_horse" Relationship="Self.FK_tb_horse_tb_country" FromRole="tb_country" ToRole="tb_horse" />
+        </EntityType>
+        <EntityType Name="tb_horse">
+          <Key>
+            <PropertyRef Name="Horse_Id" />
+          </Key>
+          <Property Name="Horse_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Horse_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Date_Of_Birth" Type="DateTime" Precision="3" />
+          <Property Name="IsRetired" Type="Boolean" Nullable="false" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Age" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="tb_country" Relationship="Self.FK_tb_horse_tb_country" FromRole="tb_horse" ToRole="tb_country" />
+          <NavigationProperty Name="tb_race_horse" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_horse" FromRole="tb_horse" ToRole="tb_race_horse" />
+        </EntityType>
+        <Association Name="FK_tb_horse_tb_country">
+          <End Role="tb_country" Type="Self.tb_country" Multiplicity="1" />
+          <End Role="tb_horse" Type="Self.tb_horse" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="ProjectPunterEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="tb_country" EntityType="Self.tb_country" />
+          <EntitySet Name="tb_horse" EntityType="Self.tb_horse" />
+          <AssociationSet Name="FK_tb_horse_tb_country" Association="Self.FK_tb_horse_tb_country">
+            <End Role="tb_country" EntitySet="tb_country" />
+            <End Role="tb_horse" EntitySet="tb_horse" />
+          </AssociationSet>
+          <FunctionImport Name="pr_add_horse">
+            <Parameter Name="Horse_Name" Mode="In" Type="String" />
+            <Parameter Name="Date_Of_Birth" Mode="In" Type="DateTime" />
+            <Parameter Name="Country" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="pr_get_countries" ReturnType="Collection(ProjectPunterModel.pr_get_countries_Result)" />
+          <EntitySet Name="tb_class" EntityType="ProjectPunterModel.tb_class" />
+          <EntitySet Name="tb_event" EntityType="ProjectPunterModel.tb_event" />
+          <EntitySet Name="tb_jockey" EntityType="ProjectPunterModel.tb_jockey" />
+          <EntitySet Name="tb_race" EntityType="ProjectPunterModel.tb_race" />
+          <EntitySet Name="tb_race_horse" EntityType="ProjectPunterModel.tb_race_horse" />
+          <EntitySet Name="tb_racetype" EntityType="ProjectPunterModel.tb_racetype" />
+          <EntitySet Name="tb_surface" EntityType="ProjectPunterModel.tb_surface" />
+          <EntitySet Name="tb_trainer" EntityType="ProjectPunterModel.tb_trainer" />
+          <EntitySet Name="tb_weather" EntityType="ProjectPunterModel.tb_weather" />
+          <AssociationSet Name="FK_tb_race_tb_class" Association="ProjectPunterModel.FK_tb_race_tb_class">
+            <End Role="tb_class" EntitySet="tb_class" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_event" Association="ProjectPunterModel.FK_tb_race_tb_event">
+            <End Role="tb_event" EntitySet="tb_event" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_horse" Association="ProjectPunterModel.FK_tb_race_horse_tb_horse">
+            <End Role="tb_horse" EntitySet="tb_horse" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_jockey" Association="ProjectPunterModel.FK_tb_race_horse_tb_jockey">
+            <End Role="tb_jockey" EntitySet="tb_jockey" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_race" Association="ProjectPunterModel.FK_tb_race_horse_tb_race">
+            <End Role="tb_race" EntitySet="tb_race" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_racetype" Association="ProjectPunterModel.FK_tb_race_tb_racetype">
+            <End Role="tb_racetype" EntitySet="tb_racetype" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_surface" Association="ProjectPunterModel.FK_tb_race_tb_surface">
+            <End Role="tb_surface" EntitySet="tb_surface" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_tb_weather" Association="ProjectPunterModel.FK_tb_race_tb_weather">
+            <End Role="tb_weather" EntitySet="tb_weather" />
+            <End Role="tb_race" EntitySet="tb_race" />
+          </AssociationSet>
+          <AssociationSet Name="FK_tb_race_horse_tb_trainer" Association="ProjectPunterModel.FK_tb_race_horse_tb_trainer">
+            <End Role="tb_trainer" EntitySet="tb_trainer" />
+            <End Role="tb_race_horse" EntitySet="tb_race_horse" />
+          </AssociationSet>
+        </EntityContainer>
+        <ComplexType Name="pr_get_countries_Result">
+          <Property Type="Int32" Name="Country_Id" Nullable="false" />
+          <Property Type="String" Name="Country_Name" Nullable="false" MaxLength="50" />
+          <Property Type="String" Name="Country_Code" Nullable="true" MaxLength="10" />
+        </ComplexType>
+        <EntityType Name="tb_class">
+          <Key>
+            <PropertyRef Name="Class_Id" />
+          </Key>
+          <Property Name="Class_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Class_Number" Type="Int32" Nullable="false" />
+          <Property Name="Class_Description" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_race" Relationship="ProjectPunterModel.FK_tb_race_tb_class" FromRole="tb_class" ToRole="tb_race" />
+        </EntityType>
+        <EntityType Name="tb_event">
+          <Key>
+            <PropertyRef Name="Event_Id" />
+          </Key>
+          <Property Name="Event_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Event_Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_race" Relationship="ProjectPunterModel.FK_tb_race_tb_event" FromRole="tb_event" ToRole="tb_race" />
+        </EntityType>
+        <EntityType Name="tb_jockey">
+          <Key>
+            <PropertyRef Name="Jockey_Id" />
+          </Key>
+          <Property Name="Jockey_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Jockey_Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_race_horse" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_jockey" FromRole="tb_jockey" ToRole="tb_race_horse" />
+        </EntityType>
+        <EntityType Name="tb_race">
+          <Key>
+            <PropertyRef Name="Race_Id" />
+          </Key>
+          <Property Name="Race_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Number_Of_Horses" Type="Int32" Nullable="false" />
+          <Property Name="IsComplete" Type="Boolean" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="tb_class" Relationship="ProjectPunterModel.FK_tb_race_tb_class" FromRole="tb_race" ToRole="tb_class" />
+          <NavigationProperty Name="tb_event" Relationship="ProjectPunterModel.FK_tb_race_tb_event" FromRole="tb_race" ToRole="tb_event" />
+          <NavigationProperty Name="tb_race_horse" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_race" FromRole="tb_race" ToRole="tb_race_horse" />
+          <NavigationProperty Name="tb_racetype" Relationship="ProjectPunterModel.FK_tb_race_tb_racetype" FromRole="tb_race" ToRole="tb_racetype" />
+          <NavigationProperty Name="tb_surface" Relationship="ProjectPunterModel.FK_tb_race_tb_surface" FromRole="tb_race" ToRole="tb_surface" />
+          <NavigationProperty Name="tb_weather" Relationship="ProjectPunterModel.FK_tb_race_tb_weather" FromRole="tb_race" ToRole="tb_weather" />
+        </EntityType>
+        <EntityType Name="tb_race_horse">
+          <Key>
+            <PropertyRef Name="Race_Id" />
+            <PropertyRef Name="Horse_Id" />
+          </Key>
+          <Property Name="Race_Id" Type="Int32" Nullable="false" />
+          <Property Name="Horse_Id" Type="Int32" Nullable="false" />
+          <Property Name="Weight" Type="Int32" Nullable="false" />
+          <Property Name="Age" Type="Int32" Nullable="false" />
+          <Property Name="Position" Type="Int32" />
+          <Property Name="DNF" Type="Boolean" />
+          <Property Name="Clean_Race" Type="Boolean" />
+          <NavigationProperty Name="tb_horse" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_horse" FromRole="tb_race_horse" ToRole="tb_horse" />
+          <NavigationProperty Name="tb_jockey" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_jockey" FromRole="tb_race_horse" ToRole="tb_jockey" />
+          <NavigationProperty Name="tb_race" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_race" FromRole="tb_race_horse" ToRole="tb_race" />
+          <NavigationProperty Name="tb_trainer" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_trainer" FromRole="tb_race_horse" ToRole="tb_trainer" />
+        </EntityType>
+        <EntityType Name="tb_racetype">
+          <Key>
+            <PropertyRef Name="Race_Type_Id" />
+          </Key>
+          <Property Name="Race_Type_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Race_Type_Description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Hurdle" Type="Boolean" Nullable="false" />
+          <Property Name="No_Of_Hurdles" Type="Int32" />
+          <Property Name="Meters" Type="Int32" Nullable="false" />
+          <Property Name="furlongs" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tb_race" Relationship="ProjectPunterModel.FK_tb_race_tb_racetype" FromRole="tb_racetype" ToRole="tb_race" />
+        </EntityType>
+        <EntityType Name="tb_surface">
+          <Key>
+            <PropertyRef Name="Surface_Id" />
+          </Key>
+          <Property Name="Surface_Id" Type="Int32" Nullable="false" />
+          <Property Name="Surface_Description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_race" Relationship="ProjectPunterModel.FK_tb_race_tb_surface" FromRole="tb_surface" ToRole="tb_race" />
+        </EntityType>
+        <EntityType Name="tb_trainer">
+          <Key>
+            <PropertyRef Name="Trainer_Id" />
+          </Key>
+          <Property Name="Trainer_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Trainer_Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_race_horse" Relationship="ProjectPunterModel.FK_tb_race_horse_tb_trainer" FromRole="tb_trainer" ToRole="tb_race_horse" />
+        </EntityType>
+        <EntityType Name="tb_weather">
+          <Key>
+            <PropertyRef Name="Weather_Id" />
+          </Key>
+          <Property Name="Weather_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Weather_Description" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="tb_race" Relationship="ProjectPunterModel.FK_tb_race_tb_weather" FromRole="tb_weather" ToRole="tb_race" />
+        </EntityType>
+        <Association Name="FK_tb_race_tb_class">
+          <End Type="ProjectPunterModel.tb_class" Role="tb_class" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race" Role="tb_race" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_tb_race_tb_event">
+          <End Type="ProjectPunterModel.tb_event" Role="tb_event" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race" Role="tb_race" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_horse">
+          <End Type="ProjectPunterModel.tb_horse" Role="tb_horse" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race_horse" Role="tb_race_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_horse">
+              <PropertyRef Name="Horse_Id" />
+            </Principal>
+            <Dependent Role="tb_race_horse">
+              <PropertyRef Name="Horse_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_jockey">
+          <End Type="ProjectPunterModel.tb_jockey" Role="tb_jockey" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race_horse" Role="tb_race_horse" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_race">
+          <End Type="ProjectPunterModel.tb_race" Role="tb_race" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race_horse" Role="tb_race_horse" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tb_race">
+              <PropertyRef Name="Race_Id" />
+            </Principal>
+            <Dependent Role="tb_race_horse">
+              <PropertyRef Name="Race_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_tb_race_tb_racetype">
+          <End Type="ProjectPunterModel.tb_racetype" Role="tb_racetype" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race" Role="tb_race" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_tb_race_tb_surface">
+          <End Type="ProjectPunterModel.tb_surface" Role="tb_surface" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race" Role="tb_race" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_tb_race_tb_weather">
+          <End Type="ProjectPunterModel.tb_weather" Role="tb_weather" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race" Role="tb_race" Multiplicity="*" />
+        </Association>
+        <Association Name="FK_tb_race_horse_tb_trainer">
+          <End Type="ProjectPunterModel.tb_trainer" Role="tb_trainer" Multiplicity="1" />
+          <End Type="ProjectPunterModel.tb_race_horse" Role="tb_race_horse" Multiplicity="*" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ProjectPunterModelStoreContainer" CdmEntityContainer="ProjectPunterEntities">
+          <EntitySetMapping Name="tb_country">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_country">
+              <MappingFragment StoreEntitySet="tb_country">
+                <ScalarProperty Name="Country_Id" ColumnName="Country_Id" />
+                <ScalarProperty Name="Country_Name" ColumnName="Country_Name" />
+                <ScalarProperty Name="Country_Code" ColumnName="Country_Code" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_horse">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_horse">
+              <MappingFragment StoreEntitySet="tb_horse">
+                <ScalarProperty Name="Horse_Id" ColumnName="Horse_Id" />
+                <ScalarProperty Name="Horse_Name" ColumnName="Horse_Name" />
+                <ScalarProperty Name="Date_Of_Birth" ColumnName="Date_Of_Birth" />
+                <ScalarProperty Name="IsRetired" ColumnName="IsRetired" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_tb_horse_tb_country" TypeName="ProjectPunterModel.FK_tb_horse_tb_country" StoreEntitySet="tb_horse">
+            <EndProperty Name="tb_country">
+              <ScalarProperty Name="Country_Id" ColumnName="Country" />
+            </EndProperty>
+            <EndProperty Name="tb_horse">
+              <ScalarProperty Name="Horse_Id" ColumnName="Horse_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <FunctionImportMapping FunctionImportName="pr_add_horse" FunctionName="ProjectPunterModel.Store.pr_add_horse" />
+          <FunctionImportMapping FunctionImportName="pr_get_countries" FunctionName="ProjectPunterModel.Store.pr_get_countries">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProjectPunterModel.pr_get_countries_Result">
+                <ScalarProperty Name="Country_Id" ColumnName="Country_Id" />
+                <ScalarProperty Name="Country_Name" ColumnName="Country_Name" />
+                <ScalarProperty Name="Country_Code" ColumnName="Country_Code" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="tb_class">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_class">
+              <MappingFragment StoreEntitySet="tb_class">
+                <ScalarProperty Name="Class_Description" ColumnName="Class_Description" />
+                <ScalarProperty Name="Class_Number" ColumnName="Class_Number" />
+                <ScalarProperty Name="Class_Id" ColumnName="Class_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_event">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_event">
+              <MappingFragment StoreEntitySet="tb_event">
+                <ScalarProperty Name="Event_Name" ColumnName="Event_Name" />
+                <ScalarProperty Name="Event_Id" ColumnName="Event_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_jockey">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_jockey">
+              <MappingFragment StoreEntitySet="tb_jockey">
+                <ScalarProperty Name="Jockey_Name" ColumnName="Jockey_Name" />
+                <ScalarProperty Name="Jockey_Id" ColumnName="Jockey_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_race">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_race">
+              <MappingFragment StoreEntitySet="tb_race">
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="IsComplete" ColumnName="IsComplete" />
+                <ScalarProperty Name="Number_Of_Horses" ColumnName="Number_Of_Horses" />
+                <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_race_horse">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_race_horse">
+              <MappingFragment StoreEntitySet="tb_race_horse">
+                <ScalarProperty Name="Clean_Race" ColumnName="Clean_Race" />
+                <ScalarProperty Name="DNF" ColumnName="DNF" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+                <ScalarProperty Name="Weight" ColumnName="Weight" />
+                <ScalarProperty Name="Horse_Id" ColumnName="Horse_Id" />
+                <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_racetype">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_racetype">
+              <MappingFragment StoreEntitySet="tb_racetype">
+                <ScalarProperty Name="furlongs" ColumnName="furlongs" />
+                <ScalarProperty Name="Meters" ColumnName="Meters" />
+                <ScalarProperty Name="No_Of_Hurdles" ColumnName="No_Of_Hurdles" />
+                <ScalarProperty Name="Hurdle" ColumnName="Hurdle" />
+                <ScalarProperty Name="Race_Type_Description" ColumnName="Race_Type_Description" />
+                <ScalarProperty Name="Race_Type_Id" ColumnName="Race_Type_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_surface">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_surface">
+              <MappingFragment StoreEntitySet="tb_surface">
+                <ScalarProperty Name="Surface_Description" ColumnName="Surface_Description" />
+                <ScalarProperty Name="Surface_Id" ColumnName="Surface_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_trainer">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_trainer">
+              <MappingFragment StoreEntitySet="tb_trainer">
+                <ScalarProperty Name="Trainer_Name" ColumnName="Trainer_Name" />
+                <ScalarProperty Name="Trainer_Id" ColumnName="Trainer_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tb_weather">
+            <EntityTypeMapping TypeName="ProjectPunterModel.tb_weather">
+              <MappingFragment StoreEntitySet="tb_weather">
+                <ScalarProperty Name="Weather_Description" ColumnName="Weather_Description" />
+                <ScalarProperty Name="Weather_Id" ColumnName="Weather_Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="FK_tb_race_tb_class" TypeName="ProjectPunterModel.FK_tb_race_tb_class" StoreEntitySet="tb_race">
+            <EndProperty Name="tb_race">
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_class">
+              <ScalarProperty Name="Class_Id" ColumnName="Class_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_tb_race_tb_event" TypeName="ProjectPunterModel.FK_tb_race_tb_event" StoreEntitySet="tb_race">
+            <EndProperty Name="tb_race">
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_event">
+              <ScalarProperty Name="Event_Id" ColumnName="Event_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_tb_race_horse_tb_jockey" TypeName="ProjectPunterModel.FK_tb_race_horse_tb_jockey" StoreEntitySet="tb_race_horse">
+            <EndProperty Name="tb_race_horse">
+              <ScalarProperty Name="Horse_Id" ColumnName="Horse_Id" />
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_jockey">
+              <ScalarProperty Name="Jockey_Id" ColumnName="Jockey_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_tb_race_tb_racetype" TypeName="ProjectPunterModel.FK_tb_race_tb_racetype" StoreEntitySet="tb_race">
+            <EndProperty Name="tb_race">
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_racetype">
+              <ScalarProperty Name="Race_Type_Id" ColumnName="Race_Type_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_tb_race_tb_surface" TypeName="ProjectPunterModel.FK_tb_race_tb_surface" StoreEntitySet="tb_race">
+            <EndProperty Name="tb_race">
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_surface">
+              <ScalarProperty Name="Surface_Id" ColumnName="Surface_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_tb_race_tb_weather" TypeName="ProjectPunterModel.FK_tb_race_tb_weather" StoreEntitySet="tb_race">
+            <EndProperty Name="tb_race">
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_weather">
+              <ScalarProperty Name="Weather_Id" ColumnName="Weather_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+          <AssociationSetMapping Name="FK_tb_race_horse_tb_trainer" TypeName="ProjectPunterModel.FK_tb_race_horse_tb_trainer" StoreEntitySet="tb_race_horse">
+            <EndProperty Name="tb_race_horse">
+              <ScalarProperty Name="Horse_Id" ColumnName="Horse_Id" />
+              <ScalarProperty Name="Race_Id" ColumnName="Race_Id" />
+            </EndProperty>
+            <EndProperty Name="tb_trainer">
+              <ScalarProperty Name="Trainer_Id" ColumnName="Trainer_Id" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="false" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
