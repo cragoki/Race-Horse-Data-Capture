@@ -154,6 +154,8 @@
       <DependentUpon>ProjectPunterDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Race\RaceListModel.cs" />
+    <Compile Include="Models\Race\RaceHorseModel.cs" />
+    <Compile Include="Models\Race\RaceModel.cs" />
     <Compile Include="Models\tb_class.cs">
       <DependentUpon>ProjectPunterDB.tt</DependentUpon>
     </Compile>
@@ -197,6 +199,7 @@
     <Compile Include="ViewModels\AddRaceViewModel.cs" />
     <Compile Include="ViewModels\AdminViewModel.cs" />
     <Compile Include="ViewModels\RaceListViewModel.cs" />
+    <Compile Include="ViewModels\RaceViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -281,6 +284,7 @@
     <Content Include="Views\Race\AddRace.cshtml" />
     <Content Include="Views\Race\AddRaceHorse.cshtml" />
     <Content Include="Views\Race\ViewRaces.cshtml" />
+    <Content Include="Views\Race\ViewRace.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

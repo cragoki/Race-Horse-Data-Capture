@@ -1,4 +1,5 @@
 ﻿using ProjectPunter.Models;
+using ProjectPunter.Models.Race;
 using ProjectPunter.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,18 @@ namespace ProjectPunter.Factories
 
                 result.Add(horse);
             }
+
+            return result;
+        }
+
+        public static RaceViewModel BuildRaceModel(List<RaceHorseModel> raceHorses, RaceModel raceInfo) 
+        {
+
+            var result = new RaceViewModel()
+            { 
+            RaceHorses = raceHorses,
+            RaceModel = raceInfo
+            };
 
             return result;
         }

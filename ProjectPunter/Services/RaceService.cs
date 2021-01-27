@@ -53,6 +53,28 @@ namespace ProjectPunter.Services
             }
         }
 
+        public RaceModel GetRaceView(int raceId)
+        {
+            using (var context = new ProjectPunterEntities())
+            {
+                SqlParameter parameters = new SqlParameter("@race_Id", raceId);
+                RaceModel result = context.Database.SqlQuery<RaceModel>("pr_get_race_view").FirstOrDefault();
+
+                return result;
+            }
+        }
+
+        public List<RaceHorseModel> GetRaceHorseListView(int raceId)
+        {
+            using (var context = new ProjectPunterEntities())
+            {
+                SqlParameter parameters = new SqlParameter("@race_Id", raceId);
+                List<RaceHorseModel> result = context.Database.SqlQuery<RaceHorseModel>("pr_get_race_horse_view").ToList();
+
+                return result;
+            }
+        }
+
         public void AddRaceHorse(tb_race_horse raceHorse)
         {
             using (var context = new ProjectPunterEntities())

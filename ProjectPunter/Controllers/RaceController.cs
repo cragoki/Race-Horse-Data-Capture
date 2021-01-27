@@ -101,6 +101,23 @@ namespace ProjectPunter.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public ActionResult ViewRace(int raceId) 
+        {
+            //Get Race Details from ID (pr_get_race)
+            var raceInfo = _raceService.GetRaceView(raceId);
+
+            //Get the list of horses which are involved in the race (pr_get_race_horse)
+            var raceHorses = _raceService.GetRaceHorseListView(raceId);
+
+            //Create a factory method to build a view model which will ultimately populate the view
+            var model = RaceFactory.BuildRaceModel(raceHorses, raceInfo);
+
+            return View(model);
+        }
+
+
+
         #region AJAX Endpoints
 
         [HttpPost]

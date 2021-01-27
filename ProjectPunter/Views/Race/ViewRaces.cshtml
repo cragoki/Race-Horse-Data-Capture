@@ -23,7 +23,7 @@
             {
                 if (race.isComplete)
                 {
-                    <tr class="completed-race">
+                    <tr class="completed-race" onclick="location.href = '@(Url.Action("ViewRace", "Race", new { raceId = race.Race_Id }))'">
                         <td>@race.Race_Id</td>
                         <td>@race.Date</td>
                         <td>@race.Event_Name</td>
@@ -35,7 +35,7 @@
                 }
                 else
                 {
-                    <tr class="incompleted-race">
+                    <tr class="incompleted-race" onclick="location.href = '@(Url.Action("ViewRace", "Race", new { raceId = race.Race_Id }))'">
                         <td>@race.Race_Id</td>
                         <td>@race.Date</td>
                         <td>@race.Event_Name</td>
