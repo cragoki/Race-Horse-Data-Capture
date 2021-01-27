@@ -57,8 +57,8 @@ namespace ProjectPunter.Services
         {
             using (var context = new ProjectPunterEntities())
             {
-                SqlParameter parameters = new SqlParameter("@race_Id", raceId);
-                RaceModel result = context.Database.SqlQuery<RaceModel>("pr_get_race_view").FirstOrDefault();
+                SqlParameter parameters = new SqlParameter("@Race_Id", raceId);
+                RaceModel result = context.Database.SqlQuery<RaceModel>("pr_get_race_view @Race_Id", parameters).FirstOrDefault();
 
                 return result;
             }
@@ -68,8 +68,8 @@ namespace ProjectPunter.Services
         {
             using (var context = new ProjectPunterEntities())
             {
-                SqlParameter parameters = new SqlParameter("@race_Id", raceId);
-                List<RaceHorseModel> result = context.Database.SqlQuery<RaceHorseModel>("pr_get_race_horse_view").ToList();
+                SqlParameter parameters = new SqlParameter("@Race_Id", raceId);
+                List<RaceHorseModel> result = context.Database.SqlQuery<RaceHorseModel>("pr_get_race_horse_view @Race_Id", parameters).ToList();
 
                 return result;
             }
