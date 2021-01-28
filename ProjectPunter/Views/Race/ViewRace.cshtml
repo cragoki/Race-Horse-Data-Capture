@@ -3,4 +3,56 @@
     ViewBag.Title = "ViewRace";
 }
 
+<div class="container">
+        <div class="col-lg-12 header-block">
+            <div class="sub-header-block">
+                <h1>@Model.RaceModel.Event_Name</h1>
+                <h2>@Model.RaceModel.Date</h2>
+            </div>
+            <div class="sub-header-block">
+                <h3>@Model.RaceModel.Race_Type_Description</h3>
+                <h3>Surface: @Model.RaceModel.Surface_Description</h3>
+                <h3>Weather: @Model.RaceModel.Weather_Description</h3>
 
+            </div>
+            <div class="sub-header-block">
+                <h4>Number Of Horses: @Model.RaceModel.Number_Of_Horses</h4>
+                <h4>Class: @Model.RaceModel.Class_Number</h4>
+                <h4>Race Id: @Model.RaceModel.Race_Id</h4>
+            </div>
+        </div>
+    <div class="race-list-container">
+        <table class="horse-table table table-dark">
+            <thead>
+                <tr class="table-header">
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Weight</th>
+                    <th>Trainer</th>
+                    <th>Jockey</th>
+                    <th>Position</th>
+                    <th>DNF</th>
+                    <th>Clean Race</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var horse in Model.RaceHorses)
+                {
+                    <tr class="horse-row">
+                        <td>@horse.Horse_Id</td>
+                        <td>@horse.Horse_Name</td>
+                        <td>@horse.Age</td>
+                        <td>@horse.Weight</td>
+                        <td>@horse.Trainer_Name</td>
+                        <td>@horse.Jockey_Name</td>
+                        <td>@Html.EditorFor(x => horse.Position)</td>
+                        <td><input type="checkbox" /></td>
+                        <td><input type="checkbox" /></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
