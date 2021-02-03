@@ -133,3 +133,7 @@ border:none;
     color: white;
     text-align:center;
 }
+
+.horse-row input, option, select {
+    color: black;
+}

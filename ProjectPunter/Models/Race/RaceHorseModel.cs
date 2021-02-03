@@ -21,6 +21,7 @@ namespace ProjectPunter.Models.Race
         public string Trainer_Name { get; set; }
         public string Jockey_Name { get; set; }
         public int? Position { get; set; }
+
         public bool? DNF { get; set; }
 
         public bool? Clean_Race { get; set; }

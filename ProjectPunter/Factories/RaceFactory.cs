@@ -3,6 +3,7 @@ using ProjectPunter.Models.Race;
 using ProjectPunter.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 
@@ -46,5 +47,24 @@ namespace ProjectPunter.Factories
 
             return result;
         }
+
+        public static DataTable BuildRaceResultDataTable(RaceViewModel model) 
+        {
+            //Declare table and add each column
+            var result = new DataTable();
+            result.Columns.Add("horse_id", typeof(int));
+            result.Columns.Add("position", typeof(int));
+            result.Columns.Add("dnf", typeof(bool));
+            result.Columns.Add("clean_race", typeof(bool));
+
+            //Add data to table foreach horse
+            foreach (var horse in model.RaceHorses) 
+            {
+                result.Rows.Add(horse.Horse_Id, horse.Position, horse.DNF, horse.Clean_Race);
+            }
+
+            return result;
+        }
+
     }
 }

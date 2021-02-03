@@ -3,6 +3,7 @@ using ProjectPunter.Models.Race;
 using ProjectPunter.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
@@ -90,6 +91,25 @@ namespace ProjectPunter.Services
                 };
 
                context.Database.ExecuteSqlCommand("pr_add_race_horse @Race_Id, @Horse_Id, @Weight, @Age, @Trainer_Id, @Jockey_Id", parameters);
+
+            }
+        }
+
+        public void UpdateRace(DataTable dt, int raceId) 
+        {
+            using (var context = new ProjectPunterEntities())
+            {
+                SqlParameter id = new SqlParameter("@raceId", raceId);
+                SqlParameter dataTable = new SqlParameter("@raceDetails", dt);
+                dataTable.TypeName = "[dbo].[ut_race]";
+
+                SqlParameter[] parameters =
+                {
+                    id,
+                    dataTable
+                };
+
+                context.Database.ExecuteSqlCommand("pr_update_race @raceId, @raceDetails", parameters);
 
             }
         }
