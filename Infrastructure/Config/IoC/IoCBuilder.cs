@@ -48,6 +48,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IEventService, EventService>();
             container.RegisterScoped<IRaceService, RaceService>();
             container.RegisterScoped<IScraperService, ScraperService>();
+            container.RegisterScoped<IConfigurationService, ConfigurationService>();
 
             return container;
         }
