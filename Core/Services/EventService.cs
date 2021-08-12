@@ -3,6 +3,7 @@ using Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Core.Services
 {
@@ -16,18 +17,30 @@ namespace Core.Services
             _scraperService = scraperService;
         }
 
-        public List<Event> GetTodaysEvents()
+        public async Task<List<Event>> GetTodaysEvents()
         {
             var result = new List<Event>();
-            int totalEvents = 0;
 
             try
             {
                 Logger.Info("Fetching Todays Events.");
 
-                _scraperService.RetrieveTodaysEvents();
+                var todaysRaces = await _scraperService.RetrieveTodaysEvents();
 
-                Logger.Info($"{totalEvents} Events Retrieved and stored.");
+                //Store todays race information with batch
+
+                //Return necessary information
+                foreach (var even in todaysRaces.Courses)
+                {
+                    var res = new Event()
+                    {
+                        EventId = even.Id
+                    };
+
+                    result.Add(res);
+                }
+
+                Logger.Info($"{todaysRaces.Courses.Count} Events Retrieved and stored successfully.");
             }
             catch (Exception ex)
             {

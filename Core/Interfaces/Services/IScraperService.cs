@@ -1,8 +1,11 @@
-﻿namespace Core.Interfaces.Services
+﻿using Core.Models.GetRace;
+using System.Threading.Tasks;
+
+namespace Core.Interfaces.Services
 {
     public interface IScraperService
     {
-        void RetrieveTodaysEvents();
+        Task<DailyRaces> RetrieveTodaysEvents();
 
         void RetrieveRacesForEvent(int eventId);
     }

@@ -1,12 +1,15 @@
 ﻿using Core.Interfaces.Services;
+using Core.Models.GetRace;
 using Core.Models.Settings;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -23,9 +26,9 @@ namespace Core.Services
             _racingPostConfig = _configService.GetRacingPostSettings();
         }
 
-        public async void RetrieveTodaysEvents() 
+        public async Task<DailyRaces> RetrieveTodaysEvents() 
         {
-
+            var result = new DailyRaces();
             //Retrieve the events for today
             try
             {
@@ -38,15 +41,18 @@ namespace Core.Services
                 htmlDoc.LoadHtml(page);
 
                 //Now we have the page we must parse the table into individual elements.
-                var getTableRows = await ExtractJson(page, "cardsMatrix", "}");
-                
-                var a = JsonConvert.DeserializeObject<object>(getTableRows + "}");
+                var getTableRows = await ExtractJson(page, "cardsMatrix\":", "}]}]");
+
+                //Convert Json to model
+                result = JsonConvert.DeserializeObject<DailyRaces>(getTableRows + "}");
             }
             catch (Exception ex)
             {
                 Logger.Error($"!!! Failed to retrieve todays events.  Terminating process. {ex.Message} !!!");
                 throw new Exception(ex.Message);
             }
+
+            return result;
         }
 
         public void RetrieveRacesForEvent(int eventId)
@@ -100,7 +106,7 @@ namespace Core.Services
                     int Start, End;
                     Start = strSource.IndexOf(strStart, 0) + strStart.Length;
                     End = strSource.IndexOf(strEnd, Start);
-                    return strSource.Substring(Start, End - Start);
+                    return strSource.Substring(Start, End + strEnd.Length - Start);
                 }
             }
             catch (Exception ex) 

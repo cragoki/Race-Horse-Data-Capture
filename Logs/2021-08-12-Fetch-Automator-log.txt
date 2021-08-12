@@ -1,0 +1,36 @@
+{ "time": "2021-08-12 13:14:26.0351", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:26.0596", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:26.0596", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:26.0596", "level": "INFO", "message": "------------------------------------Fetch Automator Inilializing---------------------------------" }
+{ "time": "2021-08-12 13:14:26.0596", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:26.0596", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:26.0596", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:26.0648", "level": "INFO", "message": "Fetching Todays Events." }
+{ "time": "2021-08-12 13:14:26.1915", "level": "INFO", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2021-08-12 13:14:26.1915", "level": "INFO", "message": "Hosting environment: Production", "envName": "Production" }
+{ "time": "2021-08-12 13:14:26.1915", "level": "INFO", "message": "Content root path: C:\\Users\\Craig\\Documents\\repo\\Prsonal\\Race-Horse-Data-Capture\\RHDCAutomation\\bin\\Debug\\netcoreapp3.1", "contentRoot": "C:\\Users\\Craig\\Documents\\repo\\Prsonal\\Race-Horse-Data-Capture\\RHDCAutomation\\bin\\Debug\\netcoreapp3.1" }
+{ "time": "2021-08-12 13:14:33.9293", "level": "INFO", "message": "8 Events Retrieved and stored successfully." }
+{ "time": "2021-08-12 13:14:44.0253", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:44.0253", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:46.1164", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:46.1164", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Fetching Races for event eventName - 8\/12\/2021 12:00:00 AM." }
+{ "time": "2021-08-12 13:14:48.0026", "level": "INFO", "message": "Races Retrieved for event eventName - 8\/12\/2021 12:00:00 AM" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "{\"Automator\":0,\"TimeInitialized\":\"2021-08-12T13:14:26.0631334+02:00\",\"TimeCompleted\":\"2021-08-12T13:14:48.0123863+02:00\",\"RacesFiltered\":8,\"ErrorsEncountered\":0,\"EllapsedTime\":21.9492529}" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-----------------------------------Automator Terminating-----------------------------------------" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }
+{ "time": "2021-08-12 13:14:48.0523", "level": "INFO", "message": "-------------------------------------------------------------------------------------------------" }

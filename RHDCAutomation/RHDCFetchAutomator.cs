@@ -50,7 +50,7 @@ namespace RHDCAutomation
             };
 
             //Get todays Events
-            var events = _eventService.GetTodaysEvents();
+            var events = await _eventService.GetTodaysEvents();
 
             foreach (var even in events) 
             {
@@ -61,7 +61,7 @@ namespace RHDCAutomation
             }
 
             //Complete Diagnostics
-            diagnostics.RacesFiltered = racesFiltered;
+            diagnostics.EventsFiltered = racesFiltered;
             diagnostics.ErrorsEncountered = 0;
             diagnostics.TimeCompleted = DateTime.Now;
             diagnostics.EllapsedTime = (diagnostics.TimeCompleted - diagnostics.TimeInitialized).TotalSeconds;
