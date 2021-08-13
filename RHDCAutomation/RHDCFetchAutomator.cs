@@ -19,6 +19,7 @@ namespace RHDCAutomation
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IEventService _eventService;
         private readonly IRaceService _raceService;
+        private static Guid _batch;
         public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
@@ -34,6 +35,7 @@ namespace RHDCAutomation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _batch = Guid.NewGuid();
             int racesFiltered = 0;
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
@@ -42,6 +44,10 @@ namespace RHDCAutomation
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
+            Logger.Info("                                                                                                 ");
+            Logger.Info($"                Batch Initialized with Identifier {_batch}          ");
+
+
             //Initialize Diagnostics
             var diagnostics = new Diagnostics()
             {
@@ -50,7 +56,7 @@ namespace RHDCAutomation
             };
 
             //Get todays Events
-            var events = await _eventService.GetTodaysEvents();
+            var events = await _eventService.GetTodaysEvents(_batch);
 
             foreach (var even in events) 
             {
@@ -65,6 +71,8 @@ namespace RHDCAutomation
             diagnostics.ErrorsEncountered = 0;
             diagnostics.TimeCompleted = DateTime.Now;
             diagnostics.EllapsedTime = (diagnostics.TimeCompleted - diagnostics.TimeInitialized).TotalSeconds;
+            //Store Batch in the database
+
             Logger.Info(JsonSerializer.Serialize(diagnostics));
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");

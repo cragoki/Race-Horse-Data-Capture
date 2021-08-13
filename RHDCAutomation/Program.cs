@@ -2,12 +2,13 @@
 using Microsoft.Extensions.Logging;
 using System;
 using Microsoft.Extensions.Configuration;
-using System.IO;
 using Stashbox;
 using Infrastructure.Config.IoC;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace RHDCAutomation
 {
@@ -25,7 +26,7 @@ namespace RHDCAutomation
         public static IHostBuilder CreateHostBuilder(string[] args) 
         {
             var host = Host.CreateDefaultBuilder(args);
-
+            IConfiguration config;
             //Configure Logging
             host.ConfigureLogging((hostingContext, logging) =>
             {
@@ -52,10 +53,10 @@ namespace RHDCAutomation
                     => opts.ShutdownTimeout = TimeSpan.FromMinutes(2));
                 services.AddHostedService<RHDCFetchAutomator>();
 
-            });
-
-
-
+                services.AddDbContextPool<DbContextData>(option =>
+                    option.UseSqlServer(hostContext.Configuration.GetConnectionString("DefaultConnection"),
+                    sqlServerOptions => sqlServerOptions.CommandTimeout(120)));
+                });
 
             return host;
 
