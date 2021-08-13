@@ -1,12 +1,9 @@
 ﻿using Core.Enums;
 using Core.Interfaces.Services;
 using Core.Models;
-using Infrastructure.Config;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +16,15 @@ namespace RHDCAutomation
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IEventService _eventService;
         private readonly IRaceService _raceService;
+        private readonly IConfigurationService _configService;
         private static Guid _batch;
-        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService)
+        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
             _eventService = eventService;
             _raceService = raceService;
-
+            _configService = configService;
         }
         private void OnStopping()
         {
@@ -36,7 +34,7 @@ namespace RHDCAutomation
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _batch = Guid.NewGuid();
-            int racesFiltered = 0;
+            int eventsFiltered = 0;
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
@@ -63,17 +61,18 @@ namespace RHDCAutomation
                 //Retrieve and store races
                 _raceService.GetEventRaces(even.EventId);
 
-                racesFiltered++;
+                eventsFiltered++;
             }
 
             //Complete Diagnostics
-            diagnostics.EventsFiltered = racesFiltered;
+            diagnostics.EventsFiltered = eventsFiltered;
             diagnostics.ErrorsEncountered = 0;
             diagnostics.TimeCompleted = DateTime.Now;
             diagnostics.EllapsedTime = (diagnostics.TimeCompleted - diagnostics.TimeInitialized).TotalSeconds;
             //Store Batch in the database
-
-            Logger.Info(JsonSerializer.Serialize(diagnostics));
+            var diagnosticsString = JsonSerializer.Serialize(diagnostics);
+            _configService.AddBatch(_batch, diagnosticsString);
+            Logger.Info(diagnosticsString);
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");

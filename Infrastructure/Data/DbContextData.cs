@@ -15,7 +15,7 @@ namespace Infrastructure.Data
         // Tables
         public DbSet<CourseEntity> tb_course { get; set; }
         public DbSet<EventEntity> tb_event { get; set; }
-
+        public DbSet<BatchEntity> tb_batch { get; set; }
 
     }
 }

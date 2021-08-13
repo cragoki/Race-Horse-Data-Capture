@@ -1,7 +1,7 @@
-﻿using Core.Interfaces.Services;
+﻿using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace Core.Services
 {
@@ -9,6 +9,7 @@ namespace Core.Services
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IScraperService _scraperService;
+        private readonly IEventRepository _eventRepository;
 
         public RaceService(IScraperService scraperService)
         {
@@ -21,9 +22,13 @@ namespace Core.Services
 
             try
             {
-                Logger.Info($"Fetching Races for event {eventName}.");
+                var even = _eventRepository.GetEventById(EventId);
 
-                Logger.Info($"Races Retrieved for event {eventName}");
+                Logger.Info($"Fetching Races for event {even.name}.");
+
+                //Base URL + even.meeting_url will get you a list of all the races for that event
+
+                Logger.Info($"Races Retrieved for event {even.name}");
 
             }
             catch (Exception ex)

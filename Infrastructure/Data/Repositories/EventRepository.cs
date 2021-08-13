@@ -14,7 +14,7 @@ namespace Infrastructure.Data.Repositories
             _context = context;
         }
 
-        IEnumerable<EventEntity> GetEvents()
+        public IEnumerable<EventEntity> GetEvents()
         {
             return _context.tb_event.ToList();
         }
@@ -22,11 +22,11 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_course.ToList();
         }
-        EventEntity GetEventById(int eventId)
+        public EventEntity GetEventById(int eventId)
         {
             return _context.tb_event.Find(eventId);
         }
-        IEnumerable<EventEntity> GetEventByCourse(int courseId)
+        public IEnumerable<EventEntity> GetEventByCourse(int courseId)
         {
             return _context.tb_event.Where(x => x.course_id == courseId).ToList();
         }

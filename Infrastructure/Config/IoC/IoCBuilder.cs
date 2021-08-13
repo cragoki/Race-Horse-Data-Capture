@@ -4,7 +4,6 @@ using Core.Interfaces.Services;
 using Core.Services;
 using Infrastructure.Data.Repositories;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Stashbox;
 
 namespace Infrastructure.Config.IoC
@@ -29,6 +28,7 @@ namespace Infrastructure.Config.IoC
 
             // Repository
             container.RegisterScoped<IEventRepository, EventRepository>();
+            container.RegisterScoped<IConfigurationRepository, ConfigurationRepository>();
 
             container.RegisterSettings(configuration);
             container.RegisterServices();
