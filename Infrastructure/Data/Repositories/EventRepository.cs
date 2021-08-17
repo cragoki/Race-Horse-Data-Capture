@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,7 +38,13 @@ namespace Infrastructure.Data.Repositories
         }
         public void AddCourse(CourseEntity courseToAdd)
         {
+            //Entry<CourseEntity>(courseToAdd).State = EntityState.Detached;
             _context.tb_course.Add(courseToAdd);
+
+        }
+
+        public void SaveChanges() 
+        {
             _context.SaveChanges();
         }
     }

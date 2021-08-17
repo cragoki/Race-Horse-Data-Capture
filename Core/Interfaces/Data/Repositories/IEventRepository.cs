@@ -11,5 +11,6 @@ namespace Core.Interfaces.Data.Repositories
         void AddCourse(CourseEntity courseToAdd);
         void AddEvent(EventEntity eventToAdd);
         List<CourseEntity> GetCourses();
+        void SaveChanges();
     }
 }

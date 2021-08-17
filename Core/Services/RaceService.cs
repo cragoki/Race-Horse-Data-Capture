@@ -11,9 +11,10 @@ namespace Core.Services
         private readonly IScraperService _scraperService;
         private readonly IEventRepository _eventRepository;
 
-        public RaceService(IScraperService scraperService)
+        public RaceService(IScraperService scraperService, IEventRepository evenRepository)
         {
             _scraperService = scraperService;
+            _eventRepository = evenRepository;
         }
 
         public void GetEventRaces(int EventId)
@@ -24,11 +25,14 @@ namespace Core.Services
             {
                 var even = _eventRepository.GetEventById(EventId);
 
-                Logger.Info($"Fetching Races for event {even.name}.");
+                if (even != null) 
+                {
+                    Logger.Info($"Fetching Races for event {even.name}.");
 
-                //Base URL + even.meeting_url will get you a list of all the races for that event
+                    //Base URL + even.meeting_url will get you a list of all the races for that event
 
-                Logger.Info($"Races Retrieved for event {even.name}");
+                    Logger.Info($"Races Retrieved for event {even.name}");
+                }
 
             }
             catch (Exception ex)

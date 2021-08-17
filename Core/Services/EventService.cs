@@ -5,6 +5,7 @@ using Core.Models;
 using Core.Models.GetRace;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,13 +103,14 @@ namespace Core.Services
             {
                 var courses = _eventRepository.GetCourses();
 
-                if (courses.Contains(course))
+                if (courses.Any(x => x.course_id == course.course_id))
                 {
                     Logger.Info($"{course.name} already exists in the database.");
                 }
                 else 
                 {
                     _eventRepository.AddCourse(course);
+                    _eventRepository.SaveChanges();
                 }
             }
             catch (Exception ex) 
