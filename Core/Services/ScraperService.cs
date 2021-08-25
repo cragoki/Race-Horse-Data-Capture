@@ -1,15 +1,17 @@
-﻿using Core.Interfaces.Services;
+﻿using Core.Entities;
+using Core.Helpers;
+using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
+using Core.Models;
 using Core.Models.GetRace;
 using Core.Models.Settings;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -55,20 +57,104 @@ namespace Core.Services
             return result;
         }
 
-        public void RetrieveRacesForEvent(int eventId)
+        public async Task<RaceModel> RetrieveRacesForEvent(EventEntity eventEntity)
         {
+            var result = new RaceModel();
+            result.RaceEntities = new List<RaceEntity>();
             //Retrieve the event info from the DB
             try
             {
+                //Build the URL
+                var url = $"{_racingPostConfig.BaseUrl + eventEntity.meeting_url}";
 
-                //We will need to fetch and return a race object here...
+                //Get the raw HTML
+                var page = await CallUrl(url);
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(page);
 
+                result.CourseUrl = await ExtractCourseUrl(htmlDoc);
+                result.Weather = await ExtractWeather(htmlDoc);
+
+                var divs = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'RC-meetingDay__race')]").Where(x => x.Attributes.Contains("data-diffusion-racetime"));
+
+                foreach (HtmlNode div in divs)
+                {
+                    var raceTime = div.Attributes["data-diffusion-racetime"].Value;
+                    var rpRaceId = div.Attributes["data-diffusion-race-id"].Value;
+                    var raceUrl = $"{eventEntity.meeting_url}/{rpRaceId}";
+
+                    var race = new RaceEntity()
+                    {
+                        race_time = raceTime,
+                        rp_race_id = Int32.Parse(rpRaceId),
+                        race_url = raceUrl,
+                        event_id = eventEntity.event_id,
+                        weather = result.Weather
+                    };
+                    race = await ExtractRaceInfo(div, race);
+
+                    result.RaceEntities.Add(race);
+                }
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to retrieve races for event {eventId}");
+                Logger.Error($"Failed to retrieve races for event {eventEntity.event_id} ... {ex.Message}");
             }
+
+            return result;
         }
+
+        private async Task<string> ExtractCourseUrl(HtmlDocument htmlDoc) 
+        {
+            //Get the race course h2 to extract the course URL
+            string raceCourse = htmlDoc.DocumentNode
+            .SelectSingleNode("//h2[contains(@class,'RC-meetingDay__titleName')]").InnerHtml;
+            HtmlDocument courseUrlDoc = new HtmlDocument();
+            courseUrlDoc.LoadHtml(raceCourse);
+
+            //This should extract the course URL
+            string courseUrl = courseUrlDoc.DocumentNode
+            .SelectSingleNode("//a[contains(@class,'ui-link')]")
+            .Attributes["href"].Value;
+
+            return courseUrl;
+        }
+
+        private async Task<string> ExtractWeather(HtmlDocument htmlDoc)
+        {
+            //Get the race course h2 to extract the course URL
+            string raceCourse = htmlDoc.DocumentNode
+            .SelectSingleNode("//div[contains(@class,'RC-meetingDay__description')]").InnerHtml;
+            HtmlDocument courseUrlDoc = new HtmlDocument();
+            courseUrlDoc.LoadHtml(raceCourse);
+
+            //This should extract the course URL
+            var weather = courseUrlDoc.DocumentNode
+            .SelectNodes("//span");
+
+            return weather[1].InnerText;
+        }
+
+        private async Task<RaceEntity> ExtractRaceInfo(HtmlNode htmlDoc, RaceEntity raceEntity) 
+        {
+            //RC-meetingDay__raceDescription
+            //div class = RC-cardHeader
+            var nodeDescription = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-meetingDay__raceHeader')]").SelectSingleNode("div[contains(@class, 'RC-meetingDay__raceDescription')]");
+            var no_of_horses = nodeDescription.SelectSingleNode("span[contains(@data-test-selector, 'RC-meetingDay__raceRunnersNo')]")?.InnerText ?? "0";
+            var race_class = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceClass')]")?.InnerText ?? "0";
+
+            raceEntity.ages = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceAgesAllowed')]")?.InnerText.Replace(" ", "") ?? "";
+            raceEntity.going = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceGoingType')]")?.InnerText ?? "";
+            raceEntity.stalls = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceStalls')]")?.InnerText ?? "";
+            raceEntity.no_of_horses = Extractor.ExtractIntsFromString(no_of_horses);
+            raceEntity.distance = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceDistance')]")?.InnerText.Replace(" ", "") ?? "";
+            raceEntity.description = nodeDescription.SelectSingleNode("a[contains(@class,'RC-meetingDay__raceTitle')]")?.InnerText ?? "";
+            raceEntity.race_class =Extractor.ExtractIntsFromString(race_class);
+
+            return raceEntity;
+
+        }
+
 
         private async Task<string> CallUrl(string fullUrl)
         {

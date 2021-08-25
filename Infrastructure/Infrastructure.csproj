@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Config\Logging\" />
     <Folder Include="Config\Settings\" />
-    <Folder Include="Data\Repositories\Interface\" />
   </ItemGroup>
 
 </Project>

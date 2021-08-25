@@ -1,7 +1,8 @@
 ﻿using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using System;
-
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Core.Services
 {
@@ -17,7 +18,7 @@ namespace Core.Services
             _eventRepository = evenRepository;
         }
 
-        public void GetEventRaces(int EventId)
+        public async Task GetEventRaces(int EventId)
         {
             string eventName = $"eventName - {DateTime.Now.Date}";
 
@@ -29,7 +30,23 @@ namespace Core.Services
                 {
                     Logger.Info($"Fetching Races for event {even.name}.");
 
-                    //Base URL + even.meeting_url will get you a list of all the races for that event
+                    //Get all of the raceUrls/Weather/course Url for this event
+                    var races = await _scraperService.RetrieveRacesForEvent(even);
+
+                    //Add course URL if one does not already exist
+                    var course = _eventRepository.GetCourseById(even.course_id);
+                    if (string.IsNullOrEmpty(course.course_url)) 
+                    {
+                        course.course_url = races.CourseUrl;
+                        _eventRepository.UpdateCourse(course);
+                    }
+
+                    //Add Each race
+                    foreach (var race in races.RaceEntities) 
+                    {
+                        //Add to database
+                        _eventRepository.AddRace(race);
+                    }
 
                     Logger.Info($"Races Retrieved for event {even.name}");
                 }

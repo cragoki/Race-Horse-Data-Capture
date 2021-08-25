@@ -16,11 +16,7 @@ namespace RHDCAutomation
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-            //_logger.LogInformation("Run endpoint {endpoint} {verb}", "/api/article-hit", "POST");
-            //_logger.LogTrace("Added new ArticleHit entity with Id {id}", entity.Id);
-            CreateHostBuilder(args).Build().Run();
-            
+            CreateHostBuilder(args).Build().Run();          
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) 

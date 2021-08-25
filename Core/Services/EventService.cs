@@ -35,12 +35,13 @@ namespace Core.Services
                 //Return necessary information
                 foreach (var even in todaysRaces.Courses)
                 {
+                    AddDbInfoForEvent(even, batch);
+
+                    //Now Collect the generated event_id based on the course and batch
                     var res = new Event()
                     {
-                        EventId = even.Id
+                        EventId = _eventRepository.GetEventByBatch(even.Id, batch).event_id
                     };
-
-                    AddDbInfoForEvent(even, batch);
 
                     result.Add(res);
                 }

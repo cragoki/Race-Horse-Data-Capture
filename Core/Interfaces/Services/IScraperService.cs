@@ -1,4 +1,6 @@
-﻿using Core.Models.GetRace;
+﻿using Core.Entities;
+using Core.Models;
+using Core.Models.GetRace;
 using System.Threading.Tasks;
 
 namespace Core.Interfaces.Services
@@ -7,6 +9,7 @@ namespace Core.Interfaces.Services
     {
         Task<DailyRaces> RetrieveTodaysEvents();
 
-        void RetrieveRacesForEvent(int eventId);
+        Task<RaceModel> RetrieveRacesForEvent(EventEntity eventEntity);
+
     }
 }

@@ -12,5 +12,6 @@ namespace Core.Entities
         public string name { get; set; }
         public string country_code { get; set; }
         public bool all_weather { get; set; }
+        public string course_url { get; set; }
     }
 }

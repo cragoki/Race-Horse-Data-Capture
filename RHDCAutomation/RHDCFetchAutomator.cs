@@ -59,9 +59,12 @@ namespace RHDCAutomation
             foreach (var even in events) 
             {
                 //Retrieve and store races
-                _raceService.GetEventRaces(even.EventId);
+                await _raceService.GetEventRaces(even.EventId);
 
                 eventsFiltered++;
+
+                //Adding timeout so we don't spam requests
+                Thread.Sleep(5000);
             }
 
             //Complete Diagnostics

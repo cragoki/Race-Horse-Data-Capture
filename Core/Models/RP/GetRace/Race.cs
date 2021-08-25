@@ -27,7 +27,7 @@ namespace Core.Models.GetRace
         public string Time { get; set; }
 
         [JsonProperty("runners")]
-        public int Runners { get; set; }
+        public int? Runners { get; set; }
 
         [JsonProperty("isNextRace")]
         public bool IsNextRace { get; set; }
