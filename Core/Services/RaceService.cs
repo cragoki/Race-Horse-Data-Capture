@@ -1,7 +1,6 @@
 ﻿using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -46,6 +45,14 @@ namespace Core.Services
                     {
                         //Add to database
                         _eventRepository.AddRace(race);
+
+                        //Now use the race URL to fetch the Horses/Trainers/Owners
+                        var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
+
+                        //another foreach, loop through the horses to check if they exist, if they do update/archive the details then continue
+                        //if they dont then add them into tb_horse
+
+                        //Now add all race horse entities
                     }
 
                     Logger.Info($"Races Retrieved for event {even.name}");

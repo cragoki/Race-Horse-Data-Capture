@@ -26,6 +26,11 @@ namespace Core.Services
             };
         }
 
+        public bool SavePermitted()
+        {
+            return _config.GetValue<bool>("AppSettings:SaveData");
+        }
+
         public void AddBatch(Guid batchId, string diagnostics) 
         {
             var batchEntity = new BatchEntity()

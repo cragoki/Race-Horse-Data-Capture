@@ -1,6 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Core.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,12 @@ namespace Infrastructure.Data.Repositories
     public class EventRepository : IEventRepository
     {
         private readonly DbContextData _context;
+        private readonly IConfigurationService _configService;
 
-        public EventRepository(DbContextData context)
+        public EventRepository(DbContextData context, IConfigurationService configService)
         {
             _context = context;
+            _configService = configService;
         }
 
         public IEnumerable<EventEntity> GetEvents()
@@ -46,33 +48,36 @@ namespace Infrastructure.Data.Repositories
         public void AddEvent(EventEntity eventToAdd)
         {
             _context.tb_event.Add(eventToAdd);
-            _context.SaveChanges();
+            SaveChanges();
         }
         public void AddCourse(CourseEntity courseToAdd)
         {
             _context.tb_course.Add(courseToAdd);
-            _context.SaveChanges();
+            SaveChanges();
         }
         public void UpdateCourse(CourseEntity courseToUpdate)
         {
             _context.tb_course.Update(courseToUpdate);
-            _context.SaveChanges();
+            SaveChanges();
         }
 
         public void AddRace(RaceEntity raceToAdd)
         {
             _context.tb_race.Add(raceToAdd);
-            _context.SaveChanges();
+            SaveChanges();
         }
         public void UpdateRace(RaceEntity raceToUpdate)
         {
             _context.tb_race.Add(raceToUpdate);
-            _context.SaveChanges();
+            SaveChanges();
         }
 
         public void SaveChanges() 
         {
-            _context.SaveChanges();
+            if (_configService.SavePermitted()) 
+            {
+                _context.SaveChanges();
+            }
         }
     }
 }
