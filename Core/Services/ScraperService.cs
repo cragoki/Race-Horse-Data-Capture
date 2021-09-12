@@ -129,9 +129,12 @@ namespace Core.Services
                         race_id = race.race_id,
                         finished = false,
                     };
-                    var raceHorseDetails = await ExtractRaceHorseData(horse, raceHorse);
+                    var raceHorseDetails = await ExtractRaceHorseData(horse, raceHorse, result);
 
-                    result.Add(raceHorseDetails);
+                    if (raceHorseDetails.RaceHorse != null && raceHorseDetails.Horse != null) 
+                    {
+                        result.Add(raceHorseDetails);
+                    }
                 }
                 //div class="RC-runnerRow"
                     //div class="RC-runnerCardWrapper"
@@ -221,27 +224,39 @@ namespace Core.Services
 
         }
 
-        private async Task<RaceHorseModel> ExtractRaceHorseData(HtmlNode htmlDoc, RaceHorseEntity raceHorse)
+        private async Task<RaceHorseModel> ExtractRaceHorseData(HtmlNode htmlDoc, RaceHorseEntity raceHorse, List<RaceHorseModel> existing)
         {
             var result = new RaceHorseModel();
 
-                var horseName = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-runnerPriceWrapper PC-bestOddsContainer')]").Attributes["data-diffusion-horsename"].Value;
-                var horseUrl = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-runnerMainWrapper')]").SelectSingleNode("//a").Attributes["href"].Value;
-                var rpr = htmlDoc.SelectSingleNode("span[contains(@class, 'runnerRpr')]").InnerText;
-                var ts = htmlDoc.SelectSingleNode("span[contains(@class, 'RC-runnerTs')]").InnerText;
+            var horseName = htmlDoc.SelectSingleNode(".//a[contains(@class, 'RC-runnerName')]").InnerText.Replace(" ", "");
+
+            if (!existing.Any(x => x.Horse.horse_name == horseName)) 
+            {
+                var horseUrl = htmlDoc.SelectSingleNode(".//a[contains(@class, 'RC-runnerName')]").Attributes["href"].Value; // remove all after #
+                var horseUrlIndex = horseUrl.IndexOf("#");
+                horseUrl = horseUrl.Remove(horseUrlIndex);
+
+                var rpr = htmlDoc.SelectSingleNode(".//span[contains(@class, 'runnerRpr')]").InnerText.Replace(" ", "");
+                var ts = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerTs')]").InnerText.Replace(" ", "");
 
                 //We need to extract the numeric values of the horse URL to retrieve the rp horse id -> After "horse/" up until the next "/"
-                var rpHorseIdSubstr = horseUrl.Substring(14);
+                var rpHorseIdSubstr = horseUrl.Substring(15);
                 var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
-                int rpHorseId = Int32.Parse(rpHorseIdSubstr.Substring(horseIdIndex));
+                int rpHorseId = Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
 
 
 
-                //We need to cut everything (including) after the # for the horse URL
+                //Get Race Horse data
+                //Jockey
+                //Trainer
+                //Weight
+                //Age
+                //jockey_weight
+                //RP Notes
 
                 var horse = new HorseEntity()
                 {
-                    horse_name = horseName,
+                    horse_name = horseName,//horseName,
                     horse_url = horseUrl,
                     rpr = rpr,// span with this class runnerRpr
                     top_speed = ts,// span with this class RC-runnerTs
@@ -254,8 +269,7 @@ namespace Core.Services
                     RaceHorse = raceHorse,
                     Horse = horse
                 };
-            
-
+            }
 
             return result;
         }
