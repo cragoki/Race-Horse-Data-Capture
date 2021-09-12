@@ -28,6 +28,7 @@ namespace Infrastructure.Config.IoC
 
             // Repository
             container.RegisterScoped<IEventRepository, EventRepository>();
+            container.RegisterScoped<IHorseRepository, HorseRepository>();
             container.RegisterScoped<IConfigurationRepository, ConfigurationRepository>();
 
             container.RegisterSettings(configuration);

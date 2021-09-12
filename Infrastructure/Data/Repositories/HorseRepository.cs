@@ -11,6 +11,12 @@ namespace Infrastructure.Data.Repositories
         private readonly DbContextData _context;
         private readonly IConfigurationService _configService;
 
+        public HorseRepository(DbContextData context, IConfigurationService configService)
+        {
+            _context = context;
+            _configService = configService;
+        }
+
         public HorseEntity GetHorse(int horse_id)
         {
             return _context.tb_horse.Where(x => x.horse_id == horse_id).FirstOrDefault();
@@ -23,10 +29,12 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_archive_horse.Where(x => x.horse_id == horse_id).FirstOrDefault();
         }
-        public void AddHorse(HorseEntity horse)
+        public int AddHorse(HorseEntity horse)
         {
             _context.tb_horse.Add(horse);
             SaveChanges();
+
+            return horse.horse_id;
         }
 
         public void AddRaceHorse(RaceHorseEntity horse)
@@ -51,6 +59,22 @@ namespace Infrastructure.Data.Repositories
         {
             _context.tb_archive_horse.Update(horse);
             SaveChanges();
+        }
+
+        public int AddJockey(JockeyEntity jockey)
+        {
+            _context.tb_jockey.Add(jockey);
+            SaveChanges();
+
+            return jockey.jockey_id;
+        }
+
+        public int AddTrainer(TrainerEntity trainer)
+        {
+            _context.tb_trainer.Add(trainer);
+            SaveChanges();
+
+            return trainer.trainer_id;
         }
 
         public void SaveChanges()

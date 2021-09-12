@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Helpers;
+using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.GetRace;
@@ -20,11 +21,13 @@ namespace Core.Services
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private  readonly RacingPostSettings _racingPostConfig;
         private  readonly IConfigurationService _configService;
+        private readonly IHorseRepository _horseRepository;
 
-        public ScraperService(IConfigurationService configService)
+        public ScraperService(IConfigurationService configService, IHorseRepository horseRepository)
         {
             _configService = configService;
             _racingPostConfig = _configService.GetRacingPostSettings();
+            _horseRepository = horseRepository;
         }
 
         public async Task<DailyRaces> RetrieveTodaysEvents() 
@@ -245,14 +248,35 @@ namespace Core.Services
                 int rpHorseId = Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
 
 
-
                 //Get Race Horse data
                 //Jockey
+                //Create Jockey Object and return Jockey Id
+                var jockey = new JockeyEntity() 
+                { 
+                    jockey_name = "Steeeviee",
+                    jockey_url = "www.jockey.com"
+                };
+                var jockeyWeight = "";
+                jockey.jockey_id = _horseRepository.AddJockey(jockey);
+
                 //Trainer
+                //Create Trainer Object and return Jockey Id
+                var trainer = new TrainerEntity()
+                {
+
+                };
+
+                trainer.trainer_id = _horseRepository.AddTrainer(trainer);
+
                 //Weight
                 //Age
                 //jockey_weight
                 //RP Notes
+                //HORSE ID!!!
+
+                raceHorse.jockey_id = jockey.jockey_id;
+                raceHorse.jockey_weight = jockeyWeight;
+                raceHorse.trainer_id = trainer.trainer_id;
 
                 var horse = new HorseEntity()
                 {
