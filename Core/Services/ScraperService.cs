@@ -120,7 +120,7 @@ namespace Core.Services
                 HtmlDocument htmlDoc = new HtmlDocument();
                 htmlDoc.LoadHtml(page);
 
-                var horseContainers = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'RC-runnerRow')]");
+                var horseContainers = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'RC-runnerCardWrapper')]");
 
                 foreach (var horse in horseContainers) 
                 {
@@ -224,10 +224,8 @@ namespace Core.Services
         private async Task<RaceHorseModel> ExtractRaceHorseData(HtmlNode htmlDoc, RaceHorseEntity raceHorse)
         {
             var result = new RaceHorseModel();
-            var isValid = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-runnerCardWrapper')]");
-            if (isValid != null)
-            {
-                var horseName = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-runnerMainWrapper')]").SelectSingleNode("//a").InnerText;
+
+                var horseName = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-runnerPriceWrapper PC-bestOddsContainer')]").Attributes["data-diffusion-horsename"].Value;
                 var horseUrl = htmlDoc.SelectSingleNode("div[contains(@class, 'RC-runnerMainWrapper')]").SelectSingleNode("//a").Attributes["href"].Value;
                 var rpr = htmlDoc.SelectSingleNode("span[contains(@class, 'runnerRpr')]").InnerText;
                 var ts = htmlDoc.SelectSingleNode("span[contains(@class, 'RC-runnerTs')]").InnerText;
@@ -256,7 +254,7 @@ namespace Core.Services
                     RaceHorse = raceHorse,
                     Horse = horse
                 };
-            }
+            
 
 
             return result;
