@@ -22,6 +22,10 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_event.ToList();
         }
+        public IEnumerable<EventEntity> GetTodaysEvents() 
+        {
+            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date);
+        }
         public List<CourseEntity> GetCourses()
         {
             return _context.tb_course.ToList();
@@ -60,7 +64,10 @@ namespace Infrastructure.Data.Repositories
             _context.tb_course.Update(courseToUpdate);
             SaveChanges();
         }
-
+        public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
+        {
+            return _context.tb_race.Where(x => x.event_id == eventId);
+        }
         public void AddRace(RaceEntity raceToAdd)
         {
             _context.tb_race.Add(raceToAdd);

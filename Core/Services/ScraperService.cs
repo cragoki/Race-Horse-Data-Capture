@@ -140,39 +140,69 @@ namespace Core.Services
                         result.Add(raceHorseDetails);
                     }
                 }
-                //div class="RC-runnerRow"
-                //div class="RC-runnerCardWrapper"
-                //div class="runnerRowPriceWrapper "    
-                //--> CONTAINS ODDS
-                //div class="RC-runnerRowHorseWrapper"
-                //div class="RC-runnerNumber" //=> span value = Runner Number
-                //div class="RC-runnerMainWrapper" //=> a href = horse profile url, a value = horse name
-                //div class="RC-runnerRowInfoWrapper"
-                //span class="RC-runnerTs" -> TOP SPEED
-                //span class="RC-runnerRpr" -> RPR
-                //div class="RC-runnerWgtorWrapper"
-                //span class="RC-runnerWgt__carried_st" -> Get the weight in stone
-                //span class="RC-runnerWgt__carried_lb" -> Get the weight in lbs
-                //div class="RC-runnerInfoWrapper"
-                //div class="RC-runnerInfo_jockey"
-                //a href = Jockey Profile, value = name
-                //div class="RC-runnerInfo_trainer"
-                //a href = Trainer Profile, value = name
-                //div class="RC-runnerCustomWrapper"
-                //div class="RC-comments RC-comments_hidden"
-                //div class="RC-comments__content"
-                //=> Comment text in here...
-
-
-                //FOR HORSE DOB
-                //Go to the horses page and look for a span with the class hp-details__info, should be in a div class hp-details
-                //You will also need to trim the # to remove the race id addition to the URL
             }
             catch (Exception ex)
             {
                 Logger.Error($"Failed to retrieve races for race {race.race_id} ... {ex.Message}");
             }
 
+
+            return result;
+        }
+
+        public async Task<List<RaceHorseEntity>> GetResultsForRace(RaceEntity race, List<RaceHorseEntity> raceHorses) 
+        {
+            var result = new List<RaceHorseEntity>();
+
+            try
+            {
+                //Build the URL
+                var resultUrl = race.race_url.Replace("racecards", "results");
+                var url = $"{_racingPostConfig.BaseUrl + resultUrl}";
+
+                //Get the raw HTML
+                var page = await CallUrl(url);
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(page);
+
+                var resultDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__mainRow')]");
+
+                foreach (var div in resultDivs) 
+                {
+                    //Horse
+                    //div class rp-horseTable__horse
+                    var horseDiv = div.SelectSingleNode("//div[contains(@class, 'rp-horseTable__horse')]");
+                    //a class rp-horseTable__horse__name => href get url and parse into ID
+                    var rpHorseurl = horseDiv.SelectSingleNode(".//a[contains(@class,'rp-horseTable__horse__name')]")?.Attributes["href"].Value ?? "";
+                    var horseId = await ExtractHorseIdFromUrl(rpHorseurl);
+
+
+                    //Position
+                    //div class rp-horseTable__pos__numWrapper
+                    var positionDiv = div.SelectSingleNode("//div[contains(@class, 'rp-horseTable__pos__numWrapper')]");
+                    //span class rp-horseTable__pos__number inner text
+                    var position = positionDiv.SelectSingleNode(".//span[contains(@class, 'rp-horseTable__pos__number')]")?.InnerText.Replace(" ", "");
+                    var index = position.IndexOf("(");
+                    var formattedPos = position.Remove(index);
+                    //Comment
+                    //tr class rp-horseTable__commentRow
+                    var comment = div.SelectSingleNode("//tr[contains(@class, 'rp-horseTable__commentRow')]").Attributes["td"].Value;
+
+                    var horse = _horseRepository.GetHorseByRpId(horseId);
+
+                    var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
+
+                    toUpdate.position = Int32.Parse(position);
+                    toUpdate.description = comment;
+
+                    _horseRepository.UpdateRaceHorse(toUpdate);
+                }
+
+            }
+            catch (Exception ex) 
+            {
+                Logger.Error($"Failed to retrieve results for race {race.race_id} ... {ex.Message}");
+            }
 
             return result;
         }
@@ -244,9 +274,8 @@ namespace Core.Services
                 var ts = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerTs')]").InnerText.Replace(" ", "");
 
                 //We need to extract the numeric values of the horse URL to retrieve the rp horse id -> After "horse/" up until the next "/"
-                var rpHorseIdSubstr = horseUrl.Substring(15);
-                var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
-                int rpHorseId = Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
+
+                int rpHorseId = await ExtractHorseIdFromUrl(horseUrl);
 
 
 
@@ -440,6 +469,13 @@ namespace Core.Services
             }
 
             return result;
+        }
+
+        private async Task<int> ExtractHorseIdFromUrl(string horseUrl) 
+        {
+            var rpHorseIdSubstr = horseUrl.Substring(15);
+            var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
+            return Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
         }
     }
 }

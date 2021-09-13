@@ -57,6 +57,22 @@ namespace Core.Services
             return result;
         }
 
+        public async Task<List<EventEntity>> GetEventsFromDatabase() 
+        {
+            var result = new List<EventEntity>();
+
+            try
+            {
+                result = _eventRepository.GetTodaysEvents().ToList();
+            }
+            catch (Exception ex) 
+            {
+                Logger.Error($"Failed to get entities from the database. Error: {ex.InnerException}");
+            }
+
+            return result;
+        }
+
         private void AddDbInfoForEvent(Course even, Guid batchId)
         {
             var eventName = $"{even.Name}_{DateTime.Now.ToShortDateString()}";

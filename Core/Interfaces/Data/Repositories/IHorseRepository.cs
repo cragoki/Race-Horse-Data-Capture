@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using System.Collections.Generic;
 
 namespace Core.Interfaces.Data.Repositories
 {
@@ -6,7 +7,9 @@ namespace Core.Interfaces.Data.Repositories
     {
         void AddArchiveHorse(HorseArchiveEntity horse);
         int AddHorse(HorseEntity horse);
+        IEnumerable<RaceHorseEntity> GetRaceHorsesForRace(int raceId);
         void AddRaceHorse(RaceHorseEntity horse);
+        void UpdateRaceHorse(RaceHorseEntity horse);
         HorseEntity GetHorse(int horse_id);
         HorseArchiveEntity GetHorseArchive(int horse_id);
         HorseEntity GetHorseByRpId(int rp_id);

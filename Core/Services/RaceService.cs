@@ -1,6 +1,9 @@
-﻿using Core.Interfaces.Data.Repositories;
+﻿using Core.Entities;
+using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -69,6 +72,37 @@ namespace Core.Services
             catch (Exception ex)
             {
                 Logger.Error($"Error attempting to retrieve todays races.  {ex.Message}");
+            }
+        }
+
+        public async Task<List<RaceEntity>> GetEventRacesFromDB(int EventId)
+        {
+            var result = new List<RaceEntity>();
+
+            try
+            {
+                result = _eventRepository.GetRacesForEvent(EventId).ToList();
+            }
+            catch (Exception ex) 
+            {
+                Logger.Error($"Error attempting to retrieve todays races from the database.  {ex.InnerException}");
+            }
+
+            return result;
+        }
+
+        public async Task GetRaceResults(RaceEntity race) 
+        {
+            try
+            {
+                //Get RaceHorse Entities
+                var raceHorseList = _horseRepository.GetRaceHorsesForRace(race.race_id);
+                await _scraperService.GetResultsForRace(race, raceHorseList.ToList());
+
+            }
+            catch (Exception ex) 
+            {
+            
             }
         }
     }

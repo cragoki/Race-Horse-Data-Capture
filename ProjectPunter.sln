@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{51521557-DD17-4152-92FF-6D903BBE9B19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RHDCResultRetriever", "RHDCResultRetriever\RHDCResultRetriever.csproj", "{BCE8A708-300E-4F68-8F4F-62CBF0CADF5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{51521557-DD17-4152-92FF-6D903BBE9B19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51521557-DD17-4152-92FF-6D903BBE9B19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51521557-DD17-4152-92FF-6D903BBE9B19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCE8A708-300E-4F68-8F4F-62CBF0CADF5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCE8A708-300E-4F68-8F4F-62CBF0CADF5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCE8A708-300E-4F68-8F4F-62CBF0CADF5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCE8A708-300E-4F68-8F4F-62CBF0CADF5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using System.Collections.Generic;
 using System.Linq;
 
 
@@ -36,10 +37,18 @@ namespace Infrastructure.Data.Repositories
 
             return horse.horse_id;
         }
-
+        public IEnumerable<RaceHorseEntity> GetRaceHorsesForRace(int raceId)
+        {
+            return _context.tb_race_horse.Where(x => x.race_id == raceId);
+        }
         public void AddRaceHorse(RaceHorseEntity horse)
         {
             _context.tb_race_horse.Add(horse);
+            SaveChanges();
+        }
+        public void UpdateRaceHorse(RaceHorseEntity horse)
+        {
+            _context.tb_race_horse.Update(horse);
             SaveChanges();
         }
 

@@ -7,6 +7,7 @@ namespace Core.Interfaces.Data.Repositories
     public interface IEventRepository
     {
         IEnumerable<EventEntity> GetEvents();
+        IEnumerable<EventEntity> GetTodaysEvents();
         EventEntity GetEventById(int eventId);
         CourseEntity GetCourseById(int courseId);
         EventEntity GetEventByBatch(int courseId, Guid batch);
@@ -15,6 +16,7 @@ namespace Core.Interfaces.Data.Repositories
         void UpdateCourse(CourseEntity courseToUpdate);
         void AddEvent(EventEntity eventToAdd);
         List<CourseEntity> GetCourses();
+        IEnumerable<RaceEntity> GetRacesForEvent(int eventId);
         void AddRace(RaceEntity raceToUpdate);
         void UpdateRace(RaceEntity raceToUpdate);
         void SaveChanges();
