@@ -15,5 +15,7 @@ namespace Core.Interfaces.Data.Repositories
         void UpdateHorseArchive(HorseArchiveEntity horse);
         int AddJockey(JockeyEntity jockey);
         int AddTrainer(TrainerEntity trainer);
+        JockeyEntity GetJockeyByName(string name);
+        TrainerEntity GetTrainerByName(string name);
     }
 }

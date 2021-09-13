@@ -77,6 +77,15 @@ namespace Infrastructure.Data.Repositories
             return trainer.trainer_id;
         }
 
+        public JockeyEntity GetJockeyByName(string name)
+        {
+            return _context.tb_jockey.Where(x => x.jockey_name == name).FirstOrDefault();
+        }
+        public TrainerEntity GetTrainerByName(string name)
+        {
+            return _context.tb_trainer.Where(x => x.trainer_name == name).FirstOrDefault();
+        }
+
         public void SaveChanges()
         {
             if (_configService.SavePermitted())

@@ -1,6 +1,7 @@
 ﻿using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -10,11 +11,13 @@ namespace Core.Services
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IScraperService _scraperService;
         private readonly IEventRepository _eventRepository;
+        private readonly IHorseRepository _horseRepository;
 
-        public RaceService(IScraperService scraperService, IEventRepository evenRepository)
+        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository)
         {
             _scraperService = scraperService;
             _eventRepository = evenRepository;
+            _horseRepository = horseRepository;
         }
 
         public async Task GetEventRaces(int EventId)
@@ -49,10 +52,14 @@ namespace Core.Services
                         //Now use the race URL to fetch the Horses/Trainers/Owners
                         var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
 
-                        //another foreach, loop through the horses to check if they exist, if they do update/archive the details then continue
                         //if they dont then add them into tb_horse
+                        foreach (var raceHorse in horses) 
+                        {
+                            var rh = raceHorse.RaceHorse;
+                            _horseRepository.AddRaceHorse(rh);
+                        }
 
-                        //Now add all race horse entities
+                        Thread.Sleep(5000);
                     }
 
                     Logger.Info($"Races Retrieved for event {even.name}");

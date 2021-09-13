@@ -5,9 +5,10 @@ namespace Core.Entities
     public class RaceHorseEntity
     {
         [Key]
+        public int race_horse_id { get; set; }
         public int race_id { get; set; }
         public int horse_id { get; set; }
-        public int weight { get; set; }
+        public string weight { get; set; }
         public int age { get; set; }
         public int trainer_id { get; set; }
         public int jockey_id { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using Core.Helpers;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
@@ -19,8 +20,8 @@ namespace Core.Services
     public class ScraperService : IScraperService
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private  readonly RacingPostSettings _racingPostConfig;
-        private  readonly IConfigurationService _configService;
+        private readonly RacingPostSettings _racingPostConfig;
+        private readonly IConfigurationService _configService;
         private readonly IHorseRepository _horseRepository;
 
         public ScraperService(IConfigurationService configService, IHorseRepository horseRepository)
@@ -30,7 +31,7 @@ namespace Core.Services
             _horseRepository = horseRepository;
         }
 
-        public async Task<DailyRaces> RetrieveTodaysEvents() 
+        public async Task<DailyRaces> RetrieveTodaysEvents()
         {
             var result = new DailyRaces();
             //Retrieve the events for today
@@ -109,7 +110,7 @@ namespace Core.Services
             return result;
         }
 
-        public async Task<List<RaceHorseModel>> RetrieveHorseDetailsForRace(RaceEntity race) 
+        public async Task<List<RaceHorseModel>> RetrieveHorseDetailsForRace(RaceEntity race)
         {
             var result = new List<RaceHorseModel>();
 
@@ -125,7 +126,7 @@ namespace Core.Services
 
                 var horseContainers = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'RC-runnerCardWrapper')]");
 
-                foreach (var horse in horseContainers) 
+                foreach (var horse in horseContainers)
                 {
                     var raceHorse = new RaceHorseEntity()
                     {
@@ -134,49 +135,49 @@ namespace Core.Services
                     };
                     var raceHorseDetails = await ExtractRaceHorseData(horse, raceHorse, result);
 
-                    if (raceHorseDetails.RaceHorse != null && raceHorseDetails.Horse != null) 
+                    if (raceHorseDetails.RaceHorse != null && raceHorseDetails.Horse != null)
                     {
                         result.Add(raceHorseDetails);
                     }
                 }
                 //div class="RC-runnerRow"
-                    //div class="RC-runnerCardWrapper"
-                        //div class="runnerRowPriceWrapper "    
-                            //--> CONTAINS ODDS
-                        //div class="RC-runnerRowHorseWrapper"
-                            //div class="RC-runnerNumber" //=> span value = Runner Number
-                            //div class="RC-runnerMainWrapper" //=> a href = horse profile url, a value = horse name
-                        //div class="RC-runnerRowInfoWrapper"
-                        //span class="RC-runnerTs" -> TOP SPEED
-                        //span class="RC-runnerRpr" -> RPR
-                            //div class="RC-runnerWgtorWrapper"
-                                //span class="RC-runnerWgt__carried_st" -> Get the weight in stone
-                                //span class="RC-runnerWgt__carried_lb" -> Get the weight in lbs
-                            //div class="RC-runnerInfoWrapper"
-                                //div class="RC-runnerInfo_jockey"
-                                    //a href = Jockey Profile, value = name
-                                //div class="RC-runnerInfo_trainer"
-                                    //a href = Trainer Profile, value = name
-                    //div class="RC-runnerCustomWrapper"
-                        //div class="RC-comments RC-comments_hidden"
-                            //div class="RC-comments__content"
-                                //=> Comment text in here...
+                //div class="RC-runnerCardWrapper"
+                //div class="runnerRowPriceWrapper "    
+                //--> CONTAINS ODDS
+                //div class="RC-runnerRowHorseWrapper"
+                //div class="RC-runnerNumber" //=> span value = Runner Number
+                //div class="RC-runnerMainWrapper" //=> a href = horse profile url, a value = horse name
+                //div class="RC-runnerRowInfoWrapper"
+                //span class="RC-runnerTs" -> TOP SPEED
+                //span class="RC-runnerRpr" -> RPR
+                //div class="RC-runnerWgtorWrapper"
+                //span class="RC-runnerWgt__carried_st" -> Get the weight in stone
+                //span class="RC-runnerWgt__carried_lb" -> Get the weight in lbs
+                //div class="RC-runnerInfoWrapper"
+                //div class="RC-runnerInfo_jockey"
+                //a href = Jockey Profile, value = name
+                //div class="RC-runnerInfo_trainer"
+                //a href = Trainer Profile, value = name
+                //div class="RC-runnerCustomWrapper"
+                //div class="RC-comments RC-comments_hidden"
+                //div class="RC-comments__content"
+                //=> Comment text in here...
 
 
                 //FOR HORSE DOB
                 //Go to the horses page and look for a span with the class hp-details__info, should be in a div class hp-details
                 //You will also need to trim the # to remove the race id addition to the URL
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Failed to retrieve races for race {race.race_id} ... {ex.Message}");
             }
-            
+
 
             return result;
         }
 
-        private async Task<string> ExtractCourseUrl(HtmlDocument htmlDoc) 
+        private async Task<string> ExtractCourseUrl(HtmlDocument htmlDoc)
         {
             //Get the race course h2 to extract the course URL
             string raceCourse = htmlDoc.DocumentNode
@@ -207,7 +208,7 @@ namespace Core.Services
             return weather[1].InnerText;
         }
 
-        private async Task<RaceEntity> ExtractRaceInfo(HtmlNode htmlDoc, RaceEntity raceEntity) 
+        private async Task<RaceEntity> ExtractRaceInfo(HtmlNode htmlDoc, RaceEntity raceEntity)
         {
             //RC-meetingDay__raceDescription
             //div class = RC-cardHeader
@@ -221,7 +222,7 @@ namespace Core.Services
             raceEntity.no_of_horses = Extractor.ExtractIntsFromString(no_of_horses);
             raceEntity.distance = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceDistance')]")?.InnerText.Replace(" ", "") ?? "";
             raceEntity.description = nodeDescription.SelectSingleNode("a[contains(@class,'RC-meetingDay__raceTitle')]")?.InnerText ?? "";
-            raceEntity.race_class =Extractor.ExtractIntsFromString(race_class);
+            raceEntity.race_class = Extractor.ExtractIntsFromString(race_class);
 
             return raceEntity;
 
@@ -233,7 +234,7 @@ namespace Core.Services
 
             var horseName = htmlDoc.SelectSingleNode(".//a[contains(@class, 'RC-runnerName')]").InnerText.Replace(" ", "");
 
-            if (!existing.Any(x => x.Horse.horse_name == horseName)) 
+            if (!existing.Any(x => x.Horse.horse_name == horseName))
             {
                 var horseUrl = htmlDoc.SelectSingleNode(".//a[contains(@class, 'RC-runnerName')]").Attributes["href"].Value; // remove all after #
                 var horseUrlIndex = horseUrl.IndexOf("#");
@@ -248,45 +249,55 @@ namespace Core.Services
                 int rpHorseId = Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
 
 
+
                 //Get Race Horse data
                 //Jockey
-                //Create Jockey Object and return Jockey Id
-                var jockey = new JockeyEntity() 
-                { 
-                    jockey_name = "Steeeviee",
-                    jockey_url = "www.jockey.com"
+
+                //Get div with class RC-runnerInfo_jockey
+                var jockeyContainer = htmlDoc.SelectSingleNode(".//div[contains(@class, 'RC-runnerInfo_jockey')]");
+                //Look for a with class RC-runnerInfo__name => Inner Text = name, href = url
+                var jockey = new JockeyEntity()
+                {
+                    jockey_name = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").InnerText.Replace(" ","") ?? "",
+                    jockey_url = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").Attributes["href"].Value
                 };
-                var jockeyWeight = "";
-                jockey.jockey_id = _horseRepository.AddJockey(jockey);
 
                 //Trainer
-                //Create Trainer Object and return Jockey Id
+                //Get div with class RC-runnerInfo_trainer
+                //Look for a with class RC-runnerInfo__name => Inner Text = name, href = url
+                var trainerContainer = htmlDoc.SelectSingleNode(".//div[contains(@class, 'RC-runnerInfo_trainer')]");
+
                 var trainer = new TrainerEntity()
                 {
-
+                    trainer_name = trainerContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").InnerText.Replace(" ", "") ?? "",
+                    trainer_url = trainerContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").Attributes["href"].Value
                 };
 
-                trainer.trainer_id = _horseRepository.AddTrainer(trainer);
-
-                //Weight
-                //Age
-                //jockey_weight
-                //RP Notes
-                //HORSE ID!!!
-
-                raceHorse.jockey_id = jockey.jockey_id;
-                raceHorse.jockey_weight = jockeyWeight;
-                raceHorse.trainer_id = trainer.trainer_id;
-
+                //Horse
                 var horse = new HorseEntity()
                 {
                     horse_name = horseName,//horseName,
                     horse_url = horseUrl,
                     rpr = rpr,// span with this class runnerRpr
                     top_speed = ts,// span with this class RC-runnerTs
-                    dob = await ExtractHorseData(horseUrl),
+                    //dob = //await ExtractHorseData(horseUrl),
                     rp_horse_id = rpHorseId
                 };
+
+                //Fetch the remaining race horse info
+                var horseWeightS = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerWgt__carried_st')]").InnerText.Replace(" ", "") ?? "";
+                var horseWeightL = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerWgt__carried_lb')]").InnerText.Replace(" ", "") ?? "";
+                var horseWeight = $"{horseWeightS}.{horseWeightL}";
+                var age = Int32.Parse(htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerAge')]").InnerText ?? "");
+                var identity = await AddOrUpdateHorseData(horse, jockey, trainer);
+
+                raceHorse.jockey_id = identity.JockeyId;
+                raceHorse.trainer_id = identity.TrainerId;
+                raceHorse.horse_id = identity.HorseId;
+                horse.horse_id = identity.HorseId;
+                raceHorse.weight = horseWeight;
+                raceHorse.age = age;
+
 
                 result = new RaceHorseModel()
                 {
@@ -298,9 +309,87 @@ namespace Core.Services
             return result;
         }
 
+        private async Task<AddUpdateHorseModel> AddOrUpdateHorseData(HorseEntity horse, JockeyEntity jockey, TrainerEntity trainer)
+        {
+            var result = new AddUpdateHorseModel();
+            var existingHorse = _horseRepository.GetHorseByRpId(horse.rp_horse_id);
+            var existingJockey = _horseRepository.GetJockeyByName(jockey.jockey_name);
+            var existingTrainer = _horseRepository.GetTrainerByName(trainer.trainer_name);
+
+            if (existingHorse != null)
+            {
+                result.HorseId = existingHorse.horse_id;
+
+                if (horse.rpr != existingHorse.rpr || horse.top_speed != existingHorse.top_speed)
+                {
+                    if (horse.rpr != existingHorse.rpr)
+                    {
+                        var horseArchiveRPR = new HorseArchiveEntity()
+                        {
+                            horse_id = horse.horse_id,
+                            field_changed = HorseFieldEnum.rpr.ToString(),
+                            old_value = existingHorse.rpr,
+                            new_value = horse.rpr,
+                            date = DateTime.Now
+                        };
+
+                        _horseRepository.AddArchiveHorse(horseArchiveRPR);
+                    }
+                    if (horse.top_speed != existingHorse.top_speed)
+                    {
+                        var horseArchiveTS = new HorseArchiveEntity()
+                        {
+                            horse_id = horse.horse_id,
+                            field_changed = HorseFieldEnum.ts.ToString(),
+                            old_value = existingHorse.top_speed,
+                            new_value = horse.top_speed,
+                            date = DateTime.Now
+                        };
+
+                        _horseRepository.AddArchiveHorse(horseArchiveTS);
+                    }
+
+                    _horseRepository.UpdateHorse(horse);
+
+                }
+            }
+            else 
+            {
+                result.HorseId = _horseRepository.AddHorse(horse);
+            }
+
+            if (existingJockey != null)
+            {
+                result.JockeyId = existingJockey.jockey_id;
+            }
+            else 
+            {
+                result.JockeyId = _horseRepository.AddJockey(jockey);
+            }
+
+            if (existingTrainer != null)
+            {
+                result.TrainerId = existingTrainer.trainer_id;
+            }
+            else 
+            {
+                result.TrainerId = _horseRepository.AddTrainer(trainer);
+            }
+
+            return result;
+        }
+
         private async Task<DateTime> ExtractHorseData(string horseUrl)
         {
-            //For now only DOB
+            //Build the URL
+            var url = $"{_racingPostConfig.BaseUrl + horseUrl}";
+
+            //Get the raw HTML
+            var page = await CallUrl(url);
+            HtmlDocument htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(page);
+
+            var horseContainer = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class,'hp-details')]");
 
             return DateTime.Now;
         }
