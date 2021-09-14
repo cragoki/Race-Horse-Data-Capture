@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -166,12 +167,13 @@ namespace Core.Services
                 htmlDoc.LoadHtml(page);
 
                 var resultDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__mainRow')]");
+                var commentDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__commentRow')]");
 
-                foreach (var div in resultDivs) 
+                for (int i = 0; i < resultDivs.Count; i++) 
                 {
                     //Horse
                     //div class rp-horseTable__horse
-                    var horseDiv = div.SelectSingleNode("//div[contains(@class, 'rp-horseTable__horse')]");
+                    var horseDiv = resultDivs[i].SelectSingleNode(".//div[contains(@class, 'rp-horseTable__horse')]");
                     //a class rp-horseTable__horse__name => href get url and parse into ID
                     var rpHorseurl = horseDiv.SelectSingleNode(".//a[contains(@class,'rp-horseTable__horse__name')]")?.Attributes["href"].Value ?? "";
                     var horseId = await ExtractHorseIdFromUrl(rpHorseurl);
@@ -179,21 +181,30 @@ namespace Core.Services
 
                     //Position
                     //div class rp-horseTable__pos__numWrapper
-                    var positionDiv = div.SelectSingleNode("//div[contains(@class, 'rp-horseTable__pos__numWrapper')]");
+                    var positionDiv = resultDivs[i].SelectSingleNode(".//div[contains(@class, 'rp-horseTable__pos__numWrapper')]");
                     //span class rp-horseTable__pos__number inner text
                     var position = positionDiv.SelectSingleNode(".//span[contains(@class, 'rp-horseTable__pos__number')]")?.InnerText.Replace(" ", "");
+                    string formattedPos = "";
                     var index = position.IndexOf("(");
-                    var formattedPos = position.Remove(index);
+                    if (index == -1)
+                    {
+                        formattedPos = Regex.Match(position, @"\d+").Value;
+                    }
+                    else 
+                    {
+                         formattedPos = Regex.Match(position, @"\d+").Value;
+                    }
                     //Comment
                     //tr class rp-horseTable__commentRow
-                    var comment = div.SelectSingleNode("//tr[contains(@class, 'rp-horseTable__commentRow')]").Attributes["td"].Value;
+                    var comment = commentDivs[i].SelectSingleNode("td").InnerText;
 
                     var horse = _horseRepository.GetHorseByRpId(horseId);
 
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
 
-                    toUpdate.position = Int32.Parse(position);
+                    toUpdate.position = Int32.Parse(formattedPos);
                     toUpdate.description = comment;
+                    toUpdate.finished = true;
 
                     _horseRepository.UpdateRaceHorse(toUpdate);
                 }
