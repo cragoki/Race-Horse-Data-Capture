@@ -287,8 +287,8 @@ namespace Core.Services
                 //Look for a with class RC-runnerInfo__name => Inner Text = name, href = url
                 var jockey = new JockeyEntity()
                 {
-                    jockey_name = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").InnerText.Replace(" ","") ?? "",
-                    jockey_url = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").Attributes["href"].Value
+                    jockey_name = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.InnerText.Replace(" ","") ?? "",
+                    jockey_url = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.Attributes["href"].Value ?? ""
                 };
 
                 //Trainer
@@ -298,8 +298,8 @@ namespace Core.Services
 
                 var trainer = new TrainerEntity()
                 {
-                    trainer_name = trainerContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").InnerText.Replace(" ", "") ?? "",
-                    trainer_url = trainerContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]").Attributes["href"].Value
+                    trainer_name = trainerContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.InnerText.Replace(" ", "") ?? "",
+                    trainer_url = trainerContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.Attributes["href"].Value ?? ""
                 };
 
                 //Horse
@@ -355,30 +355,30 @@ namespace Core.Services
                     {
                         var horseArchiveRPR = new HorseArchiveEntity()
                         {
-                            horse_id = horse.horse_id,
+                            horse_id = existingHorse.horse_id,
                             field_changed = HorseFieldEnum.rpr.ToString(),
                             old_value = existingHorse.rpr,
                             new_value = horse.rpr,
                             date = DateTime.Now
                         };
-
+                        existingHorse.rpr = horse.rpr;
                         _horseRepository.AddArchiveHorse(horseArchiveRPR);
                     }
                     if (horse.top_speed != existingHorse.top_speed)
                     {
                         var horseArchiveTS = new HorseArchiveEntity()
                         {
-                            horse_id = horse.horse_id,
+                            horse_id = existingHorse.horse_id,
                             field_changed = HorseFieldEnum.ts.ToString(),
                             old_value = existingHorse.top_speed,
                             new_value = horse.top_speed,
                             date = DateTime.Now
                         };
-
+                        existingHorse.top_speed = horse.top_speed;
                         _horseRepository.AddArchiveHorse(horseArchiveTS);
                     }
 
-                    _horseRepository.UpdateHorse(horse);
+                    _horseRepository.UpdateHorse(existingHorse);
 
                 }
             }
