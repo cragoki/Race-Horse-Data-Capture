@@ -14,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -70,7 +71,7 @@ namespace Core.Services
             {
                 //Build the URL
                 var url = $"{_racingPostConfig.BaseUrl + eventEntity.meeting_url}";
-
+                Thread.Sleep(2500);
                 //Get the raw HTML
                 var page = await CallUrl(url);
                 HtmlDocument htmlDoc = new HtmlDocument();
@@ -119,7 +120,7 @@ namespace Core.Services
             {
                 //Build the URL
                 var url = $"{_racingPostConfig.BaseUrl + race.race_url}";
-
+                Thread.Sleep(2500);
                 //Get the raw HTML
                 var page = await CallUrl(url);
                 HtmlDocument htmlDoc = new HtmlDocument();
@@ -160,7 +161,7 @@ namespace Core.Services
                 //Build the URL
                 var resultUrl = race.race_url.Replace("racecards", "results");
                 var url = $"{_racingPostConfig.BaseUrl + resultUrl}";
-
+                Thread.Sleep(5000);
                 //Get the raw HTML
                 var page = await CallUrl(url);
                 HtmlDocument htmlDoc = new HtmlDocument();
@@ -202,11 +203,15 @@ namespace Core.Services
 
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
 
-                    toUpdate.position = Int32.Parse(formattedPos);
-                    toUpdate.description = comment;
-                    toUpdate.finished = true;
+                    if (toUpdate != null) 
+                    {
+                        toUpdate.position = Int32.Parse(formattedPos);
+                        toUpdate.description = comment.Replace(" ", "");
+                        toUpdate.finished = true;
 
-                    _horseRepository.UpdateRaceHorse(toUpdate);
+                        _horseRepository.UpdateRaceHorse(toUpdate);
+                    }
+
                 }
 
             }

@@ -63,8 +63,6 @@ namespace RHDCAutomation
 
                 eventsFiltered++;
 
-                //Adding timeout so we don't spam requests
-                Thread.Sleep(5000);
             }
 
             //Complete Diagnostics

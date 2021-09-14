@@ -61,8 +61,6 @@ namespace Core.Services
                             var rh = raceHorse.RaceHorse;
                             _horseRepository.AddRaceHorse(rh);
                         }
-
-                        Thread.Sleep(5000);
                     }
 
                     Logger.Info($"Races Retrieved for event {even.name}");
