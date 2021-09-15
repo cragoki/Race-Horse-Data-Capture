@@ -84,10 +84,15 @@ namespace Core.Services
                 {
                     var toAdd = new Course();
 
+                    //TO ADD: RACING POST COURSE_ID = section.attribute = "data-course-id",
+                    //Course Name = section.attribute = data-diffusion-coursename
+                    //Get Course Name + check if it exists. if it does, use existing course info.
+
                     //Seems to be split into two kind of divs from here. The Meeting details: div class = "rp-raceCourse__panel__details"
+                    //Expect 1
+                    //Data: "Going", "Weather", "Total Runners", "Stalls"
                     //and the races are split into their own divs: div class = "rp-raceCourse__panel__container"
 
-                    //Get Course Name + check if it exists. if it does, use existing course info.
 
                     toAdd.Abandoned = false;
                     toAdd.CountryCode = "";
