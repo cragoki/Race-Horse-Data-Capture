@@ -20,5 +20,6 @@ namespace Core.Interfaces.Data.Repositories
         int AddTrainer(TrainerEntity trainer);
         JockeyEntity GetJockeyByName(string name);
         TrainerEntity GetTrainerByName(string name);
+        IEnumerable<RaceHorseEntity> GetNoResultRaces();
     }
 }

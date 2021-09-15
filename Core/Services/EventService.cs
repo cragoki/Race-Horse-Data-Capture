@@ -56,6 +56,11 @@ namespace Core.Services
 
             return result;
         }
+        public async Task<bool> GetBacklogEvents(Guid batch, DateTime date)
+        {
+            await _scraperService.RetrieveBacklogEvents(date);
+            return false;
+        }
 
         public async Task<List<EventEntity>> GetEventsFromDatabase() 
         {
@@ -72,6 +77,7 @@ namespace Core.Services
 
             return result;
         }
+
 
         private void AddDbInfoForEvent(Course even, Guid batchId)
         {

@@ -100,8 +100,41 @@ namespace Core.Services
             }
             catch (Exception ex) 
             {
-            
+                Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
             }
+        }
+
+        public async Task<List<RaceEntity>> GetIncompleteRaces() 
+        {
+            var result = new List<RaceEntity>();
+
+            try
+            {
+                //Get a list of races from the database where tb_race_horse.result = null AND where date is not today
+                var nonCompleteRaces = _horseRepository.GetNoResultRaces();
+
+                if (nonCompleteRaces != null && nonCompleteRaces.Count() > 0) 
+                {
+                    //Get race URL/Date
+                    foreach (var race in nonCompleteRaces) 
+                    {
+                        var raceEntity = _eventRepository.GetRaceById(race.race_id);
+                        var eventEntity = _eventRepository.GetEventById(raceEntity.event_id);
+
+                        //Ensure that this is not a race which occurred today
+                        if (eventEntity.created.Date != DateTime.Now.Date) 
+                        {
+                            result.Add(raceEntity);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) 
+            {
+                Logger.Error($"Error attempting to retrieve incomplete races.  {ex.Message}");
+            }
+
+            return result;
         }
     }
 }

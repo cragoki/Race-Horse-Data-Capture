@@ -95,6 +95,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_trainer.Where(x => x.trainer_name == name).FirstOrDefault();
         }
 
+        public IEnumerable<RaceHorseEntity> GetNoResultRaces()
+        {
+           return _context.tb_race_horse.Where(x => x.finished == false);
+        }
+
         public void SaveChanges()
         {
             if (_configService.SavePermitted())

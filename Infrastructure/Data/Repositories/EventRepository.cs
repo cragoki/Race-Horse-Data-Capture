@@ -68,6 +68,11 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_race.Where(x => x.event_id == eventId);
         }
+
+        public RaceEntity GetRaceById(int raceId)
+        {
+            return _context.tb_race.Where(x => x.race_id == raceId).FirstOrDefault();
+        }
         public void AddRace(RaceEntity raceToAdd)
         {
             _context.tb_race.Add(raceToAdd);

@@ -62,6 +62,49 @@ namespace Core.Services
             return result;
         }
 
+        public async Task<DailyRaces> RetrieveBacklogEvents(DateTime date)
+        {
+            var result = new DailyRaces();
+            //Retrieve the events for today
+            try
+            {
+                var dateFormatted = date.Date.ToString("yyyy-MM-dd");
+
+                //Build the URL
+                var url = $"{_racingPostConfig.BacklogUrl}{dateFormatted}";
+
+                //Get the raw HTML
+                var page = await CallUrl(url);
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(page);
+
+                var resultDivs = htmlDoc.DocumentNode.SelectNodes("//section[contains(@class,'rp-raceCourse__meetingContainer')]");
+
+                foreach (var section in resultDivs) 
+                {
+                    var toAdd = new Course();
+
+                    //Seems to be split into two kind of divs from here. The Meeting details: div class = "rp-raceCourse__panel__details"
+                    //and the races are split into their own divs: div class = "rp-raceCourse__panel__container"
+
+                    //Get Course Name + check if it exists. if it does, use existing course info.
+
+                    toAdd.Abandoned = false;
+                    toAdd.CountryCode = "";
+
+                    result.Courses.Add(toAdd);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"!!! Failed to retrieve todays events.  Terminating process. {ex.Message} !!!");
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
         public async Task<RaceModel> RetrieveRacesForEvent(EventEntity eventEntity)
         {
             var result = new RaceModel();

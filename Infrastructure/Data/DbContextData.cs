@@ -22,6 +22,7 @@ namespace Infrastructure.Data
         public DbSet<RaceHorseEntity> tb_race_horse { get; set; }
         public DbSet<TrainerEntity> tb_trainer { get; set; }
         public DbSet<JockeyEntity> tb_jockey { get; set; }
+        public DbSet<BacklogDateEntity> tb_backlog_date { get; set; }
 
     }
 }

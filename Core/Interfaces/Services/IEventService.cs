@@ -9,6 +9,7 @@ namespace Core.Interfaces.Services
     public interface IEventService
     {
         Task<List<Event>> GetTodaysEvents(Guid batch);
+        Task<bool> GetBacklogEvents(Guid batch, DateTime date);
         Task<List<EventEntity>> GetEventsFromDatabase();
     }
 }

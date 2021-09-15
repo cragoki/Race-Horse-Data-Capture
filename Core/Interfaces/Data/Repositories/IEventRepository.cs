@@ -19,6 +19,7 @@ namespace Core.Interfaces.Data.Repositories
         IEnumerable<RaceEntity> GetRacesForEvent(int eventId);
         void AddRace(RaceEntity raceToUpdate);
         void UpdateRace(RaceEntity raceToUpdate);
+        RaceEntity GetRaceById(int raceId);
         void SaveChanges();
     }
 }

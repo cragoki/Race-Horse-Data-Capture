@@ -4,6 +4,7 @@ using Core.Interfaces.Services;
 using System;
 using Core.Entities;
 using Core.Interfaces.Data.Repositories;
+using System.Threading.Tasks;
 
 namespace Core.Services
 {
@@ -22,7 +23,8 @@ namespace Core.Services
         {
             return new RacingPostSettings()
             {
-                BaseUrl = _config.GetValue<string>("RacingPostSettings:BaseUrl")
+                BaseUrl = _config.GetValue<string>("RacingPostSettings:BaseUrl"),
+                BacklogUrl = _config.GetValue<string>("RacingPostSettings:BacklogUrl")
             };
         }
 
@@ -41,6 +43,18 @@ namespace Core.Services
             };
 
             _repository.AddBatch(batchEntity);
+        }
+
+        public DateTime GetLastBackfillDate()
+        {
+            var result = _repository.GetBacklogDate();
+
+            return result.backlog_date;
+        }
+
+        public async Task UpdateBackfillDate(DateTime newDate) 
+        {
+            _repository.UpdateBacklogDate(newDate);
         }
     }
 }

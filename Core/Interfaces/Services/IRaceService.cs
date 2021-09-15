@@ -9,5 +9,6 @@ namespace Core.Interfaces.Services
         Task GetEventRaces(int EventId);
         Task<List<RaceEntity>> GetEventRacesFromDB(int EventId);
         Task GetRaceResults(RaceEntity race);
+        Task<List<RaceEntity>> GetIncompleteRaces();
     }
 }
