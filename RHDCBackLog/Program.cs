@@ -29,6 +29,7 @@ namespace RHDCBackLog
                 logging.AddConsole();
                 logging.AddDebug();
                 logging.AddEventSourceLogger();
+                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Error);
                 // Enable NLog as one of the Logging Provider
                 logging.AddNLog();
             });

@@ -142,7 +142,8 @@ namespace Core.Services
                         rp_race_id = Int32.Parse(rpRaceId),
                         race_url = raceUrl,
                         event_id = eventEntity.event_id,
-                        weather = result.Weather
+                        weather = result.Weather,
+                        completed = false
                     };
                     race = await ExtractRaceInfo(div, race);
 

@@ -96,7 +96,16 @@ namespace Core.Services
             {
                 //Get RaceHorse Entities
                 var raceHorseList = _horseRepository.GetRaceHorsesForRace(race.race_id);
+
+                Logger.Info($"Found {raceHorseList.Count()} Horses for race...");
+                Logger.Info($"Processing...");
                 await _scraperService.GetResultsForRace(race, raceHorseList.ToList());
+
+                race.completed = true;
+
+                _eventRepository.UpdateRace(race);
+                Logger.Info($"Update Complete!");
+                Logger.Info($"Finding next race...");
 
             }
             catch (Exception ex) 
@@ -119,13 +128,16 @@ namespace Core.Services
                     //Get race URL/Date
                     foreach (var race in nonCompleteRaces) 
                     {
-                        var raceEntity = _eventRepository.GetRaceById(race.race_id);
-                        var eventEntity = _eventRepository.GetEventById(raceEntity.event_id);
+                        var eventEntity = _eventRepository.GetEventById(race.event_id);
 
                         //Ensure that this is not a race which occurred today
-                        if (eventEntity.created.Date != DateTime.Now.Date) 
+                        if (eventEntity.created.Date != DateTime.Now.Date)
                         {
-                            result.Add(raceEntity);
+                            result.Add(race);
+                        }
+                        else 
+                        {
+                        
                         }
                     }
                 }

@@ -259,3 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+RHDCBackLog/appsettings.json
+RHDCAutomation/appsettings.json
+RHDCAutomation/appsettings.json

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -33,7 +34,6 @@ namespace RHDCResultRetriever
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _batch = Guid.NewGuid();
-            int eventsFiltered = 0;
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
             Logger.Info("-------------------------------------------------------------------------------------------------");
@@ -53,15 +53,18 @@ namespace RHDCResultRetriever
 
             //Get todays events from the database based on date
             var events = await _eventService.GetEventsFromDatabase();
+            Logger.Info($"Retrieved {events.Count()} events from the database");
 
             // foreach event, get all races
             foreach (var even in events) 
             {
                 var races = await _raceService.GetEventRacesFromDB(even.event_id);
+                Logger.Info($"Retrieved {races.Count()} races for event {even.name}");
 
                 //foreach race convert the race url into a result URL and scrape the results into tb_race_horse
                 foreach (var race in races) 
                 {
+                    Logger.Info($"Getting race results for {race.description}");
                     await _raceService.GetRaceResults(race);
                 }
             }

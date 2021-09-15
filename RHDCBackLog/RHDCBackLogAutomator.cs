@@ -50,7 +50,7 @@ namespace RHDCBackLog
             };
 
             //Complete races from the database
-            //await BackFill();
+            await BackFill();
 
             //Get next 'dates' results:
             await BackLog();
@@ -72,6 +72,7 @@ namespace RHDCBackLog
         /// <returns></returns>
         public async Task BackFill() 
         {
+            Logger.Info($"Retrieving existing data with missing results...");
             try
             {
                 var incompleteRaces = await _raceService.GetIncompleteRaces();
@@ -85,6 +86,7 @@ namespace RHDCBackLog
             {
                 Logger.Error($"Unable to process BackFill. Error: {ex.Message}, {ex.InnerException}");
             }
+            Logger.Info($"Back fill complete!");
         }
 
         /// <summary>

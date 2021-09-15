@@ -18,6 +18,7 @@ namespace Core.Entities
         public string ages { get; set; }
         public string description { get; set; }
         public string race_url { get; set; }
+        public bool completed { get; set; }
 
     }
 }

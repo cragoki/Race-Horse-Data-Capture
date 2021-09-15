@@ -80,7 +80,7 @@ namespace Infrastructure.Data.Repositories
         }
         public void UpdateRace(RaceEntity raceToUpdate)
         {
-            _context.tb_race.Add(raceToUpdate);
+            _context.tb_race.Update(raceToUpdate);
             SaveChanges();
         }
 

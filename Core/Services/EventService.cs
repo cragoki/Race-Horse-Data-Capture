@@ -16,10 +16,13 @@ namespace Core.Services
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IScraperService _scraperService;
         private static IEventRepository _eventRepository;
-        public EventService(IScraperService scraperService, IEventRepository eventRepository)
+        private static IIntervalService _intervalService;
+
+        public EventService(IScraperService scraperService, IEventRepository eventRepository, IIntervalService intervalService)
         {
             _scraperService = scraperService;
             _eventRepository = eventRepository;
+            _intervalService = intervalService;
         }
 
         public async Task<List<Event>> GetTodaysEvents(Guid batch)
