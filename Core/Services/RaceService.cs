@@ -4,7 +4,7 @@ using Core.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -43,6 +43,7 @@ namespace Core.Services
                     if (string.IsNullOrEmpty(course.course_url)) 
                     {
                         course.course_url = races.CourseUrl;
+                        course.rp_course_id = Int32.Parse(Regex.Match(course.course_url, @"\d+").Value);
                         _eventRepository.UpdateCourse(course);
                     }
 
