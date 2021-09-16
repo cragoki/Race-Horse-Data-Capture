@@ -28,6 +28,18 @@ namespace Core.Services
             };
         }
 
+        public MailSettings GetMailSettings() 
+        {
+            return new MailSettings()
+            {
+                Mail = _config.GetValue<string>("MailSettings:Mail"),
+                DisplayName = _config.GetValue<string>("MailSettings:DisplayName"),
+                Password = _config.GetValue<string>("MailSettings:Password"),
+                Host = _config.GetValue<string>("MailSettings:Host"),
+                Port = _config.GetValue<int>("MailSettings:Port")
+            };
+        }
+
         public bool SavePermitted()
         {
             return _config.GetValue<bool>("AppSettings:SaveData");

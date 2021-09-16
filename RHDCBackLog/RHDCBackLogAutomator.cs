@@ -1,6 +1,7 @@
 ﻿using Core.Enums;
 using Core.Interfaces.Services;
 using Core.Models;
+using Core.Models.Mail;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using System;
@@ -15,15 +16,15 @@ namespace RHDCBackLog
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private IRaceService _raceService;
         private IConfigurationService _configService;
-        private IScraperService _scraperService;
+        private IMailService _mailService;
         private IEventService _eventService;
         private static Guid _batch;
 
-        public RHDCBackLogAutomator(IRaceService raceService, IConfigurationService configService, IScraperService scraperService, IEventService eventService)
+        public RHDCBackLogAutomator(IRaceService raceService, IConfigurationService configService, IMailService mailService, IEventService eventService)
         {
             _raceService = raceService;
             _configService = configService;
-            _scraperService = scraperService;
+            _mailService = mailService;
             _eventService = eventService;
         }
         private void OnStopping()
@@ -50,10 +51,17 @@ namespace RHDCBackLog
             };
 
             //Complete races from the database
-            await BackFill();
+            //await BackFill();
+            var email = new MailModel()
+            {
+                Subject = "Testing",
+                Body = "Testing RHDC",
+                ToEmail = "craigrodger1@hotmail.com"
+            };
 
+            _mailService.SendEmailAsync(email);
             //Get next 'dates' results:
-            await BackLog();
+            //await BackLog();
 
             var diagnosticsString = JsonSerializer.Serialize(diagnostics);
             Logger.Info(diagnosticsString);

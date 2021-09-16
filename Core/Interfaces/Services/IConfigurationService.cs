@@ -11,5 +11,6 @@ namespace Core.Interfaces.Services
         void AddBatch(Guid batchId, string diagnostics);
         DateTime GetLastBackfillDate();
         Task UpdateBackfillDate(DateTime newDate);
+        MailSettings GetMailSettings();
     }
 }

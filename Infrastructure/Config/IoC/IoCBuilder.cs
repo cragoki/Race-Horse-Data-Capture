@@ -52,7 +52,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IRaceService, RaceService>();
             container.RegisterScoped<IScraperService, ScraperService>();
             container.RegisterScoped<IConfigurationService, ConfigurationService>();
-            container.RegisterScoped<IIntervalService, IntervalService>();
+            container.RegisterScoped<IMailService, MailService>();
 
             return container;
         }

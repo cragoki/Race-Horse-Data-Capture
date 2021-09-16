@@ -17,6 +17,7 @@ namespace RHDCAutomation
         private readonly IEventService _eventService;
         private readonly IRaceService _raceService;
         private readonly IConfigurationService _configService;
+
         private static Guid _batch;
         public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService)
         {
