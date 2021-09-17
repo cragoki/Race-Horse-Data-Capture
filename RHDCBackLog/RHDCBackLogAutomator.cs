@@ -51,15 +51,8 @@ namespace RHDCBackLog
             };
 
             //Complete races from the database
-            //await BackFill();
-            var email = new MailModel()
-            {
-                Subject = "Testing",
-                Body = "Testing RHDC",
-                ToEmail = "craigrodger1@hotmail.com"
-            };
+            await BackFill();
 
-            _mailService.SendEmailAsync(email);
             //Get next 'dates' results:
             //await BackLog();
 
