@@ -5,6 +5,7 @@ using System;
 using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using System.Threading.Tasks;
+using Core.Enums;
 
 namespace Core.Services
 {
@@ -67,6 +68,25 @@ namespace Core.Services
         public async Task UpdateBackfillDate(DateTime newDate) 
         {
             _repository.UpdateBacklogDate(newDate);
+        }
+
+        public async Task<bool> UpdateJob(JobEnum job) 
+        {
+            try
+            {
+                _repository.UpdateNextExecution(job);
+
+                return true;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<JobEntity> GetJobInfo(JobEnum job)
+        {
+            return _repository.GetJobInfo(job);
         }
     }
 }

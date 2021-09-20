@@ -1,4 +1,6 @@
-﻿using Core.Models.Settings;
+﻿using Core.Entities;
+using Core.Enums;
+using Core.Models.Settings;
 using System;
 using System.Threading.Tasks;
 
@@ -12,5 +14,8 @@ namespace Core.Interfaces.Services
         DateTime GetLastBackfillDate();
         Task UpdateBackfillDate(DateTime newDate);
         MailSettings GetMailSettings();
-    }
+        Task<bool> UpdateJob(JobEnum job);
+        Task<JobEntity> GetJobInfo(JobEnum job);
+
+     }
 }

@@ -23,6 +23,7 @@ namespace Infrastructure.Data
         public DbSet<TrainerEntity> tb_trainer { get; set; }
         public DbSet<JockeyEntity> tb_jockey { get; set; }
         public DbSet<BacklogDateEntity> tb_backlog_date { get; set; }
+        public DbSet<JobEntity> tb_job { get; set; }
 
     }
 }

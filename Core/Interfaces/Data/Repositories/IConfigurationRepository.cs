@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Enums;
 using System;
 
 namespace Core.Interfaces.Data.Repositories
@@ -8,5 +9,7 @@ namespace Core.Interfaces.Data.Repositories
         void AddBatch(BatchEntity batch);
         BacklogDateEntity GetBacklogDate();
         void UpdateBacklogDate(DateTime date);
+        JobEntity GetJobInfo(JobEnum job);
+        void UpdateNextExecution(JobEnum job);
     }
 }

@@ -20,6 +20,7 @@ namespace RHDCBackLog
         private IEventService _eventService;
         private static Guid _batch;
 
+
         public RHDCBackLogAutomator(IRaceService raceService, IConfigurationService configService, IMailService mailService, IEventService eventService)
         {
             _raceService = raceService;
@@ -33,38 +34,74 @@ namespace RHDCBackLog
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _batch = Guid.NewGuid();
-            int eventsFiltered = 0;
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-----------------------------------Backlog Automator Inilializing--------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info($"                   Backlog Initialized with Identifier {_batch}                                 ");
-            //Initialize Diagnostics
-            var diagnostics = new Diagnostics()
+            try
             {
-                Automator = AutomatorEnum.RHDCResultRetriever,
-                TimeInitialized = DateTime.Now
-            };
+                var job = await _configService.GetJobInfo(JobEnum.rhdcbacklog);
 
-            //Complete races from the database
-            await BackFill();
+                if (job.next_execution < DateTime.Now)
+                {
+                    _batch = Guid.NewGuid();
+                    int eventsFiltered = 0;
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-----------------------------------Backlog Automator Inilializing--------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info($"                   Backlog Initialized with Identifier {_batch}                                 ");
+                    //Initialize Diagnostics
+                    var diagnostics = new Diagnostics()
+                    {
+                        Automator = AutomatorEnum.RHDCResultRetriever,
+                        TimeInitialized = DateTime.Now
+                    };
 
-            //Get next 'dates' results:
-            //await BackLog();
+                    //Complete races from the database
+                    await BackFill();
 
-            var diagnosticsString = JsonSerializer.Serialize(diagnostics);
-            Logger.Info(diagnosticsString);
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-----------------------------------Automator Terminating-----------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
-            Logger.Info("-------------------------------------------------------------------------------------------------");
+                    //Get next 'dates' results:
+                    //await BackLog();
+
+                    var diagnosticsString = JsonSerializer.Serialize(diagnostics);
+                    Logger.Info(diagnosticsString);
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-----------------------------------Automator Terminating-----------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+                    Logger.Info("-------------------------------------------------------------------------------------------------");
+
+                    //Update Job Info
+                    if (!await _configService.UpdateJob(JobEnum.rhdcbacklog))
+                    {
+                        //Send Error Email and stop service as the service will be broken
+                        var email = new MailModel()
+                        {
+                            ToEmail = "craigrodger1@hotmail.com",
+                            Subject = "Error in the RHDCBacklogAutomator",
+                            Body = "Failed to update the job schedule, shutting down Job. This will need to be repaired manually"
+                        };
+
+                        _mailService.SendEmailAsync(email);
+                    }
+                }
+
+                //Get the Interval_Minutes from the DB to set the interval time
+                Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
+            }
+            catch (Exception ex) 
+            {
+                var email = new MailModel()
+                {
+                    ToEmail = "craigrodger1@hotmail.com",
+                    Subject = "Critical Error in the RHDCBacklogAutomator",
+                    Body = $"Critical Error in Backlog Automator, {ex.Message} shutting down Job. This will need to be repaired manually"
+                };
+
+                _mailService.SendEmailAsync(email);
+            }
         }
 
         /// <summary>
