@@ -45,7 +45,7 @@ namespace RHDCAutomation
                 {
                     _batch = Guid.NewGuid();
                     int eventsFiltered = 0;
-                    
+
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
@@ -104,9 +104,33 @@ namespace RHDCAutomation
                             Body = "Failed to update the job schedule, shutting down Job. This will need to be repaired manually"
                         };
 
-                        _mailService.SendEmailAsync(email);
+                        await _mailService.SendEmailAsync(email);
                     }
+
+                    //TEMPORARY - To test the service is executing as expected
+                    var success = new MailModel()
+                    {
+                        ToEmail = "craigrodger1@hotmail.com",
+                        Subject = "RHDCBacklogAutomator EXECUTED!",
+                        Body = "Everything Okay."
+                    };
+
+                    await _mailService.SendEmailAsync(success);
                 }
+                else 
+                {
+                    //TEMPORARY - To test the service is running as expected
+                    var healthCheck = new MailModel()
+                    {
+                        ToEmail = "craigrodger1@hotmail.com",
+                        Subject = "RHDCBacklogAutomator Health Check",
+                        Body = "Everything Okay."
+                    };
+
+                    await _mailService.SendEmailAsync(healthCheck);
+                }
+
+
                 //Get the Interval_Minutes from the DB to set the interval time
                 Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
             }
@@ -119,7 +143,7 @@ namespace RHDCAutomation
                     Body = $"Critical Error in Fetch Automator, {ex.Message} shutting down Job. This will need to be repaired manually"
                 };
 
-                _mailService.SendEmailAsync(email);
+                await _mailService.SendEmailAsync(email);
             }
             
         }
