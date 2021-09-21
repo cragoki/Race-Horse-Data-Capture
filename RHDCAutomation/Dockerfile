@@ -5,9 +5,9 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["Race-Horse-Data-Capture/RHDCAutomation/RHDCFetchAutomator.csproj", "Race-Horse-Data-Capture/RHDCAutomation/]
-COPY ["Race-Horse-Data-Capture/Infrastructure/Race-Horse-Data-Capture.Infrastructure.csproj", "Race-Horse-Data-Capture/Infrastructure/"]
-COPY ["Race-Horse-Data-Capture/Core/Race-Horse-Data-Capture.Core.csproj", "src/Race-Horse-Data-Capture/Core/"]
+COPY ["Race-Horse-Data-Capture/RHDCAutomation/RHDCAutomation.csproj", "Race-Horse-Data-Capture/RHDCAutomation/"]
+COPY ["Race-Horse-Data-Capture/Infrastructure/Infrastructure.csproj", "Race-Horse-Data-Capture/Infrastructure/"]
+COPY ["Race-Horse-Data-Capture/Core/Core.csproj", "Race-Horse-Data-Capture/Core/"]
 
 RUN dotnet restore "Race-Horse-Data-Capture/RHDCAutomation/RHDCAutomation.csproj" --configfile NuGet.Config && rm NuGet.Config
 COPY . .
