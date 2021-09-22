@@ -6,6 +6,7 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /Race-Horse-Data-Capture
 COPY ["RHDCAutomation/RHDCAutomation.csproj", "/RHDCAutomation/"]
+RUN dotnet restore
 
 COPY ["Infrastructure/Infrastructure.csproj", "/Infrastructure/"]
 COPY ["Core/Core.csproj", "/Core/"]
@@ -13,5 +14,5 @@ RUN dotnet publish -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:3.1
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=base /app/out .
 ENTRYPOINT ["dotnet", "RHDCAutomation.dll"]
