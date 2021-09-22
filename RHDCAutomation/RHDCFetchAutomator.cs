@@ -132,6 +132,8 @@ namespace RHDCAutomation
                         await _mailService.SendEmailAsync(healthCheck);
                     }
 
+                    //Get the Interval_Minutes from the DB to set the interval time
+                    Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
 
                 }
                 catch (Exception ex)
@@ -145,9 +147,6 @@ namespace RHDCAutomation
 
                     await _mailService.SendEmailAsync(email);
                 }
-
-                //Get the Interval_Minutes from the DB to set the interval time
-                Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
             }
         }
     }
