@@ -9,12 +9,6 @@ COPY ["RHDCAutomation/RHDCAutomation.csproj", "/RHDCAutomation/"]
 COPY ["Infrastructure/Infrastructure.csproj", "/Infrastructure/"]
 COPY ["Core/Core.csproj", "/Core/"]
 
-ARG NUGET_USER
-ARG NUGET_PASS
-ARG NUGET_SERVER_IP
-
-COPY NuGet/NuGet.Config ./
-
 RUN dotnet restore "Race-Horse-Data-Capture/RHDCAutomation/RHDCAutomation.csproj"
 COPY . .
 WORKDIR "Race-Horse-Data-Capture/RHDCAutomation/"
