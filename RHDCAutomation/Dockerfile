@@ -5,20 +5,20 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /Race-Horse-Data-Capture
-COPY ["RHDCAutomation/RHDCAutomation.csproj", "/RHDCAutomation/"]
+COPY ["RHDCAutomation/RHDCAutomation.csproj", "/"]
 COPY ["Infrastructure/Infrastructure.csproj", "/Infrastructure/"]
 COPY ["Core/Core.csproj", "/Core/"]
 
-WORKDIR /Race-Horse-Data-Capture
-RUN dotnet restore "RHDCAutomation/RHDCAutomation.csproj"
+
+RUN dotnet restore "/RHDCAutomation.csproj"
 COPY . .
-WORKDIR "Race-Horse-Data-Capture/RHDCAutomation/"
-RUN dotnet build "RHDCAutomation.csproj" -c Release -o /app/build
+WORKDIR /Race-Horse-Data-Capture
+RUN dotnet build "//RHDCAutomation.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "RHDCAutomation/RHDCAutomation.csproj" -c Release -o /app/publish
+RUN dotnet publish "/RHDCAutomation.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=base /app/publish .
 ENTRYPOINT ["dotnet", "RHDCAutomation.dll"]
