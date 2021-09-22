@@ -1,21 +1,21 @@
-﻿#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+﻿##﻿See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
-WORKDIR /src
-COPY ["Race-Horse-Data-Capture/RHDCAutomation/RHDCAutomation.csproj", "Race-Horse-Data-Capture/RHDCAutomation/"]
-COPY ["Race-Horse-Data-Capture/Infrastructure/Infrastructure.csproj", "Race-Horse-Data-Capture/Infrastructure/"]
-COPY ["Race-Horse-Data-Capture/Core/Core.csproj", "Race-Horse-Data-Capture/Core/"]
+WORKDIR /Race-Horse-Data-Capture
+COPY ["RHDCAutomation/RHDCAutomation.csproj", "/RHDCAutomation/"]
+COPY ["Infrastructure/Infrastructure.csproj", "/Infrastructure/"]
+COPY ["Core/Core.csproj", "/Core/"]
 
 RUN dotnet restore "Race-Horse-Data-Capture/RHDCAutomation/RHDCAutomation.csproj" --configfile NuGet.Config && rm NuGet.Config
 COPY . .
-WORKDIR "Race-Horse-Data-Capture/RHDCAutomation"
+WORKDIR "Race-Horse-Data-Capture/RHDCAutomation/"
 RUN dotnet build "RHDCAutomation.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "RHDCAutomation.csproj" -c Release -o /app/publish
+RUN dotnet publish "RHDCAutomation/RHDCAutomation.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
