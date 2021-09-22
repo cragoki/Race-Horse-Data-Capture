@@ -6,7 +6,6 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /Race-Horse-Data-Capture
 COPY ["RHDCAutomation/RHDCAutomation.csproj", "/RHDCAutomation/"]
-RUN dotnet restore
 
 COPY ["Infrastructure/Infrastructure.csproj", "/Infrastructure/"]
 COPY ["Core/Core.csproj", "/Core/"]
