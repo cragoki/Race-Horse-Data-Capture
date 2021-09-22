@@ -9,7 +9,7 @@ COPY ["RHDCAutomation/RHDCAutomation.csproj", "/RHDCAutomation/"]
 COPY ["Infrastructure/Infrastructure.csproj", "/Infrastructure/"]
 COPY ["Core/Core.csproj", "/Core/"]
 
-RUN dotnet restore "RHDCAutomation/RHDCAutomation.csproj" --configfile NuGet.Config && rm NuGet.Config
+RUN dotnet restore "RHDCAutomation/RHDCAutomation.csproj"
 COPY . .
 WORKDIR "Race-Horse-Data-Capture/RHDCAutomation/"
 RUN dotnet build "RHDCAutomation.csproj" -c Release -o /app/build
