@@ -138,6 +138,7 @@ namespace RHDCAutomation
                 }
                 catch (Exception ex)
                 {
+                    Logger.Info("Health Check Success");
                     var email = new MailModel()
                     {
                         ToEmail = "craigrodger1@hotmail.com",
