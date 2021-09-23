@@ -108,14 +108,14 @@ namespace RHDCResultRetriever
 
                             _mailService.SendEmailAsync(email);
                         }
-
-                        //Get the Interval_Minutes from the DB to set the interval time
-                        Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
                     }
                     else
                     {
                         Console.WriteLine($"Health check, everything Okay! The time is {DateTime.Now} Sleeping....");
                     }
+
+                    //Get the Interval_Minutes from the DB to set the interval time
+                    Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
                 }
                 catch (Exception ex)
                 {

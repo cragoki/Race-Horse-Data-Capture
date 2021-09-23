@@ -20,4 +20,4 @@ RUN dotnet publish "RHDCResultRetriever/RHDCResultRetriever.csproj" -c Release -
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "RHDCAutomation.dll"]
+ENTRYPOINT ["dotnet", "RHDCResultRetriever.dll"]
