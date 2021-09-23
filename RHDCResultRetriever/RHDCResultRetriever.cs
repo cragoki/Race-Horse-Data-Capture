@@ -35,88 +35,100 @@ namespace RHDCResultRetriever
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            try
-            {
-                var job = await _configService.GetJobInfo(JobEnum.rhdcresultretriever);
+            Console.WriteLine("Initializing RHDCResultRetriever");
 
-                if (job.next_execution < DateTime.Now)
+            while (!stoppingToken.IsCancellationRequested)
+            { 
+                try
                 {
-                    _batch = Guid.NewGuid();
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-----------------------------------Result Automator Inilializing---------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("                                                                                                 ");
-                    Logger.Info($"                  Batch Initialized with Identifier {_batch}                                    ");
+                    var job = await _configService.GetJobInfo(JobEnum.rhdcresultretriever);
 
-                    //Initialize Diagnostics
-                    var diagnostics = new Diagnostics()
+                    Console.WriteLine("No errors, DB connection successful.");
+
+                    if (job.next_execution < DateTime.Now)
                     {
-                        Automator = AutomatorEnum.RHDCResultRetriever,
-                        TimeInitialized = DateTime.Now
-                    };
+                        Console.WriteLine($"Beginning Batch at {DateTime.Now}");
+                        _batch = Guid.NewGuid();
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-----------------------------------Result Automator Inilializing---------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("                                                                                                 ");
+                        Logger.Info($"                  Batch Initialized with Identifier {_batch}                                    ");
 
-                    //Get todays events from the database based on date
-                    var events = await _eventService.GetEventsFromDatabase();
-                    Logger.Info($"Retrieved {events.Count()} events from the database");
-
-                    // foreach event, get all races
-                    foreach (var even in events)
-                    {
-                        var races = await _raceService.GetEventRacesFromDB(even.event_id);
-                        Logger.Info($"Retrieved {races.Count()} races for event {even.name}");
-
-                        //foreach race convert the race url into a result URL and scrape the results into tb_race_horse
-                        foreach (var race in races)
+                        //Initialize Diagnostics
+                        var diagnostics = new Diagnostics()
                         {
-                            Logger.Info($"Getting race results for {race.description}");
-                            await _raceService.GetRaceResults(race);
-                        }
-                    }
-
-                    var diagnosticsString = JsonSerializer.Serialize(diagnostics);
-                    Logger.Info(diagnosticsString);
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-----------------------------------Automator Terminating-----------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-                    Logger.Info("-------------------------------------------------------------------------------------------------");
-
-                    //Update Job Info
-                    if (!await _configService.UpdateJob(JobEnum.rhdcresultretriever))
-                    {
-                        //Send Error Email and stop service as the service will be broken
-                        var email = new MailModel()
-                        {
-                            ToEmail = "craigrodger1@hotmail.com",
-                            Subject = "Error in the RHDCBacklogAutomator",
-                            Body = "Failed to update the job schedule, shutting down Job. This will need to be repaired manually"
+                            Automator = AutomatorEnum.RHDCResultRetriever,
+                            TimeInitialized = DateTime.Now
                         };
 
-                        _mailService.SendEmailAsync(email);
-                    }
+                        //Get todays events from the database based on date
+                        var events = await _eventService.GetEventsFromDatabase();
+                        Logger.Info($"Retrieved {events.Count()} events from the database");
 
-                    //Get the Interval_Minutes from the DB to set the interval time
-                    Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
+                        // foreach event, get all races
+                        foreach (var even in events)
+                        {
+                            var races = await _raceService.GetEventRacesFromDB(even.event_id);
+                            Logger.Info($"Retrieved {races.Count()} races for event {even.name}");
+
+                            //foreach race convert the race url into a result URL and scrape the results into tb_race_horse
+                            foreach (var race in races)
+                            {
+                                Logger.Info($"Getting race results for {race.description}");
+                                await _raceService.GetRaceResults(race);
+                            }
+                        }
+
+                        var diagnosticsString = JsonSerializer.Serialize(diagnostics);
+                        Logger.Info(diagnosticsString);
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-----------------------------------Automator Terminating-----------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine($"completing Batch at {DateTime.Now}");
+
+                        //Update Job Info
+                        if (!await _configService.UpdateJob(JobEnum.rhdcresultretriever))
+                        {
+                            //Send Error Email and stop service as the service will be broken
+                            var email = new MailModel()
+                            {
+                                ToEmail = "craigrodger1@hotmail.com",
+                                Subject = "Error in the RHDCBacklogAutomator",
+                                Body = "Failed to update the job schedule, shutting down Job. This will need to be repaired manually"
+                            };
+
+                            _mailService.SendEmailAsync(email);
+                        }
+
+                        //Get the Interval_Minutes from the DB to set the interval time
+                        Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Health check, everything Okay! The time is {DateTime.Now} Sleeping....");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var email = new MailModel()
+                    {
+                        ToEmail = "craigrodger1@hotmail.com",
+                        Subject = "Critical Error in the RHDCResultRetriever",
+                        Body = $"Critical Error in Result Retriever Automator, {ex.Message} shutting down Job. This will need to be repaired manually"
+                    };
+
+                    _mailService.SendEmailAsync(email);
                 }
             }
-            catch (Exception ex)
-            {
-                var email = new MailModel()
-                {
-                    ToEmail = "craigrodger1@hotmail.com",
-                    Subject = "Critical Error in the RHDCResultRetriever",
-                    Body = $"Critical Error in Result Retriever Automator, {ex.Message} shutting down Job. This will need to be repaired manually"
-                };
-
-                _mailService.SendEmailAsync(email);
-            }
-
 
         }
 

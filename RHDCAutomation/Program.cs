@@ -21,7 +21,6 @@ namespace RHDCAutomation
 
         public static IHostBuilder CreateHostBuilder(string[] args) 
         {
-            Console.WriteLine("In Program.cs");
             var host = Host.CreateDefaultBuilder(args);
             IConfiguration config;
             //Configure Logging
@@ -43,8 +42,6 @@ namespace RHDCAutomation
             {
                 container.AddDependencies(context.Configuration);
             });
-
-            Console.WriteLine("Setting Startup class");
 
             //Configure startup class
             host.ConfigureServices((hostContext, services) =>
