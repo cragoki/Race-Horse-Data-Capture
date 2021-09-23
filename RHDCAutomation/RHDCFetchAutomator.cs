@@ -37,14 +37,22 @@ namespace RHDCAutomation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Console.WriteLine("In RHDCFetchAutomator");
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
+                    Console.WriteLine("Checking DB...");
+
                     var job = await _configService.GetJobInfo(JobEnum.rhdcautomation);
+
+                    Console.WriteLine("No errors, connection successful.");
+
 
                     if (job.next_execution < DateTime.Now)
                     {
+                        Console.WriteLine("Beginning Batch");
                         _batch = Guid.NewGuid();
                         int eventsFiltered = 0;
 
@@ -121,6 +129,8 @@ namespace RHDCAutomation
                     }
                     else
                     {
+                        Console.WriteLine("Health check, everything Okay! Sleeping....");
+
                         //TEMPORARY - To test the service is running as expected
                         var healthCheck = new MailModel()
                         {
@@ -138,7 +148,8 @@ namespace RHDCAutomation
                 }
                 catch (Exception ex)
                 {
-                    Logger.Info("Health Check Success");
+                    Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
+
                     var email = new MailModel()
                     {
                         ToEmail = "craigrodger1@hotmail.com",
