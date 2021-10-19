@@ -37,14 +37,22 @@ namespace RHDCAutomation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Console.WriteLine("Initializing RHDCFetchAutomator");
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
+                    Console.WriteLine("Checking DB...");
+
                     var job = await _configService.GetJobInfo(JobEnum.rhdcautomation);
+
+                    Console.WriteLine("No errors, DB connection successful.");
+
 
                     if (job.next_execution < DateTime.Now)
                     {
+                        Console.WriteLine($"Beginning Batch at {DateTime.Now}");
                         _batch = Guid.NewGuid();
                         int eventsFiltered = 0;
 
@@ -94,6 +102,7 @@ namespace RHDCAutomation
                         Logger.Info("-------------------------------------------------------------------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
                         if (!await _configService.UpdateJob(JobEnum.rhdcautomation))
@@ -121,15 +130,7 @@ namespace RHDCAutomation
                     }
                     else
                     {
-                        //TEMPORARY - To test the service is running as expected
-                        var healthCheck = new MailModel()
-                        {
-                            ToEmail = "craigrodger1@hotmail.com",
-                            Subject = "RHDCBacklogAutomator Health Check",
-                            Body = "Everything Okay."
-                        };
-
-                        await _mailService.SendEmailAsync(healthCheck);
+                        Console.WriteLine($"Health check, everything Okay! The time is {DateTime.Now} Sleeping....");
                     }
 
                     //Get the Interval_Minutes from the DB to set the interval time
@@ -138,7 +139,8 @@ namespace RHDCAutomation
                 }
                 catch (Exception ex)
                 {
-                    Logger.Info("Health Check Success");
+                    Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
+
                     var email = new MailModel()
                     {
                         ToEmail = "craigrodger1@hotmail.com",
