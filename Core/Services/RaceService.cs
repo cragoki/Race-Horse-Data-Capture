@@ -99,9 +99,12 @@ namespace Core.Services
 
                 Logger.Info($"Found {raceHorseList.Count()} Horses for race...");
                 Logger.Info($"Processing...");
-                await _scraperService.GetResultsForRace(race, raceHorseList.ToList());
+                var raceHorses = await _scraperService.GetResultsForRace(race, raceHorseList.ToList());
 
-                race.completed = true;
+                if (raceHorses != null || raceHorses.Count() != 0)
+                {
+                    race.completed = true;
+                }
 
                 _eventRepository.UpdateRace(race);
                 Logger.Info($"Update Complete!");

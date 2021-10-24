@@ -259,6 +259,8 @@ namespace Core.Services
                         toUpdate.finished = true;
 
                         _horseRepository.UpdateRaceHorse(toUpdate);
+
+                        result.Add(toUpdate);
                     }
 
                 }
