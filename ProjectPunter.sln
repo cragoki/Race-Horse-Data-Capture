@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RHDCResultRetriever", "RHDCResultRetriever\RHDCResultRetriever.csproj", "{BCE8A708-300E-4F68-8F4F-62CBF0CADF5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RHDCBackLog", "RHDCBackLog\RHDCBackLog.csproj", "{41DD1659-D442-42A2-8508-67EB9EC8CE64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RHDCBackLog", "RHDCBackLog\RHDCBackLog.csproj", "{41DD1659-D442-42A2-8508-67EB9EC8CE64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmAccuracyCalculator", "AlgorithmAccuracyCalculator\AlgorithmAccuracyCalculator.csproj", "{770C4C38-3BAF-47B1-B971-2451CC0F71F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{41DD1659-D442-42A2-8508-67EB9EC8CE64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41DD1659-D442-42A2-8508-67EB9EC8CE64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41DD1659-D442-42A2-8508-67EB9EC8CE64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

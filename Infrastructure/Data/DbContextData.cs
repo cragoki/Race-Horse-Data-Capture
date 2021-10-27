@@ -24,6 +24,9 @@ namespace Infrastructure.Data
         public DbSet<JockeyEntity> tb_jockey { get; set; }
         public DbSet<BacklogDateEntity> tb_backlog_date { get; set; }
         public DbSet<JobEntity> tb_job { get; set; }
+        public DbSet<AlgorithmEntity> tb_algorithm { get; set; }
+        public DbSet<VariableEntity> tb_variable { get; set; }
+        public DbSet<AlgorithmVariableEntity> tb_algorithm_variable { get; set; }
 
     }
 }
