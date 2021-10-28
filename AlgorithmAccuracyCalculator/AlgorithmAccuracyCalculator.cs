@@ -46,13 +46,7 @@ namespace AlgorithmAccuracyCalculator
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                         
-                    //CREATE ALGORITHM REPOSITORY
-                    //GET ACTIVE ALGORITHM
-                    //GET ALGORITHM VARIABLES
 
-                    //GET ALL RACES
-                    //FOREACH RACE, RUN THE VARIABLE CLASS FROM THE VARIABLE DEFINED IN ALGORITHM VARIABLES
-                    //CALCULATE AVERAGE RESULT OF EACH RACE AND UPDATE THE ACCURACY OF THE ALGORITHM
 
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");

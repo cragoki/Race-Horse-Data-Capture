@@ -73,6 +73,10 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_race.Where(x => x.race_id == raceId).FirstOrDefault();
         }
+        public List<RaceEntity> GetAllRaces()
+        {
+            return _context.tb_race.ToList();
+        }
         public void AddRace(RaceEntity raceToAdd)
         {
             _context.tb_race.Add(raceToAdd);
@@ -84,9 +88,14 @@ namespace Infrastructure.Data.Repositories
             SaveChanges();
         }
 
-        public void SaveChanges() 
+        public List<RaceHorseEntity> GetRaceHorsesForRace(int raceId) 
         {
-            if (_configService.SavePermitted()) 
+            return _context.tb_race_horse.Where(x => x.race_id == raceId).ToList();
+        }
+
+        public void SaveChanges()
+        {
+            if (_configService.SavePermitted())
             {
                 _context.SaveChanges();
             }

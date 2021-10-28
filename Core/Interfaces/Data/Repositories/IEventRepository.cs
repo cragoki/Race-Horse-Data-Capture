@@ -16,10 +16,12 @@ namespace Core.Interfaces.Data.Repositories
         void UpdateCourse(CourseEntity courseToUpdate);
         void AddEvent(EventEntity eventToAdd);
         List<CourseEntity> GetCourses();
+        List<RaceEntity> GetAllRaces();
         IEnumerable<RaceEntity> GetRacesForEvent(int eventId);
         void AddRace(RaceEntity raceToUpdate);
         void UpdateRace(RaceEntity raceToUpdate);
         RaceEntity GetRaceById(int raceId);
+        List<RaceHorseEntity> GetRaceHorsesForRace(int raceId);
         void SaveChanges();
     }
 }
