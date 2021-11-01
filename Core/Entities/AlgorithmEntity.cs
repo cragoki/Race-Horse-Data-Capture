@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
 {
     public class AlgorithmEntity
     {
+        [Key]
         public int algorithm_id { get; set; }
         public string algorithm_name { get; set; }
         public bool active { get; set; }

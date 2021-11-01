@@ -18,13 +18,13 @@ namespace Core.Variables
             {
                 foreach (var horse in race)
                 {
-                    if (horse.top_speed == null || !Int32.TryParse(horse.top_speed, out int ts)) 
+                    if (horse.top_speed == null || horse.top_speed == 0) 
                     {
-                        horse.top_speed = "0";
+                        horse.top_speed = 0;
                     }
                 }
 
-                result = race.OrderByDescending(i => Int32.Parse(i.top_speed)).ToList();
+                result = race.OrderByDescending(i => i.top_speed).ToList();
 
             }
             catch(Exception ex)

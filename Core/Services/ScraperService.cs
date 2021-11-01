@@ -339,12 +339,12 @@ namespace Core.Services
 
                 var rpr = htmlDoc.SelectSingleNode(".//span[contains(@class, 'runnerRpr')]").InnerText.Replace(" ", "");
                 var ts = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerTs')]").InnerText.Replace(" ", "");
-
-                //We need to extract the numeric values of the horse URL to retrieve the rp horse id -> After "horse/" up until the next "/"
+                int rprInt = 0;
+                int tsInt = 0;
+                Int32.TryParse(Regex.Replace(rpr, @"\s+", ""), out rprInt);
+                Int32.TryParse(Regex.Replace(ts, @"\s+", ""), out tsInt);
 
                 int rpHorseId = await ExtractHorseIdFromUrl(horseUrl);
-
-
 
                 //Get Race Horse data
                 //Jockey
@@ -374,8 +374,8 @@ namespace Core.Services
                 {
                     horse_name = horseName,//horseName,
                     horse_url = horseUrl,
-                    rpr = rpr,// span with this class runnerRpr
-                    top_speed = ts,// span with this class RC-runnerTs
+                    rpr = rprInt,// span with this class runnerRpr
+                    top_speed = tsInt,// span with this class RC-runnerTs
                     //dob = //await ExtractHorseData(horseUrl),
                     rp_horse_id = rpHorseId
                 };
@@ -424,8 +424,8 @@ namespace Core.Services
                         {
                             horse_id = existingHorse.horse_id,
                             field_changed = HorseFieldEnum.rpr.ToString(),
-                            old_value = existingHorse.rpr,
-                            new_value = horse.rpr,
+                            old_value = existingHorse.rpr.ToString(),
+                            new_value = horse.rpr.ToString(),
                             date = DateTime.Now
                         };
                         existingHorse.rpr = horse.rpr;
@@ -437,8 +437,8 @@ namespace Core.Services
                         {
                             horse_id = existingHorse.horse_id,
                             field_changed = HorseFieldEnum.ts.ToString(),
-                            old_value = existingHorse.top_speed,
-                            new_value = horse.top_speed,
+                            old_value = existingHorse.top_speed.ToString(),
+                            new_value = horse.top_speed.ToString(),
                             date = DateTime.Now
                         };
                         existingHorse.top_speed = horse.top_speed;

@@ -10,7 +10,7 @@ namespace Core.Entities
         public string horse_name { get; set; }
         public DateTime? dob { get; set; }
         public string horse_url { get; set; }
-        public string top_speed { get; set; }
-        public string rpr { get; set; }
+        public int? top_speed { get; set; }
+        public int? rpr { get; set; }
     }
 }
