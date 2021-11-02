@@ -8,6 +8,8 @@ namespace Core.Entities
         public int algorithm_id { get; set; }
         public string algorithm_name { get; set; }
         public bool active { get; set; }
-        public int accuracy { get; set; }
+        public decimal? accuracy { get; set; }
+        public int? number_of_races { get; set; }
+
     }
 }

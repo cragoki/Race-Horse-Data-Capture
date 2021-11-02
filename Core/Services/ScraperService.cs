@@ -341,8 +341,8 @@ namespace Core.Services
                 var ts = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerTs')]").InnerText.Replace(" ", "");
                 int rprInt = 0;
                 int tsInt = 0;
-                Int32.TryParse(Regex.Replace(rpr, @"\s+", ""), out rprInt);
-                Int32.TryParse(Regex.Replace(ts, @"\s+", ""), out tsInt);
+                Int32.TryParse(RegexHelper.RemoveWhitespace(rpr), out rprInt);
+                Int32.TryParse(RegexHelper.RemoveWhitespace(ts), out tsInt);
 
                 int rpHorseId = await ExtractHorseIdFromUrl(horseUrl);
 

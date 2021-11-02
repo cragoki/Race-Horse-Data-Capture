@@ -15,12 +15,14 @@ namespace AlgorithmAccuracyCalculator
         private IRaceService _raceService;
         private IConfigurationService _configService;
         private IMailService _mailService;
+        private IAlgorithmService _algorithmService;
 
-        public AlgorithmAccuracyCalculator(IRaceService raceService, IConfigurationService configService, IMailService mailService)
+        public AlgorithmAccuracyCalculator(IRaceService raceService, IConfigurationService configService, IMailService mailService, IAlgorithmService algorithmService)
         {
             _raceService = raceService;
             _configService = configService;
             _mailService = mailService;
+            _algorithmService = algorithmService;
         }
         private void OnStopping()
         {
@@ -45,8 +47,10 @@ namespace AlgorithmAccuracyCalculator
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
-                        
 
+                    var result = await _algorithmService.ExecuteActiveAlgorithm();
+
+                    await _algorithmService.StoreAlgorithmResults(result);
 
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");

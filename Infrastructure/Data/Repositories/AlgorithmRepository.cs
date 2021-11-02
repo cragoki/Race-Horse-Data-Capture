@@ -11,9 +11,10 @@ namespace Infrastructure.Data.Repositories
         private readonly DbContextData _context;
         private readonly IConfigurationService _configService;
 
-        public AlgorithmRepository(DbContextData context)
+        public AlgorithmRepository(DbContextData context, IConfigurationService configService)
         {
             _context = context;
+            _configService = configService;
         }
 
         public AlgorithmEntity GetAlgorithmById(int algorithmId)
