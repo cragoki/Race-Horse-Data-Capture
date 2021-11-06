@@ -27,6 +27,12 @@ namespace Infrastructure.Data
         public DbSet<AlgorithmEntity> tb_algorithm { get; set; }
         public DbSet<VariableEntity> tb_variable { get; set; }
         public DbSet<AlgorithmVariableEntity> tb_algorithm_variable { get; set; }
-
+        public DbSet<AgeType> tb_age_type { get; set; }
+        public DbSet<DistanceType> tb_distance_type { get; set; }
+        public DbSet<GoingType> tb_going_type { get; set; }
+        public DbSet<MeetingType> tb_meeting_type { get; set; }
+        public DbSet<StallsType> tb_stalls_type { get; set; }
+        public DbSet<SurfaceType> tb_surface_type { get; set; }
+        public DbSet<WeatherType> tb_weather_type { get; set; }
     }
 }

@@ -16,11 +16,13 @@ namespace Core.Services
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IScraperService _scraperService;
         private static IEventRepository _eventRepository;
+        private static IMappingTableRepository _mappingTableRepository;
 
-        public EventService(IScraperService scraperService, IEventRepository eventRepository)
+        public EventService(IScraperService scraperService, IEventRepository eventRepository, IMappingTableRepository mappingTableRepository)
         {
             _scraperService = scraperService;
             _eventRepository = eventRepository;
+            _mappingTableRepository = mappingTableRepository;
         }
 
         public async Task<List<Event>> GetTodaysEvents(Guid batch)
@@ -83,6 +85,9 @@ namespace Core.Services
         private void AddDbInfoForEvent(Course even, Guid batchId)
         {
             var eventName = $"{even.Name}_{DateTime.Now.ToShortDateString()}";
+            int? surfaceTypeId = null;
+            int? meetingTypeId = null;
+
             try
             {
                 //Store todays race information with batch
@@ -97,16 +102,25 @@ namespace Core.Services
 
                 CheckAndAddCourse(course);
 
+                if (!String.IsNullOrEmpty(even.SurfaceType)) 
+                {
+                    surfaceTypeId = _mappingTableRepository.AddOrReturnSurfaceType(even.SurfaceType);
+                }
+                if (!String.IsNullOrEmpty(even.meetingTypeCode))
+                {
+                    meetingTypeId = _mappingTableRepository.AddOrReturnMeetingType(even.meetingTypeCode);
+                }
+
                 //Event:
                 var ev = new EventEntity()
                 {
                     course_id = even.Id,
                     abandoned = even.Abandoned,
-                    surface_type = even.SurfaceType,
+                    surface_type = surfaceTypeId,
                     name = eventName,
                     meeting_url = even.MeetingUrl,
                     hash_name = even.HashName,
-                    meeting_type = even.meetingTypeCode,
+                    meeting_type = meetingTypeId,
                     races = even.Races.Count,
                     created = DateTime.Now,
                     batch_id = batchId

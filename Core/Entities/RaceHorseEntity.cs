@@ -12,7 +12,6 @@ namespace Core.Entities
         public int age { get; set; }
         public int trainer_id { get; set; }
         public int jockey_id { get; set; }
-        public string jockey_weight { get; set; }
         public bool finished { get; set; }
         public int position { get; set; }
         public string description { get; set; }

@@ -31,6 +31,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IHorseRepository, HorseRepository>();
             container.RegisterScoped<IConfigurationRepository, ConfigurationRepository>();
             container.RegisterScoped<IAlgorithmRepository, AlgorithmRepository>();
+            container.RegisterScoped<IMappingTableRepository, MappingTableRepository>();
 
             container.RegisterSettings(configuration);
             container.RegisterServices();
