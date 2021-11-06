@@ -101,7 +101,7 @@ namespace Core.Services
                 Logger.Info($"Processing...");
                 var raceHorses = await _scraperService.GetResultsForRace(race, raceHorseList.ToList());
 
-                if (raceHorses != null || raceHorses.Count() != 0)
+                if (raceHorses != null || raceHorses.Count() != 0 && raceHorses.All(x => x.position != 0))
                 {
                     race.completed = true;
                 }
