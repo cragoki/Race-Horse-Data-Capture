@@ -25,12 +25,14 @@ namespace Core.Services
         private readonly RacingPostSettings _racingPostConfig;
         private readonly IConfigurationService _configService;
         private readonly IHorseRepository _horseRepository;
+        private readonly IMappingTableRepository _mappingTableRepository;
 
-        public ScraperService(IConfigurationService configService, IHorseRepository horseRepository)
+        public ScraperService(IConfigurationService configService, IHorseRepository horseRepository, IMappingTableRepository mappingTableRepository)
         {
             _configService = configService;
             _racingPostConfig = _configService.GetRacingPostSettings();
             _horseRepository = horseRepository;
+            _mappingTableRepository = mappingTableRepository;
         }
 
         public async Task<DailyRaces> RetrieveTodaysEvents()
@@ -142,7 +144,7 @@ namespace Core.Services
                         rp_race_id = Int32.Parse(rpRaceId),
                         race_url = raceUrl,
                         event_id = eventEntity.event_id,
-                        weather = result.Weather,
+                        weather = _mappingTableRepository.AddOrReturnWeatherType(result.Weather),
                         completed = false
                     };
                     race = await ExtractRaceInfo(div, race);
@@ -313,11 +315,11 @@ namespace Core.Services
             var no_of_horses = nodeDescription.SelectSingleNode("span[contains(@data-test-selector, 'RC-meetingDay__raceRunnersNo')]")?.InnerText ?? "0";
             var race_class = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceClass')]")?.InnerText ?? "0";
 
-            raceEntity.ages = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceAgesAllowed')]")?.InnerText.Replace(" ", "") ?? "";
-            raceEntity.going = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceGoingType')]")?.InnerText ?? "";
-            raceEntity.stalls = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceStalls')]")?.InnerText ?? "";
+            raceEntity.ages = _mappingTableRepository.AddOrReturnAgeType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceAgesAllowed')]")?.InnerText.Replace(" ", "") ?? "");
+            raceEntity.going = _mappingTableRepository.AddOrReturnGoingType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceGoingType')]")?.InnerText ?? "");
+            raceEntity.stalls = _mappingTableRepository.AddOrReturnStallsType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceStalls')]")?.InnerText ?? "");
             raceEntity.no_of_horses = Extractor.ExtractIntsFromString(no_of_horses);
-            raceEntity.distance = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceDistance')]")?.InnerText.Replace(" ", "") ?? "";
+            raceEntity.distance = _mappingTableRepository.AddOrReturnDistanceType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceDistance')]")?.InnerText.Replace(" ", "") ?? "");
             raceEntity.description = nodeDescription.SelectSingleNode("a[contains(@class,'RC-meetingDay__raceTitle')]")?.InnerText ?? "";
             raceEntity.race_class = Extractor.ExtractIntsFromString(race_class);
 
