@@ -2,6 +2,7 @@
 {
     public enum VariableEnum
     {
-        TopSpeed = 1
+        TopSpeed = 1,
+        RPR = 2
     }
 }

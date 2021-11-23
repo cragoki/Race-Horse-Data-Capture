@@ -1,6 +1,7 @@
 ﻿
 using Core.Entities;
 using Core.Enums;
+using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models.Algorithm;
@@ -17,19 +18,20 @@ namespace Core.Services
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static IEventRepository _eventRepository;
         private static IAlgorithmRepository _algorithmRepository;
-        private static IHorseRepository _horseRepository;
+        private static ITopSpeedOnly _topSpeedOnly;
+        private static ITsRPR _topSpeedRpr;
 
-        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, IHorseRepository horseRepository)
+        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr)
         {
             _eventRepository = eventRepository;
             _algorithmRepository = algorithmRepository;
-            _horseRepository = horseRepository;
+            _topSpeedOnly = topSpeedOnly;
+            _topSpeedRpr = topSpeedRpr;
         }
 
         public async Task<AlgorithmResult> ExecuteActiveAlgorithm()
         {
             var result = new AlgorithmResult();
-            var runningTotal = new List<decimal>();
             try
             {
                 var activeAlgorithm = _algorithmRepository.GetActiveAlgorithm();
@@ -38,25 +40,18 @@ namespace Core.Services
                     result.AlgorithmId = activeAlgorithm.algorithm_id;
                     var algorithmVariables = _algorithmRepository.GetAlgorithmVariableByAlgorithmId(activeAlgorithm.algorithm_id);
                     var races = _eventRepository.GetAllRaces();
-                    result.RacesFiltered = races.Count();
-                    foreach (var race in races)
-                    {
-                        var percentageCorrect = new List<decimal>();
 
-                        foreach (var variable in algorithmVariables)
-                        {
-                            switch (variable.variable_id)
-                            {
-                                case (int)VariableEnum.TopSpeed:
-                                    percentageCorrect.Add(await TopSpeedVariable(race) * variable.threshold);
-                                    break;
-                            }
-                        }
-                        //FOREACH RACE, RUN THE VARIABLE CLASS FROM THE VARIABLE DEFINED IN ALGORITHM VARIABLES
-                        //CALCULATE AVERAGE RESULT OF EACH RACE AND UPDATE THE ACCURACY OF THE ALGORITHM
-                        runningTotal.AddRange(percentageCorrect);
+                    switch ((AlgorithmEnum)activeAlgorithm.algorithm_id) 
+                    {
+                        case AlgorithmEnum.TopSpeedOnly:
+                            result = await _topSpeedOnly.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
+                        case AlgorithmEnum.TsRPR:
+                            result = await _topSpeedRpr.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
                     }
-                    result.Accuracy = runningTotal.Average();
+
+                    result.AlgorithmId = activeAlgorithm.algorithm_id;
                 }
             }
             catch (Exception ex)
@@ -73,7 +68,7 @@ namespace Core.Services
             {
                 var update = _algorithmRepository.GetAlgorithmById(result.AlgorithmId);
 
-                update.accuracy = result.Accuracy;
+                update.accuracy = (decimal)result.Accuracy;
                 update.number_of_races = result.RacesFiltered;
                 update.active = false;
 
@@ -85,34 +80,5 @@ namespace Core.Services
             }
         }
 
-            private async Task<decimal> TopSpeedVariable(RaceEntity race)
-        {
-            var total = 3; // 3 horses placed in the prediction
-            var counter = 0;
-            var horses = _eventRepository.GetRaceHorsesForRace(race.race_id);
-            var listOfHorses = new List<HorseEntity>();
-            foreach (var h in horses)
-            {
-                var horse = _horseRepository.GetHorse(h.horse_id);
-                listOfHorses.Add(horse);
-            }
-
-            if (listOfHorses.Count > 0)
-            {
-                var predictions = TopSpeed.CalculateResultsByTopSpeed(listOfHorses).Take(3);
-                var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(3);
-
-                foreach (var prediction in predictions)
-                {
-                    //If the predictions top 3 are in the results top 3 add a point
-                    if (results.Any(x => x.horse_id == prediction.horse_id))
-                    {
-                        counter++;
-                    }
-                }
-            }
-
-            return counter / total * 100;
-        }
     }
 }

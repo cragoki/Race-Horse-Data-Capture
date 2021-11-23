@@ -1,4 +1,6 @@
 ﻿
+using Core.Algorithms;
+using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Services;
@@ -32,6 +34,11 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IConfigurationRepository, ConfigurationRepository>();
             container.RegisterScoped<IAlgorithmRepository, AlgorithmRepository>();
             container.RegisterScoped<IMappingTableRepository, MappingTableRepository>();
+
+            //Algorithms
+            container.RegisterScoped<ITopSpeedOnly, TopSpeedOnly>();
+            container.RegisterScoped<ITsRPR, TsRPR>();
+
 
             container.RegisterSettings(configuration);
             container.RegisterServices();

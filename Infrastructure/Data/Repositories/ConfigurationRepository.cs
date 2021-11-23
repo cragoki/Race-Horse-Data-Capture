@@ -2,6 +2,7 @@
 using Core.Enums;
 using Core.Interfaces.Data.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Infrastructure.Data.Repositories
@@ -35,6 +36,11 @@ namespace Infrastructure.Data.Repositories
         public JobEntity GetJobInfo(JobEnum job)
         {
             return _context.tb_job.Where(x => x.job_id == (int)job).FirstOrDefault();
+        }
+
+        public List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId)
+        {
+            return _context.tb_algorithm_settings.Where(x => x.algorithm_id == algorithmId).ToList();
         }
 
         public void UpdateNextExecution(JobEnum job)
