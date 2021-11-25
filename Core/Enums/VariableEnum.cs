@@ -3,6 +3,7 @@
     public enum VariableEnum
     {
         TopSpeed = 1,
-        RPR = 2
+        RPR = 2,
+        Form = 1002
     }
 }
