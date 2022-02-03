@@ -50,7 +50,10 @@ namespace AlgorithmAccuracyCalculator
 
                     var result = await _algorithmService.ExecuteActiveAlgorithm();
 
-                    await _algorithmService.StoreAlgorithmResults(result);
+                    if (result != null && result.AlgorithmId != 0) 
+                    {
+                        await _algorithmService.StoreAlgorithmResults(result);
+                    }
 
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
@@ -60,6 +63,7 @@ namespace AlgorithmAccuracyCalculator
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Logger.Info("-------------------------------------------------------------------------------------------------");
                     Console.WriteLine($"completing Batch at {DateTime.Now}");
+                    Thread.Sleep((int)TimeSpan.FromMinutes(30).TotalMilliseconds);
 
                 }
                 catch (Exception ex)

@@ -3,8 +3,7 @@ using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using System.Collections.Generic;
 using System.Linq;
-
-
+using System.Data.SqlClient;
 namespace Infrastructure.Data.Repositories
 {
     public class HorseRepository : IHorseRepository
@@ -26,9 +25,9 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_horse.Where(x => x.rp_horse_id == rp_id).FirstOrDefault();
         }
-        public HorseArchiveEntity GetHorseArchive(int horse_id)
+        public List<HorseArchiveEntity> GetHorseArchive(int horse_id)
         {
-            return _context.tb_archive_horse.Where(x => x.horse_id == horse_id).FirstOrDefault();
+            return _context.tb_archive_horse.Where(x => x.horse_id == horse_id).ToList();
         }
         public int AddHorse(HorseEntity horse)
         {

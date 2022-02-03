@@ -152,5 +152,47 @@ namespace Core.Services
 
             return result;
         }
+
+        public async Task<int> GetRprForHorseRace(int horseId, DateTime raceDate) 
+        {
+            var archive = _horseRepository.GetHorseArchive(horseId);
+
+            if (archive != null && archive.Count() != 0) 
+            {
+                var rpr = archive.Where(x => x.field_changed == "rpr" && x.date < raceDate)
+                    .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
+
+                if (rpr != "-") 
+                {
+                    if (Int32.TryParse(rpr, out int result)) 
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        public async Task<int> GetTsForHorseRace(int horseId, DateTime raceDate)
+        {
+            var archive = _horseRepository.GetHorseArchive(horseId);
+
+            if (archive != null && archive.Count() != 0)
+            {
+                var ts = archive.Where(x => x.field_changed == "ts" && x.date < raceDate)
+                    .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
+
+                if (ts != "-")
+                {
+                    if (Int32.TryParse(ts, out int result)) 
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            return -1;
+        }
     }
 }

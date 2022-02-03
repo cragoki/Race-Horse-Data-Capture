@@ -35,6 +35,5 @@ namespace Infrastructure.Data
         public DbSet<SurfaceType> tb_surface_type { get; set; }
         public DbSet<WeatherType> tb_weather_type { get; set; }
         public DbSet<AlgorithmSettingsEntity> tb_algorithm_settings { get; set; }
-
     }
 }

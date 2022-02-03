@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Interfaces.Algorithms;
-
+using Core.Interfaces.Services;
 namespace Core.Algorithms
 {
     public class TsRPR : ITsRPR
@@ -16,13 +16,16 @@ namespace Core.Algorithms
         private readonly IConfigurationRepository _configRepository;
         private readonly IEventRepository _eventRepository;
         private readonly IHorseRepository _horseRepository;
+        private readonly IRaceService _raceService;
+
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public TsRPR(IConfigurationRepository configRepository, IEventRepository eventRepository, IHorseRepository horseRepository)
+        public TsRPR(IConfigurationRepository configRepository, IEventRepository eventRepository, IHorseRepository horseRepository, IRaceService raceService)
         {
             _configRepository = configRepository;
             _eventRepository = eventRepository;
             _horseRepository = horseRepository;
+            _raceService = raceService;
         }
         public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms)
         {
@@ -36,7 +39,7 @@ namespace Core.Algorithms
                 {
                     var predictionResult = await TSRpRCalculation(race, algorithms);
 
-                    if (predictionResult != 500)
+                    if (predictionResult != -1)
                     {
                         Console.WriteLine($"Valid Prediction with {predictionResult}%");
                         raceCounter++;
@@ -66,7 +69,21 @@ namespace Core.Algorithms
 
             foreach (var h in horses)
             {
+                var even = _eventRepository.GetEventById(race.event_id);
                 var horse = _horseRepository.GetHorse(h.horse_id);
+                //GETTING ARCHIVED HORSE DATA
+                var rpr = await _raceService.GetRprForHorseRace(h.horse_id, even.created);
+                var ts = await _raceService.GetTsForHorseRace(h.horse_id, even.created);
+
+                if (rpr != -1) 
+                {
+                    horse.rpr = rpr;
+                }
+                if (ts != -1)
+                {
+                    horse.top_speed = ts;
+                }
+
                 listOfHorses.Add(horse);
             }
             var a = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
@@ -75,7 +92,7 @@ namespace Core.Algorithms
 
             if (listOfHorses.Where(x => (x.top_speed != null || x.top_speed > 0) && (x.rpr != null || x.rpr > 0)).Count() < variance)
             {
-                return 500;
+                return -1;
             }
 
             if (listOfHorses.Count > 0)

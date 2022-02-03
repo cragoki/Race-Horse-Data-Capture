@@ -11,7 +11,7 @@ namespace Core.Interfaces.Data.Repositories
         void AddRaceHorse(RaceHorseEntity horse);
         void UpdateRaceHorse(RaceHorseEntity horse);
         HorseEntity GetHorse(int horse_id);
-        HorseArchiveEntity GetHorseArchive(int horse_id);
+        List<HorseArchiveEntity> GetHorseArchive(int horse_id);
         HorseEntity GetHorseByRpId(int rp_id);
         void SaveChanges();
         void UpdateHorse(HorseEntity horse);

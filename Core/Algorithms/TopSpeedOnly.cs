@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Interfaces.Services;
 
 namespace Core.Algorithms
 {
@@ -18,12 +19,14 @@ namespace Core.Algorithms
         private readonly IHorseRepository _horseRepository;
         private readonly IConfigurationRepository _configRepository;
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly IRaceService _raceService;
 
-        public TopSpeedOnly(IEventRepository eventRepository, IHorseRepository horseRepository, IConfigurationRepository configRepository) 
+        public TopSpeedOnly(IEventRepository eventRepository, IHorseRepository horseRepository, IConfigurationRepository configRepository, IRaceService raceService) 
         {
             _eventRepository = eventRepository;
             _horseRepository = horseRepository;
             _configRepository = configRepository;
+            _raceService = raceService;
         }
         public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms)
         {
@@ -38,7 +41,7 @@ namespace Core.Algorithms
                 {
                     var predictionResult = await TopSpeedVariable(race);
 
-                    if(predictionResult != 500)
+                    if(predictionResult != -1)
                     {
                         raceCounter++;
                         runningTotal.Add(predictionResult);
@@ -64,22 +67,37 @@ namespace Core.Algorithms
             var counter = 0;
             var horses = _eventRepository.GetRaceHorsesForRace(race.race_id);
             var listOfHorses = new List<HorseEntity>();
-            //Percentage of horses required in the race with sufficient data to continue
-            var variance = (Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString()) / listOfHorses.Count()) * 100;
-
-            if (listOfHorses.Where(x => x.top_speed != null || x.top_speed > 0).Count() < variance) 
+            foreach (var horse in horses) 
             {
-                return 500;
+                listOfHorses.Add(_horseRepository.GetHorse(horse.horse_id));
             }
 
             foreach (var h in horses)
             {
+                var even = _eventRepository.GetEventById(race.event_id);
                 var horse = _horseRepository.GetHorse(h.horse_id);
+
+                //GETTING ARCHIVED HORSE DATA
+                var ts = await _raceService.GetTsForHorseRace(h.horse_id, even.created);
+
+                if (ts != -1)
+                {
+                    horse.top_speed = ts;
+                }
+
                 listOfHorses.Add(horse);
             }
 
             if (listOfHorses.Count > 0)
             {
+                var a = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
+                //Percentage of horses required in the race with sufficient data to continue
+                var variance = (listOfHorses.Count() * a);
+                if (listOfHorses.Where(x => x.top_speed != null || x.top_speed > 0).Count() < variance)
+                {
+                    return -1;
+                }
+
                 var predictions = TopSpeed.CalculateResultsByTopSpeed(listOfHorses).Take(total);
                 var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(3);
 
