@@ -98,6 +98,10 @@ namespace Infrastructure.Data.Repositories
         {
            return _context.tb_race.Where(x => x.completed == false).ToList();
         }
+        public IEnumerable<RaceHorseEntity> GetAllRacesForHorse(int horse_id)
+        {
+            return _context.tb_race_horse.Where(x => x.horse_id == horse_id && x.position > 0).ToList();
+        }
 
         public void SaveChanges()
         {

@@ -1,19 +1,18 @@
 ﻿using Core.Entities;
 using Core.Enums;
+using Core.Helpers;
 using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
 using Core.Models.Algorithm;
 using Core.Variables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Interfaces.Algorithms;
-using Core.Interfaces.Services;
-using Core.Helpers;
 
 namespace Core.Algorithms
 {
-    public class TsRPR : ITsRPR
+    public class FormAlgorithm
     {
         private readonly IConfigurationRepository _configRepository;
         private readonly IEventRepository _eventRepository;
@@ -22,7 +21,7 @@ namespace Core.Algorithms
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public TsRPR(IConfigurationRepository configRepository, IEventRepository eventRepository, IHorseRepository horseRepository, IRaceService raceService)
+        public FormAlgorithm(IConfigurationRepository configRepository, IEventRepository eventRepository, IHorseRepository horseRepository, IRaceService raceService)
         {
             _configRepository = configRepository;
             _eventRepository = eventRepository;
@@ -39,7 +38,7 @@ namespace Core.Algorithms
 
                 foreach (var race in races)
                 {
-                    var predictionResult = await TSRpRCalculation(race, algorithms);
+                    var predictionResult = await FormCalculation(race, algorithms);
 
                     if (predictionResult != -1)
                     {
@@ -61,56 +60,51 @@ namespace Core.Algorithms
             return result;
         }
 
-        public async Task<double> TSRpRCalculation(RaceEntity race, List<AlgorithmVariableEntity> variables)
+        public async Task<double> FormCalculation(RaceEntity race, List<AlgorithmVariableEntity> variables)
         {
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.TsRPR);
-            var total = 3; // 3 horses placed in the prediction
+            var total = SharedCalculations.GetTake(race.no_of_horses ?? 0); // 3 horses placed in the prediction
             var counter = 0;
             var horses = _eventRepository.GetRaceHorsesForRace(race.race_id);
             var listOfHorses = new List<HorseEntity>();
+            var horseRequired = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
+            var raceRequired = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.racesRequired.ToString()).FirstOrDefault().setting_value.ToString());
 
             foreach (var h in horses)
             {
                 var even = _eventRepository.GetEventById(race.event_id);
                 var horse = _horseRepository.GetHorse(h.horse_id);
                 //GETTING ARCHIVED HORSE DATA
-                var rpr = await _raceService.GetRprForHorseRace(h.horse_id, even.created);
-                var ts = await _raceService.GetTsForHorseRace(h.horse_id, even.created);
+                var races = _horseRepository.GetAllRacesForHorse(h.horse_id).Count();
 
-                if (rpr != -1) 
+                if (races > raceRequired)
                 {
-                    horse.rpr = rpr;
-                }
-                if (ts != -1)
-                {
-                    horse.top_speed = ts;
+                    listOfHorses.Add(horse);
                 }
 
-                listOfHorses.Add(horse);
             }
-            var a = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
             //Percentage of horses required in the race with sufficient data to continue
-            var variance = (listOfHorses.Count() * a);
+            //TODO: Add in filter here to ensure the LAST x RACES WERE WITHIN x MONTHS
+            //var variance = (listOfHorses.Count() * horseRequired);
 
-            if (listOfHorses.Where(x => (x.top_speed != null || x.top_speed > 0) && (x.rpr != null || x.rpr > 0)).Count() < variance)
-            {
-                return -1;
-            }
+            //if (listOfHorses.Where(x => x.).Count() < variance)
+            //{
+            //    return -1;
+            //}
 
             if (listOfHorses.Count > 0)
             {
                 Dictionary<int, decimal> horseDict = new Dictionary<int, decimal>();
-                var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(SharedCalculations.GetTake(race.no_of_horses ?? 0));
-                var predictions = new List<HorseEntity>();
+                var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(total);
+                var predictions = new List<int>();
+                var horseFormModel = new List<HorseFormModel>();
+                var take = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
                 foreach (var variable in variables)
                 {
                     switch (variable.variable_id)
                     {
-                        case (int)VariableEnum.TopSpeed:
-                            predictions = TopSpeed.CalculateResultsByTopSpeed(listOfHorses).ToList();
-                            break;
-                        case (int)VariableEnum.RPR:
-                            predictions = RPR.CalculateResultsByRPR(listOfHorses).ToList();
+                        case (int)VariableEnum.Form:
+                            predictions = Form.CalculateResultsByForm(horseFormModel, take).ToList();
                             break;
                     }
 
@@ -118,20 +112,20 @@ namespace Core.Algorithms
                     {
                         var position = i + 1;
                         //Check if horse exists in dictionary
-                        if (horseDict.ContainsKey(predictions[i].horse_id))
+                        if (horseDict.ContainsKey(predictions[i]))
                         {
                             //Add points based on position 1,2 or 3
-                            horseDict[predictions[i].horse_id] += variable.threshold / position;
+                            horseDict[predictions[i]] += variable.threshold / position;
                         }
                         else
                         {
                             //Add points based on position 1,2 or 3
-                            horseDict.Add(predictions[i].horse_id, variable.threshold / position);
+                            horseDict.Add(predictions[i], variable.threshold / position);
                         }
                     }
                 }
                 //reorder outcome based on points
-                var guess = horseDict.OrderByDescending(x => x.Value).Take(total);
+                var guess = horseDict.OrderByDescending(x => x.Value);
 
                 //compare with actual results
                 foreach (var prediction in guess)
@@ -147,4 +141,5 @@ namespace Core.Algorithms
             return (double)counter / total * 100;
         }
     }
+
 }

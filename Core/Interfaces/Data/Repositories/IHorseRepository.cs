@@ -21,5 +21,6 @@ namespace Core.Interfaces.Data.Repositories
         JockeyEntity GetJockeyByName(string name);
         TrainerEntity GetTrainerByName(string name);
         IEnumerable<RaceEntity> GetNoResultRaces();
+        IEnumerable<RaceHorseEntity> GetAllRacesForHorse(int horse_id);
     }
 }

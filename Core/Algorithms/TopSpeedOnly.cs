@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Interfaces.Services;
+using Core.Helpers;
 
 namespace Core.Algorithms
 {
@@ -99,7 +100,7 @@ namespace Core.Algorithms
                 }
 
                 var predictions = TopSpeed.CalculateResultsByTopSpeed(listOfHorses).Take(total);
-                var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(3);
+                var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(SharedCalculations.GetTake(race.no_of_horses ?? 0));
 
                 foreach (var prediction in predictions)
                 {

@@ -1,4 +1,5 @@
-﻿using Core.Models.Algorithm;
+﻿using Core.Helpers;
+using Core.Models.Algorithm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +18,25 @@ namespace Core.Variables
             try
             {
                 var horses = races.Select(x => x.HorseId).Distinct();
-
                 foreach (var horse in horses)
                 {
                     league.Add(horse, 0);
                     foreach (var race in races.Where(x => x.HorseId == horse).OrderByDescending(x => x.Date).Take(take)) 
                     {
-                        if (race.Position == 1 || race.Position == 2)
+
+                        if (race.NoOfHorses != null && race.NoOfHorses > 0) 
                         {
-                            league[horse] += 2;
-                        }
-                        else if (race.Position == 3) 
-                        {
-                            league[horse] += 1;
+                            var placedPosition = SharedCalculations.GetTake(race.NoOfHorses);
+
+                            if (race.Position == 0)
+                            {
+                                league[horse] += 0;
+                            }
+                            //Could possibly assign an extra point to horses who finished first?
+                            else if (race.Position >= placedPosition)
+                            {
+                                league[horse] += 1;
+                            }
                         }
                     }
                 }
