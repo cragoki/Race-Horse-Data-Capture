@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Helpers;
+using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models.Algorithm;
@@ -12,21 +13,19 @@ using System.Threading.Tasks;
 
 namespace Core.Algorithms
 {
-    public class FormAlgorithm
+    public class FormAlgorithm : IFormAlgorithm
     {
         private readonly IConfigurationRepository _configRepository;
         private readonly IEventRepository _eventRepository;
         private readonly IHorseRepository _horseRepository;
-        private readonly IRaceService _raceService;
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public FormAlgorithm(IConfigurationRepository configRepository, IEventRepository eventRepository, IHorseRepository horseRepository, IRaceService raceService)
+        public FormAlgorithm(IConfigurationRepository configRepository, IEventRepository eventRepository, IHorseRepository horseRepository)
         {
             _configRepository = configRepository;
             _eventRepository = eventRepository;
             _horseRepository = horseRepository;
-            _raceService = raceService;
         }
         public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms)
         {

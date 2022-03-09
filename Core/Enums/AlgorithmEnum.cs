@@ -7,6 +7,7 @@ namespace Core.Enums
     public enum AlgorithmEnum
     {
         TopSpeedOnly = 1,
-        TsRPR = 2
+        TsRPR = 2,
+        FormOnly = 3
     }
 }

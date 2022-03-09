@@ -20,6 +20,7 @@ namespace Core.Services
         private static IAlgorithmRepository _algorithmRepository;
         private static ITopSpeedOnly _topSpeedOnly;
         private static ITsRPR _topSpeedRpr;
+        private static IFormAlgorithm _formAlgorithm;
 
         public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr)
         {
@@ -48,6 +49,9 @@ namespace Core.Services
                             break;
                         case AlgorithmEnum.TsRPR:
                             result = await _topSpeedRpr.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
+                        case AlgorithmEnum.FormOnly:
+                            result = await _formAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
                             break;
                     }
 

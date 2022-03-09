@@ -38,6 +38,7 @@ namespace Infrastructure.Config.IoC
             //Algorithms
             container.RegisterScoped<ITopSpeedOnly, TopSpeedOnly>();
             container.RegisterScoped<ITsRPR, TsRPR>();
+            container.RegisterScoped<IFormAlgorithm, FormAlgorithm>();
 
 
             container.RegisterSettings(configuration);
