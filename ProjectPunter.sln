@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31129.286
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectPunter", "ProjectPunter\ProjectPunter.csproj", "{E4F4A38C-0D57-4DE2-A86D-D3B7B1039494}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RHDCAutomation", "RHDCAutomation\RHDCAutomation.csproj", "{5F115960-2C29-40B4-9832-692F6F7344ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{935B5A58-C325-4A99-B901-5649817CE4D7}"
@@ -15,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RHDCResultRetriever", "RHDC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RHDCBackLog", "RHDCBackLog\RHDCBackLog.csproj", "{41DD1659-D442-42A2-8508-67EB9EC8CE64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmAccuracyCalculator", "AlgorithmAccuracyCalculator\AlgorithmAccuracyCalculator.csproj", "{770C4C38-3BAF-47B1-B971-2451CC0F71F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlgorithmAccuracyCalculator", "AlgorithmAccuracyCalculator\AlgorithmAccuracyCalculator.csproj", "{770C4C38-3BAF-47B1-B971-2451CC0F71F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPunter", "AdminPunter\AdminPunter.csproj", "{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E4F4A38C-0D57-4DE2-A86D-D3B7B1039494}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E4F4A38C-0D57-4DE2-A86D-D3B7B1039494}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E4F4A38C-0D57-4DE2-A86D-D3B7B1039494}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E4F4A38C-0D57-4DE2-A86D-D3B7B1039494}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F115960-2C29-40B4-9832-692F6F7344ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F115960-2C29-40B4-9832-692F6F7344ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F115960-2C29-40B4-9832-692F6F7344ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +47,10 @@ Global
 		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{770C4C38-3BAF-47B1-B971-2451CC0F71F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

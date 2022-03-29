@@ -254,10 +254,10 @@ namespace Core.Services
 
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
 
-                    if (toUpdate != null) 
+                    if (toUpdate != null)
                     {
                         toUpdate.position = Int32.Parse(formattedPos);
-                        toUpdate.description = comment.Replace(" ", "");
+                        toUpdate.description = comment.Replace("  ", "");
                         toUpdate.finished = true;
 
                         _horseRepository.UpdateRaceHorse(toUpdate);
