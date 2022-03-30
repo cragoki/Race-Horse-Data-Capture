@@ -17,6 +17,12 @@ namespace Infrastructure.Data.Repositories
             _configService = configService;
         }
 
+        public List<AlgorithmEntity> GetAlgorithms()
+        {
+            return _context.tb_algorithm.ToList();
+
+        }
+
         public AlgorithmEntity GetAlgorithmById(int algorithmId)
         {
             return _context.tb_algorithm.Where(x => x.algorithm_id == algorithmId).FirstOrDefault();

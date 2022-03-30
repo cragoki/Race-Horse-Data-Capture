@@ -6,6 +6,7 @@ namespace Core.Interfaces.Data.Repositories
     public interface IAlgorithmRepository
     {
         AlgorithmEntity GetActiveAlgorithm();
+        List<AlgorithmEntity> GetAlgorithms();
         AlgorithmEntity GetAlgorithmById(int algorithmId);
         List<AlgorithmVariableEntity> GetAlgorithmVariableByAlgorithmId(int algorithmId);
         AlgorithmVariableEntity GetAlgorithmVariableById(int algorithmVariableId);

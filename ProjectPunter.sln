@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RHDCBackLog", "RHDCBackLog\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlgorithmAccuracyCalculator", "AlgorithmAccuracyCalculator\AlgorithmAccuracyCalculator.csproj", "{770C4C38-3BAF-47B1-B971-2451CC0F71F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPunter", "AdminPunter\AdminPunter.csproj", "{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminPunter", "AdminPunter\AdminPunter.csproj", "{61FB2C53-4568-4EAE-B8E3-F1BA0E54F926}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

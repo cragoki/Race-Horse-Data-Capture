@@ -1,0 +1,42 @@
+﻿@page "/Algorithms/Index"
+
+<PageTitle>Algorithms</PageTitle>
+
+@inject AlgorithmService algorithmService;
+
+@if (algorithms == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Active</th>
+                <th>Accuracy</th>
+                <th>Number Of Races</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var algorithm in algorithms)
+            {
+                <tr>
+                    <td>@algorithm.AlgorithmName</td>
+                    <td>@algorithm.IsActive</td>
+                    <td>@algorithm.Accuracy</td>
+                    <td>@algorithm.NumberOfRaces</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private List<AlgorithmTableViewModel>? algorithms;
+
+    protected override async Task OnInitializedAsync()
+    {
+        algorithms = await algorithmService.GetAlgorithmTableData();
+    }
+}
