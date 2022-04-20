@@ -9,8 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.UseStashbox();
-
+builder.Host.UseStashbox();
 builder.Host.ConfigureContainer<IStashboxContainer>((context, container) =>
 {
     container.AddDependencies(context.Configuration);
