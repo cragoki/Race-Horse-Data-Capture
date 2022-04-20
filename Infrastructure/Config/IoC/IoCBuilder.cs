@@ -5,6 +5,7 @@ using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Services;
 using Infrastructure.Data.Repositories;
+using Infrastructure.PunterAdmin.Services;
 using Microsoft.Extensions.Configuration;
 using Stashbox;
 
@@ -39,6 +40,9 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<ITopSpeedOnly, TopSpeedOnly>();
             container.RegisterScoped<ITsRPR, TsRPR>();
             container.RegisterScoped<IFormAlgorithm, FormAlgorithm>();
+
+            //Punter Admin
+            container.RegisterScoped<IAdminAlgorithmService, AdminAlgorithmService>();
 
 
             container.RegisterSettings(configuration);

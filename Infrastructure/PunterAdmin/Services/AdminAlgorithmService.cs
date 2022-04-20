@@ -6,18 +6,18 @@ using System;
 
 namespace Infrastructure.PunterAdmin.Services
 {
-    public class AlgorithmService
+    public class AdminAlgorithmService : IAdminAlgorithmService
     {
         private IAlgorithmRepository _algorithmRepository;
         private IConfigurationRepository _configurationRepository;
 
-        public AlgorithmService(IAlgorithmRepository algorithmRepository, IConfigurationRepository configurationRepository) 
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IConfigurationRepository configurationRepository)
         {
             _algorithmRepository = algorithmRepository;
             _configurationRepository = configurationRepository;
-    }
+        }
 
-        public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData() 
+        public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
         {
             var result = new List<AlgorithmTableViewModel>();
 
@@ -25,7 +25,7 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var algorithms = _algorithmRepository.GetAlgorithms();
 
-                foreach (var algorithm in algorithms) 
+                foreach (var algorithm in algorithms)
                 {
 
                     var settings = await GetAlgorithmSettings(algorithm.algorithm_id);
@@ -41,6 +41,7 @@ namespace Infrastructure.PunterAdmin.Services
                         Settings = settings,
                         Variables = variables
                     };
+                    result.Add(toAdd);
                 }
             }
             catch (Exception ex)
@@ -53,7 +54,7 @@ namespace Infrastructure.PunterAdmin.Services
 
 
         #region private
-        private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(int algorithmId) 
+        private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(int algorithmId)
         {
             var result = new List<AlgorithSettingsTableViewModel>();
             var settings = _configurationRepository.GetAlgorithmSettings(algorithmId);
@@ -75,7 +76,7 @@ namespace Infrastructure.PunterAdmin.Services
         private async Task<List<AlgorithmVariableTableViewModel>> GetAlgorithmVariables(int algorithmId)
         {
             var result = new List<AlgorithmVariableTableViewModel>();
-            var algorithmVariables =  _algorithmRepository.GetAlgorithmVariableByAlgorithmId(algorithmId);
+            var algorithmVariables = _algorithmRepository.GetAlgorithmVariableByAlgorithmId(algorithmId);
 
 
             foreach (var algorithmVariable in algorithmVariables)
