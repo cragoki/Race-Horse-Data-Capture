@@ -8,6 +8,7 @@ namespace Core.Interfaces.Data.Repositories
     public interface IConfigurationRepository
     {
         void AddBatch(BatchEntity batch);
+        BatchEntity GetMostRecentBatch();
         BacklogDateEntity GetBacklogDate();
         void UpdateBacklogDate(DateTime date);
         JobEntity GetJobInfo(JobEnum job);

@@ -10,7 +10,10 @@ namespace Core.Interfaces.Data.Repositories
         IEnumerable<EventEntity> GetTodaysEvents();
         EventEntity GetEventById(int eventId);
         CourseEntity GetCourseById(int courseId);
+        MeetingType GetMeetingTypeById(int meetingTypeId);
+        SurfaceType GetSurfaceTypeById(int surfaceTypeId);
         EventEntity GetEventByBatch(int courseId, Guid batch);
+        List<EventEntity> GetEventsByBatch(Guid batch);
         IEnumerable<EventEntity> GetEventByCourse(int courseId);
         void AddCourse(CourseEntity courseToAdd);
         void UpdateCourse(CourseEntity courseToUpdate);

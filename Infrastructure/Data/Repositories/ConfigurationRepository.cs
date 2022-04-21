@@ -22,6 +22,11 @@ namespace Infrastructure.Data.Repositories
             _context.SaveChanges();
         }
 
+        public BatchEntity GetMostRecentBatch()
+        {
+            return _context.tb_batch.OrderByDescending(x => x.date).FirstOrDefault();
+        }
+
         public BacklogDateEntity GetBacklogDate()
         {
             return _context.tb_backlog_date.FirstOrDefault();

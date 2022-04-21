@@ -34,7 +34,14 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_course.Where(x => x.course_id == courseId).FirstOrDefault();
         }
-
+        public MeetingType GetMeetingTypeById(int meetingTypeId)
+        {
+            return _context.tb_meeting_type.Where(x => x.meeting_type_id == meetingTypeId).FirstOrDefault();
+        }
+        public SurfaceType GetSurfaceTypeById(int surfaceTypeId)
+        {
+            return _context.tb_surface_type.Where(x => x.surface_type_id == surfaceTypeId).FirstOrDefault();
+        }
         public EventEntity GetEventById(int eventId)
         {
             return _context.tb_event.Find(eventId);
@@ -43,7 +50,10 @@ namespace Infrastructure.Data.Repositories
         public EventEntity GetEventByBatch(int courseId, Guid batch) 
         {
             return _context.tb_event.Where(x => x.course_id == courseId && x.batch_id == batch).FirstOrDefault();
-
+        }
+        public List<EventEntity> GetEventsByBatch(Guid batch)
+        {
+            return _context.tb_event.Where(x => x.batch_id == batch).ToList();
         }
         public IEnumerable<EventEntity> GetEventByCourse(int courseId)
         {
