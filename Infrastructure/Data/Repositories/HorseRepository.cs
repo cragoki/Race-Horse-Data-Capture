@@ -89,9 +89,18 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_jockey.Where(x => x.jockey_name == name).FirstOrDefault();
         }
+
+        public JockeyEntity GetJockeyById(int id) 
+        {
+            return _context.tb_jockey.Where(x => x.jockey_id == id).FirstOrDefault();
+        }
         public TrainerEntity GetTrainerByName(string name)
         {
             return _context.tb_trainer.Where(x => x.trainer_name == name).FirstOrDefault();
+        }
+        public TrainerEntity GetTrainerById(int id)
+        {
+            return _context.tb_trainer.Where(x => x.trainer_id == id).FirstOrDefault();
         }
 
         public IEnumerable<RaceEntity> GetNoResultRaces()

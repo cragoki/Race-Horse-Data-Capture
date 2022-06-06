@@ -16,6 +16,35 @@ namespace Infrastructure.Data.Repositories
             _configService = configService;
         }
 
+        public string GetAgeType(int age)
+        {
+            return _context.tb_age_type.Where(x => x.age_type_id == age).FirstOrDefault().age_type;
+        }
+        public string GetDistanceType(int distance)
+        {
+            return _context.tb_distance_type.Where(x => x.distance_type_id == distance).FirstOrDefault().distance_type;
+        }
+        public string GetGoingType(int going)
+        {
+            return _context.tb_going_type.Where(x => x.going_type_id == going).FirstOrDefault().going_type;
+        }
+        public string GetMeetingType(int meeting)
+        {
+            return _context.tb_meeting_type.Where(x => x.meeting_type_id == meeting).FirstOrDefault().meeting_type;
+        }
+        public string GetStallsType(int stalls)
+        {
+            return _context.tb_stalls_type.Where(x => x.stalls_type_id == stalls).FirstOrDefault().stalls_type;
+        }
+        public string GetWeatherType(int weather)
+        {
+            return _context.tb_weather_type.Where(x => x.weather_type_id == weather).FirstOrDefault().weather_type;
+        }
+        public string GetSurfaceType(int surface)
+        {
+            return _context.tb_surface_type.Where(x => x.surface_type_id == surface).FirstOrDefault().surface_type;
+        }
+
         public int AddOrReturnAgeType(string age)
         {
             int result = 0;

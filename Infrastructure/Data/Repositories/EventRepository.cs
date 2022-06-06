@@ -1,6 +1,8 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Infrastructure.PunterAdmin.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +55,30 @@ namespace Infrastructure.Data.Repositories
         }
         public List<EventEntity> GetEventsByBatch(Guid batch)
         {
-            return _context.tb_event.Where(x => x.batch_id == batch).ToList();
+            return _context.tb_event.Where(x => x.batch_id == batch)
+                .Include(x => x.Course)
+                .Include(x => x.MeetingType)
+                .Include(x => x.Surface)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Horse)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Jockey)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Trainer)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Weather)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Stalls)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Distance)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Ages)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Going)
+                .ToList();
         }
         public IEnumerable<EventEntity> GetEventByCourse(int courseId)
         {
@@ -78,6 +103,19 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_race.Where(x => x.event_id == eventId);
         }
+
+        //public async IQueryable<List<TodaysRacesViewModel>> GetEventAdminData(int eventId) 
+        //{
+        //    try
+        //    {
+        //        return await (from ev in _context.tb_event
+        //                      join race in ev on ev.event_id equals race.)
+        //    }
+        //    catch (Exception ex) 
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public RaceEntity GetRaceById(int raceId)
         {

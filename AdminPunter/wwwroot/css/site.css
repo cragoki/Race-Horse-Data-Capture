@@ -2,6 +2,8 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color:rgba(25,25,25,0.8);
+    color: white;
 }
 
 h1:focus {
@@ -62,3 +64,64 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.event-card {
+    border:2px solid white;
+    padding:50px;
+    width:100%;
+    text-align:center;
+}
+
+    .event-card a {
+        text-decoration:none;
+    }
+
+.event-card-right {
+    float:left;
+}
+
+.event-card-left {
+    float: left;
+}
+
+.event-card ul {
+    text-align: center;
+    text-decoration: none;
+    list-style:none;
+}
+
+
+    .event-card ul li{
+        text-align: center;
+        text-decoration: none;
+    }
+
+table {
+    border-color:white !important;
+    color:white !important;
+}
+.race-row {
+    color: white;
+}
+
+.race-row-incomplete {
+    color: white;
+    background-color: #5c100c;
+}
+
+.race-row-complete {
+    color: white;
+    background-color: #0c5c0d;
+}
+
+.race-row td {
+    padding: 25px;
+}
+
+.horse-tbl-head {
+    color:white;
+    background-color:black;
+}
+.horse-tbl-body {
+    color: green;
+}

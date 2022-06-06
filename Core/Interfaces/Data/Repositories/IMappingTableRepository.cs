@@ -2,6 +2,13 @@
 { 
     public interface IMappingTableRepository
     {
+        string GetAgeType(int age);
+        string GetDistanceType(int distance);
+        string GetGoingType(int going);
+        string GetMeetingType(int meeting);
+        string GetStallsType(int stalls);
+        string GetWeatherType(int weather);
+        string GetSurfaceType(int surface);
         int AddOrReturnAgeType(string age);
         int AddOrReturnDistanceType(string distance);
         int AddOrReturnGoingType(string going);

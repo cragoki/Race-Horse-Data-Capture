@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace Core.Entities
 {
@@ -12,5 +13,6 @@ namespace Core.Entities
         public string horse_url { get; set; }
         public int? top_speed { get; set; }
         public int? rpr { get; set; }
+        public List<RaceHorseEntity> Races { get; set; }
     }
 }

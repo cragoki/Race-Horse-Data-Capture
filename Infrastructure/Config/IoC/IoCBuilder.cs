@@ -43,6 +43,7 @@ namespace Infrastructure.Config.IoC
 
             //Punter Admin
             container.RegisterScoped<IAdminAlgorithmService, AdminAlgorithmService>();
+            container.RegisterScoped<IAdminRaceService, AdminRaceService>();
 
 
             container.RegisterSettings(configuration);
