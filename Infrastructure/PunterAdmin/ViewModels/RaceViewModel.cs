@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Infrastructure.PunterAdmin.ViewModels
 {
-    public class TodaysRaceViewModel
+    public class RaceViewModel
     {
         public int RaceId { get; set; }
         public bool AlgorithmRan { get; set; }
         public int EventId { get; set; }
+        public DateTime Date { get; set; }
         public string RaceTime { get; set; }
         public string Weather { get; set; }
         public string NumberOfHorses { get; set; }

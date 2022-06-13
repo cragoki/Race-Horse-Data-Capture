@@ -2,12 +2,15 @@ using Stashbox;
 using Infrastructure.Config.IoC;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Blazored.Modal;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddBlazoredModal();
+
 
 builder.Host.UseStashbox();
 builder.Host.ConfigureContainer<IStashboxContainer>((context, container) =>

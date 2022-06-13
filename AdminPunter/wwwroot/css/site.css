@@ -125,3 +125,57 @@ table {
 .horse-tbl-body {
     color: green;
 }
+
+.blazored-modal {
+    width: 80%;
+    height: 80%;
+    background-color: rgba(25,25,25,0.9) !important;
+    color:green !important;
+    overflow-y:auto;
+}
+
+    .blazored-modal span {
+        color: white !important;
+    }
+
+#horse-statistics-race-conditions {
+    border: 2px solid white;
+    padding: 10px;
+    background-color: black;
+    color:green;
+}
+    #horse-statistics-race-conditions ul {
+        list-style:none;
+        font-size:23px
+    }
+
+        #horse-statistics-race-conditions ul li {
+            display: inline-block;
+            margin-right:5px;
+            padding-right:10px;
+            border-right:2px solid white;
+        }
+#horse-statistics-info {
+    border: 2px solid white;
+    margin-top:20px;
+    margin-bottom:20px;
+}
+    #horse-statistics-info table{
+        width:100%;
+    }
+
+        #horse-statistics-info table thead {
+            background-color: black;
+            color: green;
+        }
+        #horse-statistics-info table tbody {
+            background-color: rgba(255,255,255,0.1);
+        }
+#horse-statistics-races {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border:2px solid white;
+    padding:10px;
+    height:100%;
+}

@@ -1,0 +1,70 @@
+﻿@inject IModalService modal  
+
+@if (HorseStatistics == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<div id="horse-statistics-container" class="row">
+    <div id="horse-statistics-race-conditions" class="col-md-12">
+        <ul>
+            <li>@HorseStatistics.CurrentRace.Weather |</li>
+            <li>Distance: @HorseStatistics.CurrentRace.Distance |</li>
+            <li>Going: @HorseStatistics.CurrentRace.Going |</li>
+            <li>@HorseStatistics.CurrentRace.NumberOfHorses |</li>
+            <li>Class: @HorseStatistics.CurrentRace.RaceClass |</li>
+            <li>Stalls: @HorseStatistics.CurrentRace.Stalls |</li>
+        </ul>
+    </div>
+    <div id="horse-statistics-info" class="col-md-12">
+        <table>
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Age</td>
+                    <td>Weight</td>
+                    <td>RPR</td>
+                    <td>TS</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@HorseStatistics.HorseName</td>
+                    <td>@HorseStatistics.Age</td>
+                    <td>@HorseStatistics.Weight</td>
+                    <td>@HorseStatistics.RPR</td>
+                    <td>@HorseStatistics.TS</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="horse-statistics-races" class="col-md-12">
+        @foreach(var race in @HorseStatistics.HorseRaces.Where(x => x.RaceId != HorseStatistics.CurrentRace.RaceId))
+        {
+            <table class="table">
+            <thead>
+            </thead>
+            <tbody>
+                <RaceComponent Race=race ActiveHorse=HorseStatistics.Horse />
+            </tbody>
+            </table>
+        }
+
+    </div>
+</div>
+}
+
+
+@code
+{
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [Parameter]
+    public RaceHorseStatisticsViewModel HorseStatistics { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var a = HorseStatistics;
+    }
+
+}

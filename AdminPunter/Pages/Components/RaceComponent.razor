@@ -1,0 +1,206 @@
+﻿@inject IAdminRaceService adminRaceService;
+@inject IModalService modal  
+
+
+
+@if (ActiveHorse != null)
+{
+            <tr class="race-row race-row-complete" id="race-@Race.RaceId-@Race.EventId" @onclick="@(e => @ShowRaceHorses(Race.EventId, Race.RaceId))">
+            <td>@Race.Date</td>
+            <td>Position: @(Race.Horses.Where(x => x.HorseId == ActiveHorse.HorseId).FirstOrDefault()?.Position ?? 0)</td>
+            <td>@Race.Weather</td>
+            <td>@Race.NumberOfHorses</td>
+            <td>@Race.Going</td>
+            <td>@Race.Stalls</td>
+            <td>@Race.Distance</td>
+            <td>@Race.RaceClass</td>
+            <td>@Race.Ages</td>
+            <td>@Race.Description</td>
+            <td>@Race.RaceUrl</td>
+        </tr>
+    
+            @if (Race.ShowHorses)
+            {
+                <tr>
+                <td colspan="100">
+                <table class="table">
+                    <thead>
+                        <tr class="horse-tbl-head">
+                           <td>Name</td>
+                           <td>Age</td>
+                           <td>Jockey</td>
+                           <td>Trainer</td>
+                           <td>RPR</td>
+                           <td>TS</td>
+                           <td>Position</td>
+                           <td>Predicted Position</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                <tbody>
+                @foreach (var horse in Race.Horses)
+                {
+                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                    <td>@horse.Name</td>
+                    <td>@horse.Age</td>
+                    <td>@horse.JockeyName</td>
+                    <td>@horse.TrainerName</td>
+                    <td>@horse.RPR</td>
+                    <td>@horse.Ts</td>
+                    <td>@horse.Position</td>
+                    <td>@horse.PredictedPosition</td>
+                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                </tr>
+                }
+            </tbody>
+            </table>
+            </td>
+            </tr> 
+            }
+}
+else
+{
+    @if (Race.AlgorithmRan)
+    {
+        <tr class="race-row race-row-complete" id="race-@Race.RaceId-@Race.EventId" @onclick="@(e => @ShowRaceHorses(Race.EventId, Race.RaceId))">
+            <td>@Race.Date</td>
+            <td>@Race.RaceTime</td>
+            <td>@Race.Weather</td>
+            <td>@Race.NumberOfHorses</td>
+            <td>@Race.Going</td>
+            <td>@Race.Stalls</td>
+            <td>@Race.Distance</td>
+            <td>@Race.RaceClass</td>
+            <td>@Race.Ages</td>
+            <td>@Race.RaceUrl</td>
+        </tr>
+    
+            @if (Race.ShowHorses)
+            {
+                <tr>
+                <td colspan="100">
+                <table class="table">
+                    <thead>
+                        <tr class="horse-tbl-head">
+                           <td>Name</td>
+                           <td>Age</td>
+                           <td>Jockey</td>
+                           <td>Trainer</td>
+                           <td>RPR</td>
+                           <td>TS</td>
+                           <td>Position</td>
+                           <td>Predicted Position</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                <tbody>
+                @foreach (var horse in Race.Horses)
+                {
+                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                    <td>@horse.Name</td>
+                    <td>@horse.Age</td>
+                    <td>@horse.JockeyName</td>
+                    <td>@horse.TrainerName</td>
+                    <td>@horse.RPR</td>
+                    <td>@horse.Ts</td>
+                    <td>@horse.Position</td>
+                    <td>@horse.PredictedPosition</td>
+                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                </tr>
+                }
+            </tbody>
+            </table>
+            </td>
+            </tr> 
+            }
+    }
+    else
+    {
+        <tr class="race-row race-row-incomplete" id="race-@Race.RaceId-@Race.EventId" @onclick="@(e => @ShowRaceHorses(Race.EventId, Race.RaceId))">
+            <td>@Race.Date</td>
+            <td>@Race.RaceTime</td>
+            <td>@Race.Weather</td>
+            <td>@Race.NumberOfHorses</td>
+            <td>@Race.Going</td>
+            <td>@Race.Stalls</td>
+            <td>@Race.Distance</td>
+            <td>@Race.RaceClass</td>
+            <td>@Race.Ages</td>
+            <td>@Race.RaceUrl</td>
+         </tr>
+            @if (Race.ShowHorses)
+            {
+                <tr>
+                <td colspan="100">
+                <table class="table">
+                    <thead>
+                        <tr class="horse-tbl-head">
+                           <td>Name</td>
+                           <td>Age</td>
+                           <td>Jockey</td>
+                           <td>Trainer</td>
+                           <td>RPR</td>
+                           <td>TS</td>
+                           <td>Position</td>
+                           <td>Predicted Position</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                <tbody>
+                @foreach (var horse in Race.Horses)
+                {
+                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                    <td>@horse.Name</td>
+                    <td>@horse.Age</td>
+                    <td>@horse.JockeyName</td>
+                    <td>@horse.TrainerName</td>
+                    <td>@horse.RPR</td>
+                    <td>@horse.Ts</td>
+                    <td>@horse.Position</td>
+                    <td>@horse.PredictedPosition</td>
+                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                </tr>
+                }
+            </tbody>
+            </table>
+            </td>
+            </tr> 
+        }
+    }
+}
+@code{
+    [Parameter]
+    public RaceViewModel Race { get; set; }
+    [Parameter]
+    public RaceHorseViewModel? ActiveHorse { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var a = Race;
+    }
+
+    private void ShowRaceHorses(int eventId, int raceId)
+    {
+        if (Race.ShowHorses)
+        {
+            Race.ShowHorses = false;
+        }
+        else 
+        {
+            Race.ShowHorses = true;
+        }
+    }
+
+    private async Task ShowHorseStatistics(int horseId, int raceId, int eventId) 
+    {
+        //Get Horse data
+        var raceHorse = Race.Horses.Where(x => x.HorseId == horseId).FirstOrDefault();
+
+        var result = await adminRaceService.GetHorseStatistics(raceHorse, Race);
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(HorseStatisticPopup.HorseStatistics), result);
+
+        //Pass both into partial view below
+        modal.Show<HorseStatisticPopup>(raceHorse.Name, parameters);
+    }
+}

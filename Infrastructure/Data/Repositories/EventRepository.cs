@@ -62,6 +62,7 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Races)
                     .ThenInclude(y => y.RaceHorses)
                         .ThenInclude(z => z.Horse)
+                            .ThenInclude(a =>a.Archive)
                 .Include(x => x.Races)
                     .ThenInclude(y => y.RaceHorses)
                         .ThenInclude(z => z.Jockey)

@@ -14,5 +14,7 @@ namespace Core.Entities
         public int? top_speed { get; set; }
         public int? rpr { get; set; }
         public List<RaceHorseEntity> Races { get; set; }
+        public List<HorseArchiveEntity> Archive { get; set; }
+
     }
 }

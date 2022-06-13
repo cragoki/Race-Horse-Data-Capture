@@ -12,6 +12,6 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public int NumberOfRaces { get; set; }
         public string MeetingURL { get; set; }
         public bool ShowRaces { get; set; }
-        public List<TodaysRaceViewModel> EventRaces { get; set; }
+        public List<RaceViewModel> EventRaces { get; set; }
     }
 }

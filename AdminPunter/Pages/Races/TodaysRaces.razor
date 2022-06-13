@@ -1,4 +1,5 @@
 ﻿@page "/Races/TodaysRaces"
+@using AdminPunter.Pages.Components
 
 <PageTitle>Todays Races</PageTitle>
 
@@ -36,85 +37,8 @@ else
                         <tbody>
                             @foreach (var race in even.EventRaces)
                             {
-                                @if (race.AlgorithmRan)
-                                {
-                                    <tr class="race-row race-row-complete" id="race-@race.RaceId-@race.EventId" @onclick="@(e => @ShowRaceHorses(even.EventId, race.RaceId))">
-                                        <td>@race.RaceTime</td>
-                                        <td>@race.Weather</td>
-                                        <td>@race.NumberOfHorses</td>
-                                        <td>@race.Going</td>
-                                        <td>@race.Stalls</td>
-                                        <td>@race.Distance</td>
-                                        <td>@race.RaceClass</td>
-                                        <td>@race.Ages</td>
-                                        <td>@race.Description</td>
-                                        <td>@race.RaceUrl</td>
-                                    </tr>
-
-                                        @if (race.ShowHorses)
-                                        {
-
-                                            @foreach (var horse in race.Horses)
-                                            {
-
-
-                                            }
-                                        }
-                                }
-                                else
-                                {
-                                    <tr class="race-row race-row-incomplete" id="race-@race.RaceId-@race.EventId" @onclick="@(e => @ShowRaceHorses(even.EventId, race.RaceId))">
-                                        <td>@race.RaceTime</td>
-                                        <td>@race.Weather</td>
-                                        <td>@race.NumberOfHorses</td>
-                                        <td>@race.Going</td>
-                                        <td>@race.Stalls</td>
-                                        <td>@race.Distance</td>
-                                        <td>@race.RaceClass</td>
-                                        <td>@race.Ages</td>
-                                        <td>@race.Description</td>
-                                        <td>@race.RaceUrl</td>
-                                     </tr>
-                                        @if (race.ShowHorses)
-                                        {
-                                            <tr>
-                                            <td colspan="100">
-                                            <table class="table">
-                                                <thead>
-                                                    <tr class="horse-tbl-head">
-                                                       <td>Name</td>
-                                                       <td>Age</td>
-                                                       <td>Jockey</td>
-                                                       <td>Trainer</td>
-                                                       <td>RPR</td>
-                                                       <td>TS</td>
-                                                       <td>Position</td>
-                                                       <td>Predicted Position</td>
-                                                        <td></td>
-                                                    </tr>
-                                                </thead>
-                                            <tbody>
-                                            @foreach (var horse in race.Horses)
-                                            {
-                                            <tr class="horse-tbl-body" id="horse-@race.RaceId-@horse.HorseId">
-                                                <td>@horse.Name</td>
-                                                <td>@horse.Age</td>
-                                                <td>@horse.JockeyName</td>
-                                                <td>@horse.TrainerName</td>
-                                                <td>@horse.RPR</td>
-                                                <td>@horse.Ts</td>
-                                                <td>@horse.Position</td>
-                                                <td>@horse.PredictedPosition</td>
-                                                <td><input type="button" value="Statistics" class="btn btn-primary" @onclick="@(e => @ShowHorseStatistics(horse.HorseId, race.RaceId))"/></td>
-                                            </tr>
-                                            }
-                                        </tbody>
-                                        </table>
-                                        </td>
-                                        </tr> 
-                                        }
-
-                                }
+                                <RaceComponent Race=race />
+                            }
 
                 }
                         </tbody>
@@ -144,25 +68,5 @@ else
         {
             even.ShowRaces = true;
         }
-    }
-
-    private void ShowRaceHorses(int eventId, int raceId)
-    {
-        var even = events.Where(x => x.EventId == eventId).FirstOrDefault();
-        var race = even.EventRaces.Where(x => x.RaceId == raceId).FirstOrDefault();
-
-        if (race.ShowHorses)
-        {
-            race.ShowHorses = false;
-        }
-        else 
-        {
-            race.ShowHorses = true;
-        }
-    }
-
-    private void ShowHorseStatistics(int horseId, int raceId) 
-    {
-    
     }
 }

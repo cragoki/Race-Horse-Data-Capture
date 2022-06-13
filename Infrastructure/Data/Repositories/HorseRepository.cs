@@ -1,9 +1,9 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data.SqlClient;
 namespace Infrastructure.Data.Repositories
 {
     public class HorseRepository : IHorseRepository
@@ -20,6 +20,34 @@ namespace Infrastructure.Data.Repositories
         public HorseEntity GetHorse(int horse_id)
         {
             return _context.tb_horse.Where(x => x.horse_id == horse_id).FirstOrDefault();
+        }
+        public HorseEntity GetHorseWithRaces(int horse_id)
+        {
+            return _context.tb_horse.Where(x => x.horse_id == horse_id)
+                .Include(x => x.Archive)
+                .Include(x => x.Races)
+                        .ThenInclude(z => z.Jockey)
+                .Include(x => x.Races)
+                        .ThenInclude(z => z.Race)
+                            .ThenInclude(y => y.Event)
+                .Include(x => x.Races)
+                        .ThenInclude(z => z.Trainer)
+                .Include(x => x.Races)
+                    .ThenInclude(x => x.Race)
+                        .ThenInclude(y => y.Weather)
+                .Include(x => x.Races)
+                    .ThenInclude(x => x.Race)
+                        .ThenInclude(y => y.Stalls)
+                .Include(x => x.Races)
+                    .ThenInclude(x => x.Race)
+                        .ThenInclude(y => y.Distance)
+                .Include(x => x.Races)
+                    .ThenInclude(x => x.Race)
+                        .ThenInclude(y => y.Ages)
+                .Include(x => x.Races)
+                    .ThenInclude(x => x.Race)
+                        .ThenInclude(y => y.Going)
+                .FirstOrDefault();
         }
         public HorseEntity GetHorseByRpId(int rp_id)
         {
