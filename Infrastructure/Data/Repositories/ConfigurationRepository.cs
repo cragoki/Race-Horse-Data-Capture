@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,25 @@ namespace Infrastructure.Data.Repositories
 
         public BatchEntity GetMostRecentBatch()
         {
-            return _context.tb_batch.OrderByDescending(x => x.date).FirstOrDefault();
+            return _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).FirstOrDefault();
+        }
+
+        public BatchEntity GetNextBatch(Guid currentBatch)
+        {
+            var batches = _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).ToList();
+            Int32 index = batches.IndexOf(batches.Where(x => x.batch_id == currentBatch).FirstOrDefault());
+            if (index == 0)
+            {
+                return new BatchEntity();
+            }
+            return batches.ElementAt(index - 1) ?? null;
+        }
+
+        public BatchEntity GetPreviousBatch(Guid currentBatch)
+        {
+            var batches = _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).ToList();
+            Int32 index = batches.IndexOf(batches.Where(x => x.batch_id == currentBatch).FirstOrDefault());
+            return batches.ElementAt(index + 1) ?? null;
         }
 
         public BacklogDateEntity GetBacklogDate()

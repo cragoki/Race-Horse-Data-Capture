@@ -48,7 +48,7 @@ namespace Core.Algorithms
                 }
 
                 //get average of running total and store result
-                result.Accuracy = runningTotal.Average();
+                result.Accuracy = (decimal)runningTotal.Average();
                 result.RacesFiltered = raceCounter;
             }
             catch (Exception ex)
@@ -62,7 +62,7 @@ namespace Core.Algorithms
         public async Task<double> FormCalculation(RaceEntity race, List<AlgorithmVariableEntity> variables)
         {
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.TsRPR);
-            var total = SharedCalculations.GetTake(race.no_of_horses ?? 0); // 3 horses placed in the prediction
+            var total = SharedCalculations.GetTake(race.no_of_horses ?? 0);
             var counter = 0;
             var horses = _eventRepository.GetRaceHorsesForRace(race.race_id);
             var listOfHorses = new List<HorseEntity>();

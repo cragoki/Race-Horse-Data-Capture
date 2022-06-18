@@ -9,5 +9,6 @@ namespace Core.Interfaces.Algorithms
     {
         Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms);
         Task<double> TSRpRCalculation(RaceEntity race, List<AlgorithmVariableEntity> variables);
+        Task<List<HorseEntity>> TSRpRCalculationPredictions(RaceEntity race, List<AlgorithmVariableEntity> variables, List<AlgorithmSettingsEntity> settings);
     }
 }

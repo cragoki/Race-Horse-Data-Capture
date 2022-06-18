@@ -10,7 +10,7 @@ namespace Core.Interfaces.Services
         Task<List<RaceEntity>> GetEventRacesFromDB(int EventId);
         Task GetRaceResults(RaceEntity race);
         Task<List<RaceEntity>> GetIncompleteRaces();
-        Task<int> GetRprForHorseRace(int horseId, DateTime raceDate);
-        Task<int> GetTsForHorseRace(int horseId, DateTime raceDate);
+        Task<int> GetRprForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate);
+        Task<int> GetTsForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate);
     }
 }

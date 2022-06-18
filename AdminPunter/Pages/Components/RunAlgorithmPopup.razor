@@ -1,0 +1,88 @@
+﻿@using AdminPunter.Pages.Races
+@inject IModalService modal  
+@inject IAdminAlgorithmService algorithmService;
+
+@if (algorithms == null || (SingleEvent == null && AllEvents == null))
+{
+    <p><em>Loading...</em></p>
+}
+else if(@algorithmRan == false && @algorithmActivated == true)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-12">
+                <h2>Select Algorithm</h2>
+        </div>
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+        <select class="form-select" @bind="@selectedAlgorithm">
+            @foreach(var algorithm in algorithms)
+            {
+                <option value="@algorithm.AlgorithmId">@algorithm.AlgorithmName</option>
+            }
+        </select>
+        </div>
+        <div class="col-md-2"></div>  
+        <div class="mt-10 col-md-12">
+                <button class="btn btn-primary" @onclick="RunAlgorithm"> Run Algorithm </button>
+        </div>
+    </div>
+}
+@code
+{
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [Parameter]
+    public TodaysRacesViewModel? SingleEvent { get; set; }
+    [Parameter]
+    public List<TodaysRacesViewModel>? AllEvents { get; set; }
+    [Parameter]
+    public EventCallback<string> Callback { get; set; }
+
+    async Task UseCallback() => await Callback.InvokeAsync("test 1 2 3");
+
+    private List<AlgorithmTableViewModel>? algorithms;
+    int selectedAlgorithm;
+    bool algorithmRan = false;
+    bool algorithmActivated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        algorithms = await algorithmService.GetAlgorithmTableData();
+        selectedAlgorithm = algorithms.FirstOrDefault().AlgorithmId;
+    }
+
+    private async Task RunAlgorithm() 
+    {
+        if (selectedAlgorithm == null)
+        {
+            return;
+        }
+        algorithmRan = false;
+        algorithmActivated = true;
+        var selectedAlgo = algorithms.Where(x => x.AlgorithmId == selectedAlgorithm).FirstOrDefault();
+
+        var events = new List<TodaysRacesViewModel>();
+        //Run the Algorithm
+        if (AllEvents == null && SingleEvent != null)
+        {
+            events.Add(SingleEvent);
+        }
+        else 
+        {
+            events = AllEvents;
+        }
+        var result = await algorithmService.RunAlgorithm(selectedAlgo, events);
+        //We would need to use something like this on the TodaysRaces.razor page in a seperate method.
+        //Perhaps a method where we pass in the results and then close the modal after altering the selected event!
+        algorithmActivated = false;
+        algorithmRan = true;
+        await InvokeAsync(StateHasChanged);
+        await UseCallback();
+        await ModalInstance.CloseAsync(ModalResult.Ok<List<TodaysRacesViewModel>>(result));
+    }
+
+
+}

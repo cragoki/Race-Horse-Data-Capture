@@ -6,18 +6,18 @@
 @if (ActiveHorse != null)
 {
             <tr class="race-row race-row-complete" id="race-@Race.RaceId-@Race.EventId" @onclick="@(e => @ShowRaceHorses(Race.EventId, Race.RaceId))">
-            <td>@Race.Date</td>
-            <td>Position: @(Race.Horses.Where(x => x.HorseId == ActiveHorse.HorseId).FirstOrDefault()?.Position ?? 0)</td>
-            <td>@Race.Weather</td>
-            <td>@Race.NumberOfHorses</td>
-            <td>@Race.Going</td>
-            <td>@Race.Stalls</td>
-            <td>@Race.Distance</td>
-            <td>@Race.RaceClass</td>
-            <td>@Race.Ages</td>
-            <td>@Race.Description</td>
-            <td>@Race.RaceUrl</td>
-        </tr>
+                <td>@Race.Date</td>
+                <td>Position: @(Race.Horses.Where(x => x.HorseId == ActiveHorse.HorseId).FirstOrDefault()?.Position ?? 0)</td>
+                <td>@Race.Weather</td>
+                <td>@Race.NumberOfHorses</td>
+                <td>@Race.Going</td>
+                <td>@Race.Stalls</td>
+                <td>@Race.Distance</td>
+                <td>@Race.RaceClass</td>
+                <td>@Race.Ages</td>
+                <td>@Race.Description</td>
+                <td>@Race.RaceUrl</td>
+            </tr>
     
             @if (Race.ShowHorses)
             {
@@ -40,18 +40,77 @@
                 <tbody>
                 @foreach (var horse in Race.Horses)
                 {
-                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
-                    <td>@horse.Name</td>
-                    <td>@horse.Age</td>
-                    <td>@horse.JockeyName</td>
-                    <td>@horse.TrainerName</td>
-                    <td>@horse.RPR</td>
-                    <td>@horse.Ts</td>
-                    <td>@horse.Position</td>
-                    <td>@horse.PredictedPosition</td>
-                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
-                </tr>
-                }
+                    @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
+                    {
+                        <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
+                            <td>@horse.Name</td>
+                            <td>@horse.Age</td>
+                            <td>@horse.JockeyName</td>
+                            <td>@horse.TrainerName</td>
+                            <td>@horse.RPR</td>
+                            <td>@horse.Ts</td>
+                            <td>@horse.Position</td>
+                            <td>@horse.PredictedPosition</td>
+                            <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                        </tr>
+                        }
+                        else if (horse.PredictedPosition != null && horse.PredictedPosition == 2)
+                        {
+                            <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
+                                <td>@horse.Name</td>
+                                <td>@horse.Age</td>
+                                <td>@horse.JockeyName</td>
+                                <td>@horse.TrainerName</td>
+                                <td>@horse.RPR</td>
+                                <td>@horse.Ts</td>
+                                <td>@horse.Position</td>
+                                <td>@horse.PredictedPosition</td>
+                                <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                            </tr>
+                        }
+                        else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
+                        {
+                            <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
+                                <td>@horse.Name</td>
+                                <td>@horse.Age</td>
+                                <td>@horse.JockeyName</td>
+                                <td>@horse.TrainerName</td>
+                                <td>@horse.RPR</td>
+                                <td>@horse.Ts</td>
+                                <td>@horse.Position</td>
+                                <td>@horse.PredictedPosition</td>
+                                <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                            </tr>
+                        }
+                        else if (horse.PredictedPosition != null && horse.PredictedPosition == 4)
+                        {
+                            <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
+                                <td>@horse.Name</td>
+                                <td>@horse.Age</td>
+                                <td>@horse.JockeyName</td>
+                                <td>@horse.TrainerName</td>
+                                <td>@horse.RPR</td>
+                                <td>@horse.Ts</td>
+                                <td>@horse.Position</td>
+                                <td>@horse.PredictedPosition</td>
+                                <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                            </tr>
+                        }
+                        else
+                        {
+                        <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                            <td>@horse.Name</td>
+                            <td>@horse.Age</td>
+                            <td>@horse.JockeyName</td>
+                            <td>@horse.TrainerName</td>
+                            <td>@horse.RPR</td>
+                            <td>@horse.Ts</td>
+                            <td>@horse.Position</td>
+                            <td>@horse.PredictedPosition</td>
+                            <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                        </tr>
+                        }
+                    }
             </tbody>
             </table>
             </td>
@@ -96,17 +155,76 @@ else
                 <tbody>
                 @foreach (var horse in Race.Horses)
                 {
-                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
-                    <td>@horse.Name</td>
-                    <td>@horse.Age</td>
-                    <td>@horse.JockeyName</td>
-                    <td>@horse.TrainerName</td>
-                    <td>@horse.RPR</td>
-                    <td>@horse.Ts</td>
-                    <td>@horse.Position</td>
-                    <td>@horse.PredictedPosition</td>
-                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
-                </tr>
+               @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
+                                {
+                                    <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else if (horse.PredictedPosition != null && horse.PredictedPosition == 2)
+                                {
+                                    <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
+                                {
+                                    <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else if (horse.PredictedPosition != null && horse.PredictedPosition == 4)
+                                {
+                                    <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                                    <td>@horse.Name</td>
+                                    <td>@horse.Age</td>
+                                    <td>@horse.JockeyName</td>
+                                    <td>@horse.TrainerName</td>
+                                    <td>@horse.RPR</td>
+                                    <td>@horse.Ts</td>
+                                    <td>@horse.Position</td>
+                                    <td>@horse.PredictedPosition</td>
+                                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                </tr>
+                                }
                 }
             </tbody>
             </table>
@@ -149,17 +267,77 @@ else
                 <tbody>
                 @foreach (var horse in Race.Horses)
                 {
-                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
-                    <td>@horse.Name</td>
-                    <td>@horse.Age</td>
-                    <td>@horse.JockeyName</td>
-                    <td>@horse.TrainerName</td>
-                    <td>@horse.RPR</td>
-                    <td>@horse.Ts</td>
-                    <td>@horse.Position</td>
-                    <td>@horse.PredictedPosition</td>
-                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
-                </tr>
+                                @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
+                                {
+                                    <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else if (horse.PredictedPosition != null && horse.PredictedPosition == 2)
+                                {
+                                    <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
+                                {
+                                    <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else if (horse.PredictedPosition != null && horse.PredictedPosition == 4)
+                                {
+                                    <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.Name</td>
+                                        <td>@horse.Age</td>
+                                        <td>@horse.JockeyName</td>
+                                        <td>@horse.TrainerName</td>
+                                        <td>@horse.RPR</td>
+                                        <td>@horse.Ts</td>
+                                        <td>@horse.Position</td>
+                                        <td>@horse.PredictedPosition</td>
+                                        <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                                    <td>@horse.Name</td>
+                                    <td>@horse.Age</td>
+                                    <td>@horse.JockeyName</td>
+                                    <td>@horse.TrainerName</td>
+                                    <td>@horse.RPR</td>
+                                    <td>@horse.Ts</td>
+                                    <td>@horse.Position</td>
+                                    <td>@horse.PredictedPosition</td>
+                                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
+                                </tr>
+                                }
+
                 }
             </tbody>
             </table>
@@ -199,8 +377,10 @@ else
         var result = await adminRaceService.GetHorseStatistics(raceHorse, Race);
         var parameters = new ModalParameters();
         parameters.Add(nameof(HorseStatisticPopup.HorseStatistics), result);
+        var modalOptions = new ModalOptions();
+        modalOptions.Class = "blazored-modal-lg";
 
         //Pass both into partial view below
-        modal.Show<HorseStatisticPopup>(raceHorse.Name, parameters);
+        modal.Show<HorseStatisticPopup>(raceHorse.Name, parameters, modalOptions);
     }
 }

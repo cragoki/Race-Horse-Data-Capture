@@ -13,7 +13,6 @@ namespace Core.Variables
         public static List<HorseEntity> CalculateResultsByTopSpeed(List<HorseEntity> race) 
         {
             var result = new List<HorseEntity>();
-
             try 
             {
                 foreach (var horse in race)

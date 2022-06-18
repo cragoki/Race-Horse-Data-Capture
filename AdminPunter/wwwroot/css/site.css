@@ -126,16 +126,68 @@ table {
     color: green;
 }
 
-.blazored-modal {
-    width: 80%;
-    height: 80%;
-    background-color: rgba(25,25,25,0.9) !important;
-    color:green !important;
-    overflow-y:auto;
+.predicted-first {
+    background-color: green !important;
+    color: gold !important;
 }
 
-    .blazored-modal span {
+.predicted-second {
+    background-color: blue !important;
+    color: white !important;
+}
+
+.predicted-third {
+    background-color: red !important;
+    color: white !important;
+}
+
+.predicted-fourth {
+    background-color: grey !important;
+    color: black !important;
+}
+
+.blazored-modal-lg {
+    width: 90%;
+    height: 90%;
+    background-color: rgba(25,25,25,0.9) !important;
+    color: green !important;
+    overflow-y: auto;
+    z-index: 200;
+    overflow-x: hidden;
+    text-align: center
+}
+.blazored-modal-md {
+    width: 50%;
+    height: 50%;
+    background-color: rgba(25,25,25,0.9) !important;
+    color: green !important;
+    overflow-y: auto;
+    z-index: 200;
+    overflow-x: hidden;
+    text-align: center
+}
+.blazored-modal-sm {
+    width: 30%;
+    height: 30%;
+    background-color: rgba(25,25,25,0.9) !important;
+    color: green !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 200;
+    text-align:center
+}
+
+    .blazored-modal-lg span {
         color: white !important;
+        margin-right:5px;
+    }
+    .blazored-modal-md span {
+        color: white !important;
+        margin-right:5px;
+    }
+    .blazored-modal-sm span {
+        color: white !important;
+        margin-right: 5px;
     }
 
 #horse-statistics-race-conditions {
@@ -178,4 +230,56 @@ table {
     border:2px solid white;
     padding:10px;
     height:100%;
+}
+
+
+.spinner {
+    border: 16px solid silver;
+    border-top: 16px solid #337AB7;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 700ms linear infinite;
+    top: 40%;
+    left: 55%;
+    position: absolute;
+}
+
+.mt-10 {
+    margin-top:10px;
+}
+.mt-20 {
+    margin-top: 20px;
+}
+
+.top-bar {
+    padding:30px;
+    background-color:grey;    
+}
+
+.tb-algorithm-head {
+    background-color:black;
+}
+
+.tb-algorithm-body {
+    color:green;
+}
+
+.btn-prv {
+    float:left;
+}
+.btn-ra {
+    margin-left:35%;
+}
+.btn-nxt {
+    float:right;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
 }

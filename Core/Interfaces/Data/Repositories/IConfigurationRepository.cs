@@ -9,6 +9,8 @@ namespace Core.Interfaces.Data.Repositories
     {
         void AddBatch(BatchEntity batch);
         BatchEntity GetMostRecentBatch();
+        BatchEntity GetNextBatch(Guid currentBatch);
+        BatchEntity GetPreviousBatch(Guid currentBatch);
         BacklogDateEntity GetBacklogDate();
         void UpdateBacklogDate(DateTime date);
         JobEntity GetJobInfo(JobEnum job);

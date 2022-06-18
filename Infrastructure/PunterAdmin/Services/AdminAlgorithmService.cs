@@ -3,21 +3,36 @@ using Core.Interfaces.Data.Repositories;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
+using Core.Enums;
+using Core.Interfaces.Algorithms;
+using System.Linq;
+using Core.Entities;
+using Core.Models.Algorithm;
+using Core.Interfaces.Services;
 
 namespace Infrastructure.PunterAdmin.Services
 {
     public class AdminAlgorithmService : IAdminAlgorithmService
     {
         private IAlgorithmRepository _algorithmRepository;
+        private IAlgorithmService _algorithmService;
         private IConfigurationRepository _configurationRepository;
+        private IEventRepository _eventRepository;
+        private ITopSpeedOnly _topSpeed;
+        private ITsRPR _topSpeedRpr;
 
-        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IConfigurationRepository configurationRepository)
+
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IConfigurationRepository configurationRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService)
         {
             _algorithmRepository = algorithmRepository;
             _configurationRepository = configurationRepository;
+            _eventRepository = eventRepository;
+            _topSpeed = topSpeed;
+            _topSpeedRpr = topSpeedRpr;
+            _algorithmService = algorithmService;
         }
 
-        public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
+    public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
         {
             var result = new List<AlgorithmTableViewModel>();
 
@@ -28,8 +43,8 @@ namespace Infrastructure.PunterAdmin.Services
                 foreach (var algorithm in algorithms)
                 {
 
-                    var settings = await GetAlgorithmSettings(algorithm.algorithm_id);
-                    var variables = await GetAlgorithmVariables(algorithm.algorithm_id);
+                    var settings = await GetAlgorithmSettings(algorithm.Settings);
+                    var variables = await GetAlgorithmVariables(algorithm.Variables);
 
                     var toAdd = new AlgorithmTableViewModel()
                     {
@@ -39,7 +54,9 @@ namespace Infrastructure.PunterAdmin.Services
                         IsActive = algorithm.active,
                         NumberOfRaces = algorithm.number_of_races,
                         Settings = settings,
-                        Variables = variables
+                        Variables = variables,
+                        ShowSettings = false,
+                        ShowVariables = false
                     };
                     result.Add(toAdd);
                 }
@@ -52,13 +69,183 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
+        public async Task<List<TodaysRacesViewModel>> RunAlgorithm(AlgorithmTableViewModel algorithm, List<TodaysRacesViewModel> events)
+        {
+            try 
+            {
+                switch (algorithm.AlgorithmId) 
+                {
+                    case (int)AlgorithmEnum.TopSpeedOnly:
+                        foreach (var even in events) 
+                        {
+                            var races = _eventRepository.GetRacesForEvent(even.EventId);
+
+                            foreach (var race in even.EventRaces) 
+                            {
+                                race.Horses.Select(x => { x.PredictedPosition = null; return x; }).ToList();
+                            }
+
+                            foreach (var race in races)
+                            {
+                                var settings = await BuildAlgorithmSettings(algorithm);
+
+                                var predictions = await _topSpeed.TopSpeedVariablePredictions(race, settings);
+
+                                if (predictions == null || predictions.Count() == 0) 
+                                {
+                                    continue;
+                                }
+
+                                foreach (var prediction in predictions.Select((value, i) => new { i, value })) 
+                                {
+                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                    thisRace.AlgorithmRan = true;
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
+                                    horse.PredictedPosition = prediction.i + 1;
+                                    horse.Ts = prediction.value.top_speed;
+                                    horse.RPR = prediction.value.rpr;
+                                }
+                            }
+                        }
+                        break;
+                    case (int)AlgorithmEnum.TsRPR:
+                        foreach (var even in events)
+                        {
+                            var races = _eventRepository.GetRacesForEvent(even.EventId);
+
+                            foreach (var race in even.EventRaces)
+                            {
+                                race.Horses.Select(x => { x.PredictedPosition = null; return x; }).ToList();
+                            }
+
+                            foreach (var race in races)
+                            {
+                                var settings = await BuildAlgorithmSettings(algorithm);
+                                var variables = await BuildAlgorithmVariables(algorithm);
+                                var predictions = await _topSpeedRpr.TSRpRCalculationPredictions(race, variables, settings);
+
+                                if (predictions == null || predictions.Count() == 0)
+                                {
+                                    continue;
+                                }
+
+                                foreach (var prediction in predictions.Select((value, i) => new { i, value }))
+                                {
+                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                    thisRace.AlgorithmRan = true;
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
+                                    horse.PredictedPosition = prediction.i + 1;
+                                    horse.Ts = prediction.value.top_speed;
+                                    horse.RPR = prediction.value.rpr;
+                                }
+                            }
+                        }
+                        break;
+                    case (int)AlgorithmEnum.FormOnly:
+
+                        break;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return events;
+        }
+
+        public async Task<AlgorithmTableViewModel> RunAlgorithmForAll(AlgorithmTableViewModel algorithm)
+        {
+            try
+            {
+                var allEvents = _eventRepository.GetEvents();
+                var results = new List<AlgorithmResult>();
+                var algorithmResult = new AlgorithmResult();
+                switch (algorithm.AlgorithmId)
+                {
+                    case (int)AlgorithmEnum.TopSpeedOnly:
+                        foreach (var even in allEvents)
+                        {
+                            algorithmResult = await _topSpeed.GenerateAlgorithmResult(even.Races);
+                            results.Add(algorithmResult);
+                        }
+                        break;
+                    case (int)AlgorithmEnum.TsRPR:
+                        foreach (var even in allEvents)
+                        {
+                            var variables = await BuildAlgorithmVariables(algorithm);
+                            algorithmResult = await _topSpeedRpr.GenerateAlgorithmResult(even.Races, variables);
+                            results.Add(algorithmResult);
+                        }
+                        break;
+                    case (int)AlgorithmEnum.FormOnly:
+
+                        break;
+                }
+
+                if (results == null || results.Count() == 0 || results.Sum(x => x.RacesFiltered) == 0) 
+                {
+                    algorithm.Notes = "Failed to run";
+                    return algorithm;
+                }
+                //Now take average of algorithmresult Accuracy and sum of races in a new algorithm result object
+                var algorithmTotal = new AlgorithmResult()
+                {
+                    AlgorithmId = algorithm.AlgorithmId,
+                    Accuracy = results.Average(x => x.Accuracy),
+                    RacesFiltered = results.Sum(x => x.RacesFiltered)
+                };
+                //Update db
+                if (algorithmTotal != null && algorithmTotal.AlgorithmId != 0)
+                {
+                    await _algorithmService.StoreAlgorithmResults(algorithmTotal);
+                }
+
+                algorithm.Accuracy = algorithmTotal.Accuracy;
+                algorithm.NumberOfRaces = algorithmTotal.RacesFiltered;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return algorithm;
+        }
+
+        public async Task<AlgorithmTableViewModel> UpdateAlgorithmSettings(AlgorithmTableViewModel algorithm)
+        {
+            try
+            {
+                var algorithmSettings = await BuildAlgorithmSettings(algorithm);
+
+                _algorithmRepository.UpdateAlgorithmSettings(algorithmSettings);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return algorithm;
+        }
+
+        public async Task<AlgorithmTableViewModel> UpdateAlgorithmVariables(AlgorithmTableViewModel algorithm)
+        {
+            try
+            {
+                var algorithmVariables = await BuildAlgorithmVariables(algorithm);
+
+                _algorithmRepository.UpdateAlgorithmVariables(algorithmVariables);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return algorithm;
+        }
 
         #region private
-        private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(int algorithmId)
+        private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
         {
             var result = new List<AlgorithSettingsTableViewModel>();
-            var settings = _configurationRepository.GetAlgorithmSettings(algorithmId);
-
 
             foreach (var setting in settings)
             {
@@ -73,13 +260,11 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        private async Task<List<AlgorithmVariableTableViewModel>> GetAlgorithmVariables(int algorithmId)
+        private async Task<List<AlgorithmVariableTableViewModel>> GetAlgorithmVariables(List<AlgorithmVariableEntity> variables)
         {
             var result = new List<AlgorithmVariableTableViewModel>();
-            var algorithmVariables = _algorithmRepository.GetAlgorithmVariableByAlgorithmId(algorithmId);
 
-
-            foreach (var algorithmVariable in algorithmVariables)
+            foreach (var algorithmVariable in variables)
             {
                 var variable = _algorithmRepository.GetVariableById(algorithmVariable.variable_id);
                 result.Add(new AlgorithmVariableTableViewModel()
@@ -87,6 +272,43 @@ namespace Infrastructure.PunterAdmin.Services
                     AlgorithmVariableId = algorithmVariable.algorithm_variable_id,
                     Threshold = algorithmVariable.threshold,
                     VariableName = variable.variable_name,
+                    VariableId = variable.variable_id
+                });
+            }
+
+            return result;
+        }
+
+        private async Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm) 
+        {
+            var result = new List<AlgorithmSettingsEntity>();
+
+            foreach (var setting in algorithm.Settings)
+            {
+                result.Add(new AlgorithmSettingsEntity()
+                {
+                    setting_name = setting.SettingName,
+                    algorithm_id = setting.AlgorithmSettingId,
+                    setting_value = setting.SettingValue,
+                    algorithm_setting_id = setting.AlgorithmSettingId
+                });
+            }
+
+            return result;
+        }
+
+        private async Task<List<AlgorithmVariableEntity>> BuildAlgorithmVariables(AlgorithmTableViewModel algorithm)
+        {
+            var result = new List<AlgorithmVariableEntity>();
+
+            foreach (var variable in algorithm.Variables)
+            {
+                result.Add(new AlgorithmVariableEntity()
+                {
+                    algorithm_id = algorithm.AlgorithmId,
+                    algorithm_variable_id = variable.AlgorithmVariableId,
+                    threshold = variable.Threshold,
+                    variable_id = variable.VariableId
                 });
             }
 

@@ -13,5 +13,7 @@ namespace Core.Interfaces.Data.Repositories
         VariableEntity GetVariableById(int variableId);
         void SaveChanges();
         void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity);
+        void UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings);
+        void UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables);
     }
 }

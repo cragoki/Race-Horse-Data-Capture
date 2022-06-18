@@ -22,7 +22,31 @@ namespace Infrastructure.Data.Repositories
 
         public IEnumerable<EventEntity> GetEvents()
         {
-            return _context.tb_event.ToList();
+            return _context.tb_event
+                .Include(x => x.Course)
+                .Include(x => x.MeetingType)
+                .Include(x => x.Surface)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Horse)
+                            .ThenInclude(a => a.Archive)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Jockey)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Trainer)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Weather)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Stalls)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Distance)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Ages)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Going)
+                .ToList();
         }
         public IEnumerable<EventEntity> GetTodaysEvents() 
         {
@@ -102,7 +126,11 @@ namespace Infrastructure.Data.Repositories
         }
         public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
         {
-            return _context.tb_race.Where(x => x.event_id == eventId);
+            return _context.tb_race.Where(x => x.event_id == eventId)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Archive)
+                .Include(x => x.Event);
         }
 
         //public async IQueryable<List<TodaysRacesViewModel>> GetEventAdminData(int eventId) 
@@ -124,7 +152,16 @@ namespace Infrastructure.Data.Repositories
         }
         public List<RaceEntity> GetAllRaces()
         {
-            return _context.tb_race.ToList();
+            return _context.tb_race
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Archive)
+                 .Include(x => x.Going)
+                 .Include(x => x.Weather)
+                 .Include(x => x.Stalls)
+                 .Include(x => x.Distance)
+                 .Include(x => x.Event)
+                 .ToList();
         }
         public void AddRace(RaceEntity raceToAdd)
         {
@@ -139,7 +176,7 @@ namespace Infrastructure.Data.Repositories
 
         public List<RaceHorseEntity> GetRaceHorsesForRace(int raceId) 
         {
-            return _context.tb_race_horse.Where(x => x.race_id == raceId).ToList();
+            return _context.tb_race_horse.Where(x => x.race_id == raceId).Include(x => x.Horse).ThenInclude(x => x.Archive).Include(x => x.Race).ThenInclude(x => x.Event).ToList();
         }
 
         public void SaveChanges()

@@ -25,7 +25,6 @@ namespace Core.Services
 
         public async Task GetEventRaces(int EventId)
         {
-            string eventName = $"eventName - {DateTime.Now.Date}";
 
             try
             {
@@ -153,10 +152,8 @@ namespace Core.Services
             return result;
         }
 
-        public async Task<int> GetRprForHorseRace(int horseId, DateTime raceDate) 
+        public async Task<int> GetRprForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate) 
         {
-            var archive = _horseRepository.GetHorseArchive(horseId);
-
             if (archive != null && archive.Count() != 0) 
             {
                 var rpr = archive.Where(x => x.field_changed == "rpr" && x.date < raceDate)
@@ -174,10 +171,8 @@ namespace Core.Services
             return -1;
         }
 
-        public async Task<int> GetTsForHorseRace(int horseId, DateTime raceDate)
+        public async Task<int> GetTsForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate)
         {
-            var archive = _horseRepository.GetHorseArchive(horseId);
-
             if (archive != null && archive.Count() != 0)
             {
                 var ts = archive.Where(x => x.field_changed == "ts" && x.date < raceDate)

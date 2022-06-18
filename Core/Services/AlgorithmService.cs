@@ -35,7 +35,9 @@ namespace Core.Services
             var result = new AlgorithmResult();
             try
             {
+
                 var activeAlgorithm = _algorithmRepository.GetActiveAlgorithm();
+
                 if (activeAlgorithm != null)
                 {
                     result.AlgorithmId = activeAlgorithm.algorithm_id;
@@ -45,7 +47,7 @@ namespace Core.Services
                     switch ((AlgorithmEnum)activeAlgorithm.algorithm_id) 
                     {
                         case AlgorithmEnum.TopSpeedOnly:
-                            result = await _topSpeedOnly.GenerateAlgorithmResult(races, algorithmVariables);
+                            result = await _topSpeedOnly.GenerateAlgorithmResult(races);
                             break;
                         case AlgorithmEnum.TsRPR:
                             result = await _topSpeedRpr.GenerateAlgorithmResult(races, algorithmVariables);
@@ -82,6 +84,43 @@ namespace Core.Services
             {
                 Logger.Error($"Error trying to store Algorithm result...{ex.Message}");
             }
+        }
+
+        public async Task<AlgorithmResult> ExecuteSelectedAlgorithm(List<RaceEntity> algorithm, List<AlgorithmEntity> events, List<AlgorithmVariableEntity> algorithmVariables )
+        {
+            var result = new AlgorithmResult();
+            try
+            {
+
+                var activeAlgorithm = _algorithmRepository.GetActiveAlgorithm();
+
+                if (activeAlgorithm != null)
+                {
+                    result.AlgorithmId = activeAlgorithm.algorithm_id;
+                    var races = _eventRepository.GetAllRaces();
+
+                    switch ((AlgorithmEnum)activeAlgorithm.algorithm_id)
+                    {
+                        case AlgorithmEnum.TopSpeedOnly:
+                            result = await _topSpeedOnly.GenerateAlgorithmResult(races);
+                            break;
+                        case AlgorithmEnum.TsRPR:
+                            result = await _topSpeedRpr.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
+                        case AlgorithmEnum.FormOnly:
+                            result = await _formAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
+                    }
+
+                    result.AlgorithmId = activeAlgorithm.algorithm_id;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error in Algorithm Service...{ex.Message}");
+            }
+
+            return result;
         }
 
     }

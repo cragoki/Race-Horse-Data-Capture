@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
 {
@@ -10,6 +11,8 @@ namespace Core.Entities
         public bool active { get; set; }
         public decimal? accuracy { get; set; }
         public int? number_of_races { get; set; }
+        public List<AlgorithmSettingsEntity> Settings { get; set; }
+        public List<AlgorithmVariableEntity> Variables { get; set; }
 
     }
 }

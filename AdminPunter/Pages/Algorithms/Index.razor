@@ -11,15 +11,17 @@
 else
 {
     <table class="table">
-        <thead>
+        <thead class="tb-algorithm-head">
             <tr>
                 <th>Name</th>
                 <th>Active</th>
                 <th>Accuracy</th>
                 <th>Number Of Races</th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="tb-algorithm-body">
             @foreach (var algorithm in algorithms)
             {
                 <tr>
@@ -27,16 +29,123 @@ else
                     <td>@algorithm.IsActive</td>
                     <td>@algorithm.Accuracy</td>
                     <td>@algorithm.NumberOfRaces</td>
+                    @if(algorithm.ShowSettings)
+                    {
+                        <td><input class="btn btn-primary" value="Hide Settings" @onclick="@(e => @ShowVariablesAndSettings(algorithm))"/></td>
+                    }
+                    else
+                    {
+                        <td><input class="btn btn-primary" value="Show Settings" @onclick="@(e => @ShowVariablesAndSettings(algorithm))"/></td>
+                    }
+                    @if (algorithmRunning) 
+                    {
+                        <td><input disabled value="Run algorithm" type="button" class="btn btn-primary" @onclick="@(e => @RunAlgorithm(algorithm))"/></td>
+                    }
+                    else
+                    {
+                        <td><input value="Run algorithm" type="button" class="btn btn-primary" @onclick="@(e => @RunAlgorithm(algorithm))"/></td>
+                    }
                 </tr>
+                @if (algorithm.ShowSettings)
+                {
+                    <tr>
+                    <td colspan="100">
+                    <table class="table">
+                        <thead>
+                            <tr class="horse-tbl-head">
+                               <td>Setting Name</td>
+                               <td>Value</td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    <tbody>
+
+                    @foreach (var setting in algorithm.Settings)
+                    {
+                            <tr class="horse-tbl-body predicted-first">
+                                <td>@setting.SettingName</td>
+                                <td><input @bind="@setting.SettingValue" /></td>
+                            </tr>
+                    }
+                    <tr><input value="Save" type="button" class="btn btn-primary" @onclick="@(e => @SaveAlgorithmSettings(algorithm))"/></tr>
+                    </tbody>
+                    </table>
+                    </td>
+                    </tr> 
+                }
+                @if (algorithm.ShowVariables)
+                {
+                    <tr>
+                    <td colspan="100">
+                    <table class="table">
+                        <thead>
+                            <tr class="horse-tbl-head">
+                               <td>Variable Name</td>
+                               <td>Value</td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                    <tbody>
+
+                    @foreach (var variable in algorithm.Variables)
+                    {
+                            <tr class="horse-tbl-body predicted-first">
+                                <td>@variable.VariableName</td>
+                                <td><input @bind="@variable.Threshold" /></td>
+                            </tr>
+                    }
+                        <tr><input value="Save" type="button" class="btn btn-primary" @onclick="@(e => @SaveAlgorithmVariables(algorithm))"/></tr>
+                    </tbody>
+                    </table>
+                    </td>
+                    </tr> 
+                }
             }
         </tbody>
     </table>
 }
 @code {
     private List<AlgorithmTableViewModel>? algorithms;
-
+    private bool algorithmRunning = false;
     protected override async Task OnInitializedAsync()
     {
         algorithms = await algorithmService.GetAlgorithmTableData();
+    }
+
+    private async Task RunAlgorithm(AlgorithmTableViewModel algorithm)
+    {
+        algorithmRunning = true;
+        algorithm = await algorithmService.RunAlgorithmForAll(algorithm);
+        algorithmRunning = false;
+    }
+
+    private async Task SaveAlgorithmSettings(AlgorithmTableViewModel algorithm)
+    {
+        await algorithmService.UpdateAlgorithmSettings(algorithm);
+    }
+
+    private async Task SaveAlgorithmVariables(AlgorithmTableViewModel algorithm)
+    {
+        await algorithmService.UpdateAlgorithmVariables(algorithm);
+    }
+
+    private async Task ShowVariablesAndSettings(AlgorithmTableViewModel algorithm)
+    {
+        if (algorithm.ShowVariables)
+        {
+            algorithm.ShowVariables = false;
+        }
+        else
+        {
+            algorithm.ShowVariables = true;
+        }
+        if (algorithm.ShowSettings)
+        {
+            algorithm.ShowSettings = false;
+        }
+        else
+        {
+            algorithm.ShowSettings = true;
+        }
     }
 }

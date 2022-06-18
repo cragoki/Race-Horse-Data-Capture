@@ -1,5 +1,6 @@
 ﻿
 using Core.Entities;
+using Core.Enums;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Infrastructure.Data;
@@ -15,28 +16,38 @@ namespace Infrastructure.PunterAdmin.Services
     {
         private static IConfigurationRepository _configRepo;
         private static IEventRepository _eventRepository;
-        private static IMappingTableRepository _mappingRepository;
         private static IHorseRepository _horseRepository;
-        private static IRaceService _raceService;
 
-        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IMappingTableRepository mappingRepository, IHorseRepository horseRepository, IRaceService raceService)
+        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository)
         {
             _configRepo = configRepo;
             _eventRepository = eventRepository;
-            _mappingRepository = mappingRepository;
             _horseRepository = horseRepository;
-            _raceService = raceService;
         }
 
-        public async Task<List<TodaysRacesViewModel>> GetTodaysRaces()
+        public async Task<List<TodaysRacesViewModel>> GetTodaysRaces(RaceRetrievalType retrievalType, Guid? batchId)
         {
             var result = new List<TodaysRacesViewModel>();
 
             try
             {
-                //Get Newest entry from tb_batch
-                var batch = _configRepo.GetMostRecentBatch();
+                var batch = new BatchEntity();
 
+                switch (retrievalType) 
+                {
+                    case RaceRetrievalType.Current:
+                            batch = _configRepo.GetMostRecentBatch();
+                        break;
+                    case RaceRetrievalType.Next:
+                            batch = _configRepo.GetNextBatch(batchId ?? new Guid());
+                        break;
+                    case RaceRetrievalType.Previous:
+                            batch = _configRepo.GetPreviousBatch(batchId ?? new Guid());
+                        break;
+                }
+
+                var checkIfFirst = _configRepo.GetPreviousBatch(batch.batch_id);
+                var checkIfLast = (batch.date.Date == DateTime.Now.Date);
                 //Get Events linked to that batch
                 var events = _eventRepository.GetEventsByBatch(batch.batch_id);
 
@@ -52,7 +63,10 @@ namespace Infrastructure.PunterAdmin.Services
                         MeetingType = ev.MeetingType?.meeting_type,
                         SurfaceType = String.IsNullOrEmpty(ev.Surface?.surface_type) ? "Unknown" : ev.Surface?.surface_type,
                         EventRaces =  BuildTodaysRaceViewModel(ev.Races, ev.created), 
-                        NumberOfRaces = ev.Races.Count()
+                        NumberOfRaces = ev.Races.Count(),
+                        IsMostRecent = checkIfLast,
+                        IsFirst = checkIfFirst == null ? true : false,
+                        BatchId = batch.batch_id
                     };
 
                     result.Add(toAdd);
@@ -97,7 +111,7 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var horse = _horseRepository.GetHorseWithRaces(horseId);
 
-                foreach (var race in horse.Races)
+                foreach (var race in horse.Races.OrderByDescending(x => x.Race.Event.created))
                 {
                     result.Add(new RaceViewModel()
                     {

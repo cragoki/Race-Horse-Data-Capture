@@ -16,23 +16,18 @@ namespace Core.Algorithms
 {
     public class TopSpeedOnly : ITopSpeedOnly
     {
-        private readonly IEventRepository _eventRepository;
-        private readonly IHorseRepository _horseRepository;
         private readonly IConfigurationRepository _configRepository;
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IRaceService _raceService;
 
-        public TopSpeedOnly(IEventRepository eventRepository, IHorseRepository horseRepository, IConfigurationRepository configRepository, IRaceService raceService) 
+        public TopSpeedOnly(IConfigurationRepository configRepository, IRaceService raceService) 
         {
-            _eventRepository = eventRepository;
-            _horseRepository = horseRepository;
             _configRepository = configRepository;
             _raceService = raceService;
         }
-        public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms)
+        public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races)
         {
             var result = new AlgorithmResult();
-
             try
             {
                 List<double> runningTotal = new List<double>();
@@ -50,7 +45,7 @@ namespace Core.Algorithms
                 }
 
                 //get average of running total and store result
-                result.Accuracy = runningTotal.Average();
+                result.Accuracy = (decimal)runningTotal.Average();
                 result.RacesFiltered = raceCounter;
             }
             catch (Exception ex) 
@@ -64,22 +59,17 @@ namespace Core.Algorithms
         public async Task<double> TopSpeedVariable(RaceEntity race)
         {
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.TopSpeedOnly);
-            var total = 3; // 3 horses placed in the prediction
+            var total = SharedCalculations.GetTake(race.no_of_horses ?? 0); 
             var counter = 0;
-            var horses = _eventRepository.GetRaceHorsesForRace(race.race_id);
             var listOfHorses = new List<HorseEntity>();
-            foreach (var horse in horses) 
-            {
-                listOfHorses.Add(_horseRepository.GetHorse(horse.horse_id));
-            }
 
-            foreach (var h in horses)
+            foreach (var h in race.RaceHorses)
             {
-                var even = _eventRepository.GetEventById(race.event_id);
-                var horse = _horseRepository.GetHorse(h.horse_id);
+                var even = race.Event;
+                var horse = h.Horse;
 
                 //GETTING ARCHIVED HORSE DATA
-                var ts = await _raceService.GetTsForHorseRace(h.horse_id, even.created);
+                var ts = await _raceService.GetTsForHorseRace(h.Horse.Archive, even.created);
 
                 if (ts != -1)
                 {
@@ -100,7 +90,7 @@ namespace Core.Algorithms
                 }
 
                 var predictions = TopSpeed.CalculateResultsByTopSpeed(listOfHorses).Take(total);
-                var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(SharedCalculations.GetTake(race.no_of_horses ?? 0));
+                var results = race.RaceHorses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(total);
 
                 foreach (var prediction in predictions)
                 {
@@ -113,6 +103,50 @@ namespace Core.Algorithms
             }
 
             return counter / total * 100;
+        }
+
+        public async Task<List<HorseEntity>> TopSpeedVariablePredictions(RaceEntity race, List<AlgorithmSettingsEntity> settings)
+        {
+            var result = new List<HorseEntity>();
+
+            var placed = SharedCalculations.GetTake(race.no_of_horses ?? 0);
+            var listOfHorses = new List<HorseEntity>();
+
+            foreach (var h in race.RaceHorses)
+            {
+                var even = race.Event;
+                var horse = h.Horse;
+
+                //GETTING ARCHIVED HORSE DATA
+                var ts = await _raceService.GetTsForHorseRace(h.Horse.Archive, even.created);
+
+                if (ts != -1)
+                {
+                    horse.top_speed = ts;
+                }
+
+                listOfHorses.Add(horse);
+            }
+
+            if (listOfHorses.Count > 0)
+            {
+                var a = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
+                //Percentage of horses required in the race with sufficient data to continue
+                var variance = (listOfHorses.Count() * a);
+                if (listOfHorses.Where(x => x.top_speed != null || x.top_speed > 0).Count() < variance)
+                {
+                    return result;
+                }
+
+                var predictions = TopSpeed.CalculateResultsByTopSpeed(listOfHorses).Take(placed);
+
+                foreach (var prediction in predictions)
+                {
+                    result.Add(prediction);
+                }
+            }
+
+            return result;
         }
     }
 }

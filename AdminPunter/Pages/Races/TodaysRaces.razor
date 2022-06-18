@@ -1,5 +1,7 @@
 ﻿@page "/Races/TodaysRaces"
 @using AdminPunter.Pages.Components
+@using Core.Enums
+@inject IModalService modal  
 
 <PageTitle>Todays Races</PageTitle>
 
@@ -11,6 +13,27 @@
 }
 else
 {
+    <div class="row">
+        <div class="col-md-12 top-bar">
+            @if(IsFirst)
+            {      
+                <input value="Previous Day" disabled type="button" class="btn-prv btn btn-primary" @onclick="@(e => @GetBatch(RaceRetrievalType.Previous))"/>
+            }
+            else
+            {
+                <input value="Previous Day" type="button" class="btn-prv btn btn-primary" @onclick="@(e => @GetBatch(RaceRetrievalType.Previous))"/>
+            }
+            <input value="Run algorithm" type="button" class="btn-ra btn btn-primary" @onclick="@(e => @ShowAlgorithmPopup(null))"/>
+            @if(IsMostRecent)
+            {      
+                <input value="Next Day" type="button" class="btn-nxt btn btn-primary" disabled @onclick="@(e => @GetBatch(RaceRetrievalType.Next))"/>
+            }
+            else
+            {
+                <input value="Next Day" type="button" class="btn-nxt btn btn-primary" @onclick="@(e => @GetBatch(RaceRetrievalType.Next))"/>
+            }
+        </div>
+    </div>
     @foreach (var even in events)
     {
         <div id="event-card-@even.EventId" class="row">
@@ -25,7 +48,7 @@ else
                         <li>Surface: @even.SurfaceType</li>
                         <li>Meeting Type: @even.MeetingType</li>
                     </ul>
-                    <input value="Run active algorithm" type="button" class="btn btn-primary" />
+                    <input value="Run algorithm" type="button" class="btn btn-primary" @onclick="@(e => @ShowAlgorithmPopup(even.EventId))"/>
                 </div>
             </div>
             <div class="col-md-12 races-container">
@@ -43,17 +66,22 @@ else
                 }
                         </tbody>
                 </table>
-                }
+    }
             </div>
         </div>
-    }
-}
+}}
+
 @code {
+    private bool IsMostRecent = true;
+    private bool IsFirst = false;
+    private Guid ActiveBatch;
+
     private List<TodaysRacesViewModel>? events;
+    [CascadingParameter] public IModalService Modal { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        events = await adminRaceService.GetTodaysRaces();
+        await GetBatch(RaceRetrievalType.Current);
     }
 
     private void ShowEventRaces(int eventId)
@@ -67,6 +95,57 @@ else
         else 
         {
             even.ShowRaces = true;
+        }
+    }
+
+    private async Task ShowAlgorithmPopup(int? eventId)
+    {
+
+        var modalOptions = new ModalOptions();
+        modalOptions.Class = "blazored-modal-sm";
+        if (eventId != null)
+        {
+            var even = events.Where(x => x.EventId == eventId).FirstOrDefault();
+            //Run for one specific event
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(RunAlgorithmPopup.SingleEvent), even);
+            parameters.Add(nameof(RunAlgorithmPopup.Callback), EventCallback.Factory.Create<string>(this, Refresh));
+            //Pass both into partial view below
+            var result = modal.Show<RunAlgorithmPopup>(even.EventName, parameters, modalOptions);
+        }
+        else 
+        {
+            //Run for one specific event
+            var parameters = new ModalParameters();
+            parameters.Add(nameof(RunAlgorithmPopup.AllEvents), events);
+            parameters.Add(nameof(RunAlgorithmPopup.Callback), EventCallback.Factory.Create<string>(this, Refresh));
+            //Pass both into partial view below
+            var result = Modal.Show<RunAlgorithmPopup>($"Races for {DateTime.Now.Date.ToString()}", parameters, modalOptions);
+        }
+
+    }
+
+    public void Refresh(string test)
+    {
+        StateHasChanged();
+    }
+
+    public async Task GetBatch(RaceRetrievalType type)
+    {
+        if (type == RaceRetrievalType.Current)
+        {
+            events = await adminRaceService.GetTodaysRaces(type, null);
+        }
+        else
+        {
+            events = await adminRaceService.GetTodaysRaces(type, ActiveBatch);
+        }
+
+        if (events != null)
+        {
+            ActiveBatch = events.FirstOrDefault().BatchId;
+            IsMostRecent = events.FirstOrDefault().IsMostRecent;
+            IsFirst = events.FirstOrDefault().IsFirst;
         }
     }
 }

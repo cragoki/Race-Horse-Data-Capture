@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +20,7 @@ namespace Infrastructure.Data.Repositories
 
         public List<AlgorithmEntity> GetAlgorithms()
         {
-            return _context.tb_algorithm.ToList();
+            return _context.tb_algorithm.AsNoTracking().Include(x => x.Settings).Include(x => x.Variables).ToList();
 
         }
 
@@ -52,6 +53,18 @@ namespace Infrastructure.Data.Repositories
         public void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity)
         {
             _context.tb_algorithm.Update(algorithmEntity);
+            SaveChanges();
+        }
+
+        public void UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings)
+        {
+            _context.tb_algorithm_settings.UpdateRange(algorithmSettings);
+            SaveChanges();
+        }
+
+        public void UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables)
+        {
+            _context.tb_algorithm_variable.UpdateRange(algorithmVariables);
             SaveChanges();
         }
 
