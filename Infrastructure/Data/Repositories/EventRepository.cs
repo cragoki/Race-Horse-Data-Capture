@@ -48,6 +48,38 @@ namespace Infrastructure.Data.Repositories
                     .ThenInclude(y => y.Going)
                 .ToList();
         }
+
+        public EventEntity TestAlgorithmWithOneEvent()
+        {
+            return _context.tb_event
+                .Include(x => x.Course)
+                .Include(x => x.MeetingType)
+                .Include(x => x.Surface)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Horse)
+                            .ThenInclude(a => a.Archive)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Jockey)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Trainer)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Weather)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Stalls)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Distance)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Ages)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Going)
+                .Where(x => x.created.Date != DateTime.Now)
+                .OrderByDescending(x => x.created)
+                .FirstOrDefault();
+        }
+
         public IEnumerable<EventEntity> GetTodaysEvents() 
         {
             return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date);

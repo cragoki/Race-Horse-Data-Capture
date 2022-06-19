@@ -16,20 +16,20 @@ namespace Infrastructure.PunterAdmin.Services
     {
         private IAlgorithmRepository _algorithmRepository;
         private IAlgorithmService _algorithmService;
-        private IConfigurationRepository _configurationRepository;
         private IEventRepository _eventRepository;
         private ITopSpeedOnly _topSpeed;
         private ITsRPR _topSpeedRpr;
+        private IFormAlgorithm _form;
 
 
-        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IConfigurationRepository configurationRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService)
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form)
         {
             _algorithmRepository = algorithmRepository;
-            _configurationRepository = configurationRepository;
             _eventRepository = eventRepository;
             _topSpeed = topSpeed;
             _topSpeedRpr = topSpeedRpr;
             _algorithmService = algorithmService;
+            _form = form;
         }
 
     public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
@@ -157,9 +157,12 @@ namespace Infrastructure.PunterAdmin.Services
         {
             try
             {
-                var allEvents = _eventRepository.GetEvents();
+                //var allEvents = _eventRepository.GetEvents();
+                var allEvents = new List<EventEntity>();
+                allEvents.Add(_eventRepository.TestAlgorithmWithOneEvent());
                 var results = new List<AlgorithmResult>();
                 var algorithmResult = new AlgorithmResult();
+                var variables = await BuildAlgorithmVariables(algorithm);
                 switch (algorithm.AlgorithmId)
                 {
                     case (int)AlgorithmEnum.TopSpeedOnly:
@@ -172,13 +175,16 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.TsRPR:
                         foreach (var even in allEvents)
                         {
-                            var variables = await BuildAlgorithmVariables(algorithm);
                             algorithmResult = await _topSpeedRpr.GenerateAlgorithmResult(even.Races, variables);
                             results.Add(algorithmResult);
                         }
                         break;
                     case (int)AlgorithmEnum.FormOnly:
-
+                        foreach (var even in allEvents)
+                        {
+                            algorithmResult = await _form.GenerateAlgorithmResult(even.Races, variables);
+                            results.Add(algorithmResult);
+                        }
                         break;
                 }
 
@@ -288,7 +294,7 @@ namespace Infrastructure.PunterAdmin.Services
                 result.Add(new AlgorithmSettingsEntity()
                 {
                     setting_name = setting.SettingName,
-                    algorithm_id = setting.AlgorithmSettingId,
+                    algorithm_id = algorithm.AlgorithmId,
                     setting_value = setting.SettingValue,
                     algorithm_setting_id = setting.AlgorithmSettingId
                 });

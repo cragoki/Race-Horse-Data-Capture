@@ -26,5 +26,6 @@ namespace Core.Interfaces.Data.Repositories
         RaceEntity GetRaceById(int raceId);
         List<RaceHorseEntity> GetRaceHorsesForRace(int raceId);
         void SaveChanges();
+        EventEntity TestAlgorithmWithOneEvent();
     }
 }

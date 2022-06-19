@@ -3,6 +3,7 @@
 <PageTitle>Algorithms</PageTitle>
 
 @inject IAdminAlgorithmService algorithmService;
+@inject IJSRuntime JsRuntime
 
 @if (algorithms == null)
 {
@@ -67,7 +68,7 @@ else
                                 <td><input @bind="@setting.SettingValue" /></td>
                             </tr>
                     }
-                    <tr><input value="Save" type="button" class="btn btn-primary" @onclick="@(e => @SaveAlgorithmSettings(algorithm))"/></tr>
+                    <tr><input value="Save" type="button" class="btn btn-primary mt-10" @onclick="@(e => @SaveAlgorithmSettings(algorithm))"/></tr>
                     </tbody>
                     </table>
                     </td>
@@ -94,7 +95,7 @@ else
                                 <td><input @bind="@variable.Threshold" /></td>
                             </tr>
                     }
-                        <tr><input value="Save" type="button" class="btn btn-primary" @onclick="@(e => @SaveAlgorithmVariables(algorithm))"/></tr>
+                        <tr><input value="Save" type="button" class="btn btn-primary mt-10" @onclick="@(e => @SaveAlgorithmVariables(algorithm))"/></tr>
                     </tbody>
                     </table>
                     </td>
@@ -117,16 +118,33 @@ else
         algorithmRunning = true;
         algorithm = await algorithmService.RunAlgorithmForAll(algorithm);
         algorithmRunning = false;
+        await JsRuntime.InvokeVoidAsync("alert", "Algorithm Complete");
     }
 
     private async Task SaveAlgorithmSettings(AlgorithmTableViewModel algorithm)
     {
-        await algorithmService.UpdateAlgorithmSettings(algorithm);
+        try
+        {
+            await algorithmService.UpdateAlgorithmSettings(algorithm);
+            await JsRuntime.InvokeVoidAsync("alert", "Successfully saved Algorithm Setting");
+        }
+        catch (Exception ex)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
     }
 
     private async Task SaveAlgorithmVariables(AlgorithmTableViewModel algorithm)
     {
-        await algorithmService.UpdateAlgorithmVariables(algorithm);
+        try
+        {
+            await algorithmService.UpdateAlgorithmVariables(algorithm);
+            await JsRuntime.InvokeVoidAsync("alert", "Successfully saved Algorithm Variable");
+        }
+        catch (Exception ex)
+        { 
+            await JsRuntime.InvokeVoidAsync("alert", ex.Message);
+        }
     }
 
     private async Task ShowVariablesAndSettings(AlgorithmTableViewModel algorithm)

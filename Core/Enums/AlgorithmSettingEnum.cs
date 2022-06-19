@@ -8,7 +8,7 @@ namespace Core.Enums
     {
         //The minimum percentage of horses with necessary data in the race
         horsesrequired,
-        racesRequired
+        racesrequired
 
     }
 }

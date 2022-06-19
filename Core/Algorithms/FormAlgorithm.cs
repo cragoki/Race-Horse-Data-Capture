@@ -61,35 +61,25 @@ namespace Core.Algorithms
 
         public async Task<double> FormCalculation(RaceEntity race, List<AlgorithmVariableEntity> variables)
         {
-            var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.TsRPR);
+            var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.FormOnly);
             var total = SharedCalculations.GetTake(race.no_of_horses ?? 0);
             var counter = 0;
-            var horses = _eventRepository.GetRaceHorsesForRace(race.race_id);
+            var horses = race.RaceHorses;
             var listOfHorses = new List<HorseEntity>();
             var horseRequired = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
-            var raceRequired = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.racesRequired.ToString()).FirstOrDefault().setting_value.ToString());
+            var raceRequired = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.racesrequired.ToString())?.FirstOrDefault().setting_value.ToString());
 
             foreach (var h in horses)
             {
-                var even = _eventRepository.GetEventById(race.event_id);
-                var horse = _horseRepository.GetHorse(h.horse_id);
-                //GETTING ARCHIVED HORSE DATA
-                var races = _horseRepository.GetAllRacesForHorse(h.horse_id).Count();
+                var even = race.Event;
+                var horse = h.Horse;
 
-                if (races > raceRequired)
+                if (horse.Races.Where(x => x.race_id != race.race_id).Count() >= raceRequired)
                 {
                     listOfHorses.Add(horse);
                 }
 
             }
-            //Percentage of horses required in the race with sufficient data to continue
-            //TODO: Add in filter here to ensure the LAST x RACES WERE WITHIN x MONTHS
-            //var variance = (listOfHorses.Count() * horseRequired);
-
-            //if (listOfHorses.Where(x => x.).Count() < variance)
-            //{
-            //    return -1;
-            //}
 
             if (listOfHorses.Count > 0)
             {
@@ -97,13 +87,23 @@ namespace Core.Algorithms
                 var results = horses.Where(x => x.position > 0).OrderBy(x => x.position).ToList().Take(total);
                 var predictions = new List<int>();
                 var horseFormModel = new List<HorseFormModel>();
-                var take = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
+                var take = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horsesrequired.ToString()).FirstOrDefault().setting_value.ToString());
+                //Percentage of horses required in the race with sufficient data to continue
+                var variance = (int)(race.RaceHorses.Count() * take);
+
+                //Percentage of horses required in the race with sufficient data to continue
+                //TODO: Add in filter here to ensure the LAST x RACES WERE WITHIN x MONTHS
+                if (listOfHorses.Count() < variance)
+                {
+                    return -1;
+                }
+
                 foreach (var variable in variables)
                 {
                     switch (variable.variable_id)
                     {
                         case (int)VariableEnum.Form:
-                            predictions = Form.CalculateResultsByForm(horseFormModel, take).ToList();
+                            predictions = Form.CalculateResultsByForm(horseFormModel, variance).ToList();
                             break;
                     }
 

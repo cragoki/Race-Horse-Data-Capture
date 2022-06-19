@@ -147,9 +147,10 @@ table {
 }
 
 .blazored-modal-lg {
+    padding:30px;
     width: 90%;
     height: 90%;
-    background-color: rgba(25,25,25,0.9) !important;
+    background-color: rgba(25,25,25,1) !important;
     color: green !important;
     overflow-y: auto;
     z-index: 200;
@@ -226,10 +227,11 @@ table {
 #horse-statistics-races {
     height: 100%;
     overflow-y: auto;
-    overflow-x: hidden;
-    border:2px solid white;
-    padding:10px;
-    height:100%;
+    overflow-x: auto;
+    padding: 20px;
+    border: 2px solid white;
+    padding: 10px;
+    width: 100%;
 }
 
 
