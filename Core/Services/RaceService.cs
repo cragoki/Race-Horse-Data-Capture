@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Helpers;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using System;
@@ -15,12 +16,14 @@ namespace Core.Services
         private readonly IScraperService _scraperService;
         private readonly IEventRepository _eventRepository;
         private readonly IHorseRepository _horseRepository;
+        private readonly IMappingTableRepository _mappingRepository;
 
-        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository)
+        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository, IMappingTableRepository mappingRepository)
         {
             _scraperService = scraperService;
             _eventRepository = evenRepository;
             _horseRepository = horseRepository;
+            _mappingRepository = mappingRepository;
         }
 
         public async Task GetEventRaces(int EventId)
@@ -156,6 +159,7 @@ namespace Core.Services
         {
             if (archive != null && archive.Count() != 0) 
             {
+                //set the race date to equal that distance group
                 var rpr = archive.Where(x => x.field_changed == "rpr" && x.date < raceDate)
                     .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
 

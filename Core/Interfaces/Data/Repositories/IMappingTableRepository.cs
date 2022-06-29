@@ -1,10 +1,15 @@
-﻿namespace Core.Interfaces.Data.Repositories
+﻿using Core.Entities;
+using System.Collections.Generic;
+
+namespace Core.Interfaces.Data.Repositories
 { 
     public interface IMappingTableRepository
     {
         string GetAgeType(int age);
         string GetDistanceType(int distance);
+        List<DistanceType> GetDistanceTypes();
         string GetGoingType(int going);
+        List<GoingType> GetGoingTypes();
         string GetMeetingType(int meeting);
         string GetStallsType(int stalls);
         string GetWeatherType(int weather);

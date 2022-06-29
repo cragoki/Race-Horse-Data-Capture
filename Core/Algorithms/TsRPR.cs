@@ -215,7 +215,6 @@ namespace Core.Algorithms
                 //compare with actual results
                 foreach (var prediction in guess)
                 {
-                    //If the predictions top 3 are in the results top 3 add a point
                     result.Add(listOfHorses.Where(x => x.horse_id == prediction.Key).FirstOrDefault());
                 }
             }

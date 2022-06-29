@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Infrastructure.Data.Repositories
@@ -24,9 +25,17 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_distance_type.Where(x => x.distance_type_id == distance).FirstOrDefault().distance_type;
         }
+        public List<DistanceType> GetDistanceTypes()
+        {
+            return _context.tb_distance_type.ToList();
+        }
         public string GetGoingType(int going)
         {
             return _context.tb_going_type.Where(x => x.going_type_id == going).FirstOrDefault().going_type;
+        }
+        public List<GoingType> GetGoingTypes()
+        {
+            return _context.tb_going_type.ToList();
         }
         public string GetMeetingType(int meeting)
         {

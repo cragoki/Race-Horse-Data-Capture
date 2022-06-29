@@ -22,7 +22,8 @@ namespace Infrastructure.Data.Repositories
 
         public IEnumerable<EventEntity> GetEvents()
         {
-            return _context.tb_event
+            //Get all events within the last 9 months
+              return _context.tb_event
                 .Include(x => x.Course)
                 .Include(x => x.MeetingType)
                 .Include(x => x.Surface)
@@ -35,7 +36,16 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(z => z.Jockey)
                 .Include(x => x.Races)
                     .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(z => z.Trainer)
+                        .ThenInclude(x => x.Trainer)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(x => x.Horse)
+                            .ThenInclude(x => x.Races)
+                                .ThenInclude(x => x.Race)
+                                    .ThenInclude(x => x.Event)
                 .Include(x => x.Races)
                     .ThenInclude(y => y.Weather)
                 .Include(x => x.Races)
@@ -46,38 +56,52 @@ namespace Infrastructure.Data.Repositories
                     .ThenInclude(y => y.Ages)
                 .Include(x => x.Races)
                     .ThenInclude(y => y.Going)
+                .Where(x => x.created.Date != DateTime.Now.Date && x.created.Date > DateTime.Now.Date.AddMonths(-6))
                 .ToList();
         }
 
-        public EventEntity TestAlgorithmWithOneEvent()
+        public List<EventEntity> TestAlgorithmWithOneHundredEvents()
         {
-            return _context.tb_event
-                .Include(x => x.Course)
-                .Include(x => x.MeetingType)
-                .Include(x => x.Surface)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(z => z.Horse)
-                            .ThenInclude(a => a.Archive)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(z => z.Jockey)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(z => z.Trainer)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Weather)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Stalls)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Distance)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Ages)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Going)
-                .Where(x => x.created.Date != DateTime.Now)
-                .OrderByDescending(x => x.created)
-                .FirstOrDefault();
+            var ignore = new List<int>() { 478, 480, 483, 487 };
+            var events = _context.tb_event
+              .Include(x => x.Course)
+              .Include(x => x.MeetingType)
+              .Include(x => x.Surface)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(z => z.Horse)
+                          .ThenInclude(a => a.Archive)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(z => z.Jockey)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(x => x.Trainer)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(x => x.Horse)
+                          .ThenInclude(x => x.Races)
+                              .ThenInclude(x => x.Race)
+                                  .ThenInclude(x => x.Event)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Weather)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Stalls)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Distance)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Ages)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Going)
+              .Where(x => x.created.Date != DateTime.Now.Date && x.created.Date > DateTime.Now.Date.AddMonths(-8) && !ignore.Contains(x.event_id) )
+              .Take(10)
+              .OrderBy(r => Guid.NewGuid())
+              .ToList();
+
+            return events;
         }
 
         public IEnumerable<EventEntity> GetTodaysEvents() 
@@ -162,6 +186,11 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Horse)
                         .ThenInclude(x => x.Archive)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.Event)
                 .Include(x => x.Event);
         }
 

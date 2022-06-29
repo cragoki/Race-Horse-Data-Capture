@@ -9,12 +9,14 @@ using System.Linq;
 using Core.Entities;
 using Core.Models.Algorithm;
 using Core.Interfaces.Services;
+using Core.Helpers;
 
 namespace Infrastructure.PunterAdmin.Services
 {
     public class AdminAlgorithmService : IAdminAlgorithmService
     {
         private IAlgorithmRepository _algorithmRepository;
+        private IMappingTableRepository _mappingRepository;
         private IAlgorithmService _algorithmService;
         private IEventRepository _eventRepository;
         private ITopSpeedOnly _topSpeed;
@@ -22,7 +24,7 @@ namespace Infrastructure.PunterAdmin.Services
         private IFormAlgorithm _form;
 
 
-        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form)
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository)
         {
             _algorithmRepository = algorithmRepository;
             _eventRepository = eventRepository;
@@ -30,6 +32,7 @@ namespace Infrastructure.PunterAdmin.Services
             _topSpeedRpr = topSpeedRpr;
             _algorithmService = algorithmService;
             _form = form;
+            _mappingRepository = mappingRepository;
         }
 
     public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
@@ -142,7 +145,40 @@ namespace Infrastructure.PunterAdmin.Services
                         }
                         break;
                     case (int)AlgorithmEnum.FormOnly:
+                        foreach (var even in events)
+                        {
+                            var races = _eventRepository.GetRacesForEvent(even.EventId);
+                            var distances = _mappingRepository.GetDistanceTypes();
+                            var goings = _mappingRepository.GetGoingTypes();
 
+                            foreach (var race in even.EventRaces)
+                            {
+                                race.Horses.Select(x => { x.PredictedPosition = null; return x; }).ToList();
+                            }
+
+                            foreach (var race in races)
+                            {
+
+                                var settings = await BuildAlgorithmSettings(algorithm);
+
+                                var predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
+
+                                if (predictions == null || predictions.Count() == 0)
+                                {
+                                    continue;
+                                }
+
+                                foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                {
+                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                    thisRace.AlgorithmRan = true;
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                                    horse.PredictedPosition = prediction.i + 1;
+                                    horse.HorseReliability = prediction.value.Predictability;
+                                    horse.Points = prediction.value.Points;
+                                }
+                            }
+                        }
                         break;
                 }
             }
@@ -157,9 +193,9 @@ namespace Infrastructure.PunterAdmin.Services
         {
             try
             {
-                //var allEvents = _eventRepository.GetEvents();
-                var allEvents = new List<EventEntity>();
-                allEvents.Add(_eventRepository.TestAlgorithmWithOneEvent());
+                //var allEvents = _eventRepository.TestAlgorithmWithOneHundredEvents();
+                var allEvents = _eventRepository.GetEvents();
+
                 var results = new List<AlgorithmResult>();
                 var algorithmResult = new AlgorithmResult();
                 var variables = await BuildAlgorithmVariables(algorithm);
@@ -169,21 +205,31 @@ namespace Infrastructure.PunterAdmin.Services
                         foreach (var even in allEvents)
                         {
                             algorithmResult = await _topSpeed.GenerateAlgorithmResult(even.Races);
-                            results.Add(algorithmResult);
+                            if (algorithmResult.RacesFiltered > 0)
+                            {
+                                results.Add(algorithmResult);
+                            }
                         }
                         break;
                     case (int)AlgorithmEnum.TsRPR:
                         foreach (var even in allEvents)
                         {
                             algorithmResult = await _topSpeedRpr.GenerateAlgorithmResult(even.Races, variables);
-                            results.Add(algorithmResult);
+                            if (algorithmResult.RacesFiltered > 0)
+                            {
+                                results.Add(algorithmResult);
+                            }
                         }
                         break;
                     case (int)AlgorithmEnum.FormOnly:
                         foreach (var even in allEvents)
                         {
                             algorithmResult = await _form.GenerateAlgorithmResult(even.Races, variables);
-                            results.Add(algorithmResult);
+                            //If race counter > 0
+                            if (algorithmResult.RacesFiltered > 0) 
+                            {
+                                results.Add(algorithmResult);
+                            }
                         }
                         break;
                 }
