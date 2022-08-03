@@ -14,6 +14,7 @@ namespace Core.Interfaces.Data.Repositories
         SurfaceType GetSurfaceTypeById(int surfaceTypeId);
         EventEntity GetEventByBatch(int courseId, Guid batch);
         List<EventEntity> GetEventsByBatch(Guid batch);
+        IEnumerable<RaceEntity> GetRacesForBatch(Guid batchId);
         IEnumerable<EventEntity> GetEventByCourse(int courseId);
         void AddCourse(CourseEntity courseToAdd);
         void UpdateCourse(CourseEntity courseToUpdate);

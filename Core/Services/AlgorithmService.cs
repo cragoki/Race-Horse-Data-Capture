@@ -123,5 +123,28 @@ namespace Core.Services
             return result;
         }
 
+        public async Task<List<AlgorithmSettingsEntity>> GetSettingsForAlgorithm(int algorithm_id)
+        {
+            var result = new List<AlgorithmSettingsEntity>();
+
+            try
+            {
+                var algorithm = _algorithmRepository.GetAlgorithms().Where(x => x.algorithm_id == algorithm_id).FirstOrDefault();
+
+                result = algorithm.Settings;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        public void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction) 
+        {
+            _algorithmRepository.AddAlgorithmPrediction(prediction);
+        }
+
     }
 }

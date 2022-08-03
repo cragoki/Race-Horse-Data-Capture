@@ -4,6 +4,7 @@ using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -68,6 +69,15 @@ namespace Infrastructure.Data.Repositories
             SaveChanges();
         }
 
+        public void AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction)
+        {
+            _context.tb_algorithm_prediction.Add(algorithmPrediction);
+            SaveChanges();
+        }
+        public List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
+        {
+            return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).ToList();
+        }
         public void SaveChanges()
         {
             if (_configService.SavePermitted())

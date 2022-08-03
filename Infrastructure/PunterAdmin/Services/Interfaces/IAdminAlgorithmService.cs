@@ -1,4 +1,5 @@
-﻿using Infrastructure.PunterAdmin.ViewModels;
+﻿using Core.Entities;
+using Infrastructure.PunterAdmin.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,5 +12,6 @@ namespace Infrastructure.PunterAdmin.Services
         Task<AlgorithmTableViewModel> RunAlgorithmForAll(AlgorithmTableViewModel algorithm);
         Task<AlgorithmTableViewModel> UpdateAlgorithmSettings(AlgorithmTableViewModel algorithm);
         Task<AlgorithmTableViewModel> UpdateAlgorithmVariables(AlgorithmTableViewModel algorithm);
+        Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm);
     }
 }

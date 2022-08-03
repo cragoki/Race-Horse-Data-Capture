@@ -79,6 +79,7 @@ namespace Infrastructure.Data.Repositories
         }
         public void UpdateRaceHorse(RaceHorseEntity horse)
         {
+            _context.DetachAllEntities();
             _context.tb_race_horse.Update(horse);
             SaveChanges();
         }

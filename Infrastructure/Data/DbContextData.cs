@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Infrastructure.Data
 {
@@ -10,6 +11,18 @@ namespace Infrastructure.Data
             : base(options)
         {
 
+        }
+
+        public void DetachAllEntities()
+        {
+            var changedEntriesCopy = this.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added ||
+                            e.State == EntityState.Modified ||
+                            e.State == EntityState.Deleted)
+                .ToList();
+
+            foreach (var entry in changedEntriesCopy)
+                entry.State = EntityState.Detached;
         }
 
         // Tables
@@ -35,5 +48,7 @@ namespace Infrastructure.Data
         public DbSet<SurfaceType> tb_surface_type { get; set; }
         public DbSet<WeatherType> tb_weather_type { get; set; }
         public DbSet<AlgorithmSettingsEntity> tb_algorithm_settings { get; set; }
+        public DbSet<AlgorithmPredictionEntity> tb_algorithm_prediction { get; set; }
+
     }
 }

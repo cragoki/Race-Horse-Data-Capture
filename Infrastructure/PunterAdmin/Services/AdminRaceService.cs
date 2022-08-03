@@ -17,12 +17,14 @@ namespace Infrastructure.PunterAdmin.Services
         private static IConfigurationRepository _configRepo;
         private static IEventRepository _eventRepository;
         private static IHorseRepository _horseRepository;
+        private static IAlgorithmRepository _algorithmRepository;
 
-        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository)
+        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository, IAlgorithmRepository algorithmRepository)
         {
             _configRepo = configRepo;
             _eventRepository = eventRepository;
             _horseRepository = horseRepository;
+            _algorithmRepository = algorithmRepository;
         }
 
         public async Task<List<TodaysRacesViewModel>> GetTodaysRaces(RaceRetrievalType retrievalType, Guid? batchId)
@@ -113,7 +115,7 @@ namespace Infrastructure.PunterAdmin.Services
 
                 foreach (var race in horse.Races.OrderByDescending(x => x.Race.Event.created))
                 {
-                    result.Add(new RaceViewModel()
+                    var toAdd = new RaceViewModel()
                     {
                         RaceId = race.race_id,
                         Date = race.Race.Event.created,
@@ -130,7 +132,14 @@ namespace Infrastructure.PunterAdmin.Services
                         Stalls = $"Stalls: {race.Race.Stalls?.stalls_type}",
                         Weather = $"Weather: {race.Race.Weather?.weather_type}",
                         Horses = BuildRaceHorseViewModel(race.Race.RaceHorses, race.Race.Event)
-                    });
+                    };
+
+                    if (toAdd.Horses.Any(x => x.PredictedPosition != 0)) 
+                    {
+                        toAdd.AlgorithmRan = true;
+                    }
+
+                    result.Add(toAdd);
                 }
             }
             catch(Exception ex)
@@ -186,9 +195,18 @@ namespace Infrastructure.PunterAdmin.Services
 
             foreach (var raceHorse in raceHorses)
             {
+                var racePredictedPosition = 0;
+                decimal racePoints = 0;
                 var rpr = ConfigureRPR(raceHorse, even.created);
                 var ts = ConfigureTS(raceHorse, even.created);
+                var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id);
+                var predictedPosition = predictedPositions.Where(x => x.algorithm_id == (int)AlgorithmEnum.FormOnly).FirstOrDefault();
 
+                if (predictedPosition != null) 
+                {
+                    racePredictedPosition = predictedPosition.predicted_position;
+                    racePoints = predictedPosition.points;
+                }
                 result.Add(new RaceHorseViewModel()
                 {
                     RaceHorseId = raceHorse.race_horse_id,
@@ -203,6 +221,8 @@ namespace Infrastructure.PunterAdmin.Services
                     TrainerName = raceHorse.Trainer?.trainer_name,
                     Ts = ts,
                     RPR = rpr,
+                    PredictedPosition = racePredictedPosition,
+                    Points = racePoints
                 });
             }
 

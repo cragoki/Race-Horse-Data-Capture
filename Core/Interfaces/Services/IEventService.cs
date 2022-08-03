@@ -11,5 +11,6 @@ namespace Core.Interfaces.Services
         Task<List<Event>> GetTodaysEvents(Guid batch);
         Task<bool> GetBacklogEvents(Guid batch, DateTime date);
         Task<List<EventEntity>> GetEventsFromDatabase();
+        Task<List<RaceEntity>> GetRacesFromDatabaseForAlgorithm(int event_id);
     }
 }

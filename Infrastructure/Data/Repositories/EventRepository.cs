@@ -106,7 +106,7 @@ namespace Infrastructure.Data.Repositories
 
         public IEnumerable<EventEntity> GetTodaysEvents() 
         {
-            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date);
+            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date).AsNoTracking();
         }
         public List<CourseEntity> GetCourses()
         {
@@ -191,21 +191,42 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Races)
                             .ThenInclude(x => x.Race)
                                 .ThenInclude(x => x.Event)
-                .Include(x => x.Event);
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.RaceHorses)
+                                    .ThenInclude(x => x.Horse)
+                                        .ThenInclude(x => x.Races)
+                                            .ThenInclude(x => x.Race)
+                                                .ThenInclude(x => x.Event)
+                .Include(x => x.Event).AsNoTrackingWithIdentityResolution();
         }
 
-        //public async IQueryable<List<TodaysRacesViewModel>> GetEventAdminData(int eventId) 
-        //{
-        //    try
-        //    {
-        //        return await (from ev in _context.tb_event
-        //                      join race in ev on ev.event_id equals race.)
-        //    }
-        //    catch (Exception ex) 
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //}
+        public IEnumerable<RaceEntity> GetRacesForBatch(Guid batchId)
+        {
+            return _context.tb_race
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Archive)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.Event)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.RaceHorses)
+                                    .ThenInclude(x => x.Horse)
+                                        .ThenInclude(x => x.Races)
+                                            .ThenInclude(x => x.Race)
+                                                .ThenInclude(x => x.Event)
+                .Include(x => x.Event)
+                .Where(x => x.Event.batch_id == batchId)
+                .AsNoTrackingWithIdentityResolution();
+        }
 
         public RaceEntity GetRaceById(int raceId)
         {

@@ -52,7 +52,7 @@ namespace RHDCAutomation
 
                 services.AddDbContextPool<DbContextData>(option =>
                     option.UseSqlServer(hostContext.Configuration.GetConnectionString("DefaultConnection"),
-                    sqlServerOptions => sqlServerOptions.CommandTimeout(120)));
+                    sqlServerOptions => sqlServerOptions.CommandTimeout(120)).EnableSensitiveDataLogging());
                 });
 
             return host;

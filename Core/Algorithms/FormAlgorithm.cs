@@ -248,7 +248,7 @@ namespace Core.Algorithms
 
                 foreach (var horse in result) 
                 {
-                    var horsePredictability = await CalculateHorsePredictability(horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
+                    var horsePredictability = 0;// await CalculateHorsePredictability(horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
                     horse.Predictability = horsePredictability;
                 }
             }
@@ -284,22 +284,27 @@ namespace Core.Algorithms
                     var predictions = await AssignHorsePoints(race, distanceGroup, goingGroup, distance);
 
                     //Get Actual results and compare vs horsePoints
-                    var placedHorses = race.RaceHorses.Where(x => x.position != 0 && x.position <= total);
-                    var predictedPlacedhorses = predictions.OrderByDescending(x => x.Points).Take(total);
+                    var placedHorses = race.RaceHorses.Where(x => x.position != 0 && x.position <= total).Select(x => x.horse_id).ToList();
+                    var predictedPlacedhorses = predictions.OrderByDescending(x => x.Points).Take(total).Select(x => x.Horse.horse_id).ToList();
 
-                    if (predictedPlacedhorses.Any(x => x.Horse == horse)) 
+                    if (predictions.All(x => x.Points == 0)) 
+                    {
+                        continue;
+                    }
+
+                    if (predictedPlacedhorses.Any(x => x == horse.horse_id)) 
                     {
                         horseWillPlace = true;
                     }
 
 
-                    if (horseWillPlace && placedHorses.Any(x => x.horse_id == horse.horse_id)) 
+                    if (horseWillPlace && predictedPlacedhorses.Any(x => x == horse.horse_id)) 
                     {
                         correctPredictions++;
                     }
                     else 
                     {
-                        if (!horseWillPlace && !placedHorses.Any(x => x.horse_id == horse.horse_id))
+                        if (!horseWillPlace && !predictedPlacedhorses.Any(x => x == horse.horse_id))
                         {
                             correctPredictions++;
                         }
@@ -332,7 +337,7 @@ namespace Core.Algorithms
             foreach (var horse in race.RaceHorses)
             {
                 var toAdd = new FormResultModel();
-
+                toAdd.RaceHorseId = horse.race_horse_id;
                 toAdd.Points = 0;
                 toAdd.Horse = horse.Horse;
                 //Get races within the last 6 months

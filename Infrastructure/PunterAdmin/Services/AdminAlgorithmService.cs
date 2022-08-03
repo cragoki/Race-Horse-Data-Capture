@@ -147,7 +147,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.FormOnly:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId);
+                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
                             var distances = _mappingRepository.GetDistanceTypes();
                             var goings = _mappingRepository.GetGoingTypes();
 
@@ -331,7 +331,7 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        private async Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm) 
+        public async Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm) 
         {
             var result = new List<AlgorithmSettingsEntity>();
 
