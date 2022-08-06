@@ -119,6 +119,8 @@ namespace RHDCAutomation
                                     continue;
                                 }
 
+                                Console.WriteLine($"Populating prediction table for {predictions.Count} predictions");
+
                                 foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
                                 {
                                     try
@@ -133,6 +135,7 @@ namespace RHDCAutomation
                                             points = prediction.value.Points ?? 0
                                         };
                                         _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
+                                        Console.WriteLine($"Prediction added for {algorithmPrediction.race_horse_id}");
                                     }
                                     catch (Exception ex) 
                                     {
