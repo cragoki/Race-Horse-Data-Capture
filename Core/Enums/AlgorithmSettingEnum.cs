@@ -11,6 +11,11 @@ namespace Core.Enums
         racesrequired,
         reliabilitydistance,
         reliablitygoing,
-        minimumreliability
+        minimumreliability,
+        formmultiplierzerotoonemonths,
+        formmultiplieronetotwomonths,
+        formmultipliertwotothreemonths,
+        formmultiplierthreetofourmonths,
+        formmultiplierfourtosixmonths
     }
 }

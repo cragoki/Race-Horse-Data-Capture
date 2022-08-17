@@ -244,11 +244,11 @@ namespace Core.Algorithms
                 }
 
                 //Calculate results 
-                result = await AssignHorsePoints(race, distanceGroup, goingGroup, distance);
+                result = await AssignHorsePoints(settings, race, distanceGroup, goingGroup, distance);
 
                 foreach (var horse in result) 
                 {
-                    var horsePredictability = 0;// await CalculateHorsePredictability(horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
+                    var horsePredictability = 0;// await CalculateHorsePredictability(settings, horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
                     horse.Predictability = horsePredictability;
                 }
             }
@@ -260,7 +260,7 @@ namespace Core.Algorithms
             return result;
         }
 
-        public async Task<decimal> CalculateHorsePredictability(HorseEntity horse, int? currentRaceId, List<DistanceGroupModel> distanceGroups, List<GoingGroupModel> goingGroups, decimal distance) 
+        public async Task<decimal> CalculateHorsePredictability(List<AlgorithmSettingsEntity> settings, HorseEntity horse, int? currentRaceId, List<DistanceGroupModel> distanceGroups, List<GoingGroupModel> goingGroups, decimal distance) 
         {
             var result = 0;
             var raceCounter = 0;
@@ -281,7 +281,7 @@ namespace Core.Algorithms
                     var distanceGroup = distanceGroups.Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
                     var goingGroup = goingGroups.Where(x => x.ElementIds.Contains(race.going ?? 0)).FirstOrDefault();
 
-                    var predictions = await AssignHorsePoints(race, distanceGroup, goingGroup, distance);
+                    var predictions = await AssignHorsePoints(settings, race, distanceGroup, goingGroup, distance);
 
                     //Get Actual results and compare vs horsePoints
                     var placedHorses = race.RaceHorses.Where(x => x.position != 0 && x.position <= total).Select(x => x.horse_id).ToList();
@@ -330,7 +330,7 @@ namespace Core.Algorithms
             return result;
         }
 
-        private async Task<List<FormResultModel>> AssignHorsePoints(RaceEntity race, DistanceGroupModel distanceGroup,GoingGroupModel goingGroup, decimal distance) 
+        private async Task<List<FormResultModel>> AssignHorsePoints(List<AlgorithmSettingsEntity> settings, RaceEntity race, DistanceGroupModel distanceGroup,GoingGroupModel goingGroup, decimal distance) 
         {
             var result = new List<FormResultModel>();
 
@@ -357,14 +357,18 @@ namespace Core.Algorithms
                 {
                     foreach (var idealRace in allConditions)
                     {
+                        var multiplier = GetFormMultiplier(settings, idealRace, race.Event.created);
+                        decimal points = 3M;
+
                         var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
                         if (idealRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + 3;
+                            toAdd.Points = toAdd.Points + (points * multiplier);
                         }
                         else if (idealRace.position <= placed && idealRace.position != 0)
                         {
-                            toAdd.Points = toAdd.Points + 1;
+                            points = 1.5M;
+                            toAdd.Points = toAdd.Points + (points * multiplier);
                         }
                     }
                 }
@@ -374,14 +378,18 @@ namespace Core.Algorithms
                 {
                     foreach (var distanceOnlyRace in distanceOnly)
                     {
+                        var multiplier = GetFormMultiplier(settings, distanceOnlyRace, race.Event.created);
+                        decimal points = 3M;
+
                         var placed = SharedCalculations.GetTake(distanceOnlyRace.Race.no_of_horses ?? 0);
                         if (distanceOnlyRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + (3 * distance);
+                            toAdd.Points = toAdd.Points + ((points * distance) * multiplier);
                         }
                         else if (distanceOnlyRace.position <= placed && distanceOnlyRace.position != 0)
                         {
-                            toAdd.Points = toAdd.Points + (1 * distance);
+                            points = 1.5M;
+                            toAdd.Points = toAdd.Points + ((points * distance) * multiplier);
                         }
                     }
                 }
@@ -391,6 +399,33 @@ namespace Core.Algorithms
             return result;
         }
 
+        private decimal GetFormMultiplier(List<AlgorithmSettingsEntity> settings, RaceHorseEntity race, DateTime currentRaceDate)
+        {
+            var result = 0M;
+            var raceDate = race.Race.Event.created;
+            var monthDiff = ((currentRaceDate.Year - raceDate.Year) * 12) + currentRaceDate.Month - raceDate.Month;
+
+            switch (monthDiff)
+            {
+                case 0:
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierzerotoonemonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 1 || n == 2):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplieronetotwomonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 3):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultipliertwotothreemonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 4):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierthreetofourmonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 5 || n == 6):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierfourtosixmonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+            }
+
+            return result;
+        }
     }
 
 }
