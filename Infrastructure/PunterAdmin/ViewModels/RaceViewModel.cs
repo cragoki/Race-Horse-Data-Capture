@@ -21,6 +21,8 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public string RaceUrl { get; set; }
         public bool Completed { get; set; }
         public bool ShowHorses { get; set; }
+        public bool ShowResults { get; set; }
+
         public List<RaceHorseViewModel> Horses { get; set; }
     }
 }

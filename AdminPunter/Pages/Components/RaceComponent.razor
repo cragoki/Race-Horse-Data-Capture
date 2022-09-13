@@ -16,6 +16,7 @@
                 <td>@Race.RaceClass</td>
                 <td>@Race.Ages</td>
                 <td>@Race.RaceUrl</td>
+                <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowResults(Race.EventId, Race.RaceId))" > Show Results</button></td>
             </tr>
     
             @if (Race.ShowHorses)
@@ -43,6 +44,15 @@
                 {
                     @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
                     {
+                        var position = "";
+                        @if (@Race.ShowResults) 
+                        {
+                            position = @horse.Position.ToString();
+                        }
+                        else
+                        {
+                            position = "?";
+                        }
                         <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
                             <td>@horse.Name</td>
                             <td>@horse.Age</td>
@@ -50,7 +60,7 @@
                             <td>@horse.TrainerName</td>
                             <td>@horse.RPR</td>
                             <td>@horse.Ts</td>
-                            <td>@horse.Position</td>
+                            <td>@position</td>
                             <td>@horse.Points</td>
                             <td>@horse.HorseReliability</td>
                             <td>@horse.PredictedPosition</td>
@@ -59,6 +69,15 @@
                         }
                         else if (horse.PredictedPosition != null && horse.PredictedPosition == 2)
                         {
+                            var position = "";
+                            @if (@Race.ShowResults) 
+                            {
+                                position = @horse.Position.ToString();
+                            }
+                            else
+                            {
+                                position = "?";
+                            }
                             <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
                                 <td>@horse.Name</td>
                                 <td>@horse.Age</td>
@@ -66,7 +85,7 @@
                                 <td>@horse.TrainerName</td>
                                 <td>@horse.RPR</td>
                                 <td>@horse.Ts</td>
-                                <td>@horse.Position</td>
+                                <td>@position</td>
                                 <td>@horse.Points</td>
                                 <td>@horse.HorseReliability</td>
                                 <td>@horse.PredictedPosition</td>
@@ -75,6 +94,15 @@
                         }
                         else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
                         {
+                        var position = "";
+                        @if (@Race.ShowResults) 
+                        {
+                            position = @horse.Position.ToString();
+                        }
+                        else
+                        {
+                            position = "?";
+                        }
                             <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
                                 <td>@horse.Name</td>
                                 <td>@horse.Age</td>
@@ -82,7 +110,7 @@
                                 <td>@horse.TrainerName</td>
                                 <td>@horse.RPR</td>
                                 <td>@horse.Ts</td>
-                                <td>@horse.Position</td>
+                                <td>@position</td>
                                 <td>@horse.Points</td>
                                 <td>@horse.HorseReliability</td>
                                 <td>@horse.PredictedPosition</td>
@@ -91,6 +119,15 @@
                         }
                         else if (horse.PredictedPosition != null && horse.PredictedPosition == 4)
                         {
+                            var position = "";
+                            @if (@Race.ShowResults) 
+                            {
+                                position = @horse.Position.ToString();
+                            }
+                            else
+                            {
+                                position = "?";
+                            }
                             <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
                                 <td>@horse.Name</td>
                                 <td>@horse.Age</td>
@@ -98,7 +135,7 @@
                                 <td>@horse.TrainerName</td>
                                 <td>@horse.RPR</td>
                                 <td>@horse.Ts</td>
-                                <td>@horse.Position</td>
+                                <td>@position</td>
                                 <td>@horse.Points</td>
                                 <td>@horse.HorseReliability</td>
                                 <td>@horse.PredictedPosition</td>
@@ -107,6 +144,15 @@
                         }
                         else
                         {
+                        var position = "";
+                        @if (@Race.ShowResults) 
+                        {
+                            position = @horse.Position.ToString();
+                        }
+                        else
+                        {
+                            position = "?";
+                        }
                         <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
                             <td>@horse.Name</td>
                             <td>@horse.Age</td>
@@ -114,7 +160,7 @@
                             <td>@horse.TrainerName</td>
                             <td>@horse.RPR</td>
                             <td>@horse.Ts</td>
-                            <td>@horse.Position</td>
+                            <td>@position</td>
                             <td>@horse.Points</td>
                             <td>@horse.HorseReliability</td>
                             <td>@horse.PredictedPosition</td>
@@ -143,6 +189,7 @@ else
             <td>@Race.RaceClass</td>
             <td>@Race.Ages</td>
             <td>@Race.RaceUrl</td>
+            <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowResults(Race.EventId, Race.RaceId))" > Show Results</button></td>
         </tr>
     
             @if (Race.ShowHorses)
@@ -168,8 +215,17 @@ else
                 <tbody>
                 @foreach (var horse in Race.Horses)
                 {
-               @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
+                            @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -177,7 +233,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -186,6 +242,15 @@ else
                                 }
                                 else if (horse.PredictedPosition != null && horse.PredictedPosition == 2)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -193,7 +258,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -202,6 +267,15 @@ else
                                 }
                                 else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -209,7 +283,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -218,6 +292,15 @@ else
                                 }
                                 else if (horse.PredictedPosition != null && horse.PredictedPosition == 4)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -225,7 +308,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -234,6 +317,15 @@ else
                                 }
                                 else
                                 {
+                                var position = "";
+                                @if (@Race.ShowResults) 
+                                {
+                                    position = @horse.Position.ToString();
+                                }
+                                else
+                                {
+                                    position = "?";
+                                }
                                 <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
                                     <td>@horse.Name</td>
                                     <td>@horse.Age</td>
@@ -241,8 +333,7 @@ else
                                     <td>@horse.TrainerName</td>
                                     <td>@horse.RPR</td>
                                     <td>@horse.Ts</td>
-                                    <td>@horse.Position</td>
-                                     <td>@horse.Points</td>
+                                    <td>@position</td>
                                      <td>@horse.HorseReliability</td>
                                     <td>@horse.PredictedPosition</td>
                                     <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
@@ -268,6 +359,7 @@ else
             <td>@Race.RaceClass</td>
             <td>@Race.Ages</td>
             <td>@Race.RaceUrl</td>
+            <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowResults(Race.EventId, Race.RaceId))" > Show Results</button></td>
          </tr>
             @if (Race.ShowHorses)
             {
@@ -294,6 +386,15 @@ else
                 {
                                 @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -301,7 +402,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -310,6 +411,15 @@ else
                                 }
                                 else if (horse.PredictedPosition != null && horse.PredictedPosition == 2)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -317,7 +427,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -326,6 +436,15 @@ else
                                 }
                                 else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -333,7 +452,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -342,6 +461,15 @@ else
                                 }
                                 else if (horse.PredictedPosition != null && horse.PredictedPosition == 4)
                                 {
+                                    var position = "";
+                                    @if (@Race.ShowResults) 
+                                    {
+                                        position = @horse.Position.ToString();
+                                    }
+                                    else
+                                    {
+                                        position = "?";
+                                    }
                                     <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
@@ -349,7 +477,7 @@ else
                                         <td>@horse.TrainerName</td>
                                         <td>@horse.RPR</td>
                                         <td>@horse.Ts</td>
-                                        <td>@horse.Position</td>
+                                        <td>@position</td>
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
@@ -358,6 +486,15 @@ else
                                 }
                                 else
                                 {
+                                var position = "";
+                                @if (@Race.ShowResults) 
+                                {
+                                    position = @horse.Position.ToString();
+                                }
+                                else
+                                {
+                                    position = "?";
+                                }
                                 <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
                                     <td>@horse.Name</td>
                                     <td>@horse.Age</td>
@@ -365,7 +502,7 @@ else
                                     <td>@horse.TrainerName</td>
                                     <td>@horse.RPR</td>
                                     <td>@horse.Ts</td>
-                                    <td>@horse.Position</td>
+                                    <td>@position</td>
                                     <td>@horse.Points</td>
                                     <td>@horse.HorseReliability</td>
                                     <td>@horse.PredictedPosition</td>
@@ -401,6 +538,18 @@ else
         else 
         {
             Race.ShowHorses = true;
+        }
+    }
+
+    private void ShowResults(int eventId, int raceId)
+    {
+        if (Race.ShowResults)
+        {
+            Race.ShowResults = false;
+        }
+        else 
+        {
+            Race.ShowResults = true;
         }
     }
 
