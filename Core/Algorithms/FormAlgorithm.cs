@@ -135,9 +135,17 @@ namespace Core.Algorithms
                     horsepoints.Add(toAdd);
                     continue;
                 }
-
-                var allConditions = races.Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroups.ElementIds.Contains(x.Race.going ?? 0)).ToList();
+                var allConditions = new List<RaceHorseEntity>();
+                if (race.race_class != null && race.race_class != 0)
+                {
+                    allConditions = races.Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroups.ElementIds.Contains(x.Race.going ?? 0) && x.Race.race_class <= race.race_class).ToList(); 
+                }
+                else 
+                {
+                    allConditions = races.Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroups.ElementIds.Contains(x.Race.going ?? 0)).ToList();
+                }
                 var distanceOnly = races.Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList();
+
 
                 //Loop through horses who have met the identical conditions within the last 6 months
                 if (allConditions.Count() > 0)
@@ -145,6 +153,7 @@ namespace Core.Algorithms
                     foreach (var idealRace in allConditions) 
                     {
                         var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
+                        //TODO: Implement class multiplier here, points * multiplier for each class lower (I.E 0.20 for 1 class lower, 0.40 for 2 classes lower, -0.20 for one class higher)
                         if (idealRace.position == 1) 
                         {
                             toAdd.points = toAdd.points + 3;
