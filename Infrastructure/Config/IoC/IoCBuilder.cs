@@ -40,6 +40,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<ITopSpeedOnly, TopSpeedOnly>();
             container.RegisterScoped<ITsRPR, TsRPR>();
             container.RegisterScoped<IFormAlgorithm, FormAlgorithm>();
+            container.RegisterScoped<IFormRevamped, FormRevamped>();
 
             //Punter Admin
             container.RegisterScoped<IAdminAlgorithmService, AdminAlgorithmService>();

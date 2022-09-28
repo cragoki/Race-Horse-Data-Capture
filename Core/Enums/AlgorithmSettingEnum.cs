@@ -6,7 +6,7 @@ namespace Core.Enums
 {
     public enum AlgorithmSettingEnum
     {
-        //The minimum percentage of horses with necessary data in the race
+        //FormOnly
         horsesrequired,
         racesrequired,
         reliabilitydistance,
@@ -16,6 +16,23 @@ namespace Core.Enums
         formmultiplieronetotwomonths,
         formmultipliertwotothreemonths,
         formmultiplierthreetofourmonths,
-        formmultiplierfourtosixmonths
+        formmultiplierfourtosixmonths,
+        //FormRevamp,
+        //TBE - How important or detramental is a period off for the horse
+        horseBreak,
+        //Points for last x races
+        formMultiplier,
+        //The past x races to apply the form multiplier
+        formMultiplierLastXRaces,
+        //This value will increment, e.g -> if the value is 0.25 -> placed last race = ponts += 0.25, THEN CHECK placed last 2 races points += 0.5, THEN CHECK
+        //Placed last 3 races, points += 0.75 - Totalling bonus points to 1.5
+        consecutivePlacementMultiplier,
+        //Both of the below -> check if horse is stepping up classes and has placed or hasnt placed, should still apply a multiplier
+        horseSteppingUpMultiplierPlaced,
+        horseSteppingUpMultiplierNotPlaced,
+        //Last x races to check for above settings
+        horseSteppingUpMultiplierLastXRaces,
+        //This will attribute a negative value for a horse who has never raced at the current class or lower, e.g. if the value is 0.5 -> horsePoints * 0.5 
+        horseSteppingDownMultiplier
     }
 }

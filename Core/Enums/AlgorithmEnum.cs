@@ -8,6 +8,7 @@ namespace Core.Enums
     {
         TopSpeedOnly = 1,
         TsRPR = 2,
-        FormOnly = 3
+        FormOnly = 3,
+        FormRevamp = 4
     }
 }
