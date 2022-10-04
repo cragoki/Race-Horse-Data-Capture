@@ -207,9 +207,20 @@ namespace Core.Algorithms
                 var total = SharedCalculations.GetTake(race.no_of_horses ?? 0);
                 var horses = race.RaceHorses;
                 var listOfHorses = new List<HorseEntity>();
+
+                //NEW SETTINGS
+                var horseBreakSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseBreak.ToString()).FirstOrDefault().setting_value.ToString());
+                var formMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+                var formLastXRacesSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
+                var consecutivePlacementMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.consecutivePlacementMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+                var steppingUpMultiplierPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierPlaced.ToString()).FirstOrDefault().setting_value.ToString());
+                var steppingUpMultiplierNotPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierNotPlaced.ToString()).FirstOrDefault().setting_value.ToString());
+                var classLastXRacesSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
+                var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+
+
                 var going = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliablitygoing.ToString()).FirstOrDefault().setting_value.ToString());
                 var distance = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilitydistance.ToString()).FirstOrDefault().setting_value.ToString());
-
                 var minimumReliability = settings.Where(x => x.setting_name == AlgorithmSettingEnum.minimumreliability.ToString())?.FirstOrDefault().setting_value.ToString();
 
                 var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).ToList();
@@ -271,6 +282,16 @@ namespace Core.Algorithms
         {
             var result = new List<FormResultModel>();
 
+            var horseBreakSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseBreak.ToString()).FirstOrDefault().setting_value.ToString());
+            var formMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+            var formLastXRacesSetting = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
+            var consecutivePlacementMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.consecutivePlacementMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+            var steppingUpMultiplierPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierPlaced.ToString()).FirstOrDefault().setting_value.ToString());
+            var steppingUpMultiplierNotPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierNotPlaced.ToString()).FirstOrDefault().setting_value.ToString());
+            var classLastXRacesSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
+            var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+
+
             foreach (var horse in race.RaceHorses)
             {
                 var toAdd = new FormResultModel();
@@ -286,26 +307,26 @@ namespace Core.Algorithms
                     continue;
                 }
 
-                var allConditions = races.Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0)).ToList();
-                var distanceOnly = races.Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList();
+                var allConditions = races.Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0)).ToList().Take(formLastXRacesSetting);
+                var distanceOnly = races.Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList().Take(formLastXRacesSetting - allConditions.Count());
 
                 //Loop through horses who have met the identical conditions within the last 6 months
                 if (allConditions.Count() > 0)
                 {
                     foreach (var idealRace in allConditions)
                     {
-                        var multiplier = _algorithmService.GetFormMultiplier(settings, idealRace, race.Event.created);
-                        decimal points = 3M;
+                        decimal points = formMultiplierSetting;
 
                         var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
                         if (idealRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + (points * multiplier);
+                            toAdd.Points = toAdd.Points + (points);
                         }
                         else if (idealRace.position <= placed && idealRace.position != 0)
                         {
-                            points = 1.5M;
-                            toAdd.Points = toAdd.Points + (points * multiplier);
+                            //determine new points
+                            points = (points * 0.75M);
+                            toAdd.Points = toAdd.Points + (points);
                         }
                     }
                 }
@@ -315,18 +336,18 @@ namespace Core.Algorithms
                 {
                     foreach (var distanceOnlyRace in distanceOnly)
                     {
-                        var multiplier = _algorithmService.GetFormMultiplier(settings, distanceOnlyRace, race.Event.created);
-                        decimal points = 3M;
+                        //determine new points
+                        decimal points = formMultiplierSetting;
 
                         var placed = SharedCalculations.GetTake(distanceOnlyRace.Race.no_of_horses ?? 0);
                         if (distanceOnlyRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + ((points * distance) * multiplier);
+                            toAdd.Points = toAdd.Points + ((points * distance));
                         }
                         else if (distanceOnlyRace.position <= placed && distanceOnlyRace.position != 0)
                         {
-                            points = 1.5M;
-                            toAdd.Points = toAdd.Points + ((points * distance) * multiplier);
+                            //determine new points
+                            toAdd.Points = toAdd.Points + ((points * distance) * 0.75M);
                         }
                     }
                 }

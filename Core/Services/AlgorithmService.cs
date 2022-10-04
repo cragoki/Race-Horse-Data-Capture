@@ -23,13 +23,15 @@ namespace Core.Services
         private static ITopSpeedOnly _topSpeedOnly;
         private static ITsRPR _topSpeedRpr;
         private static IFormAlgorithm _formAlgorithm;
+        private static IFormRevamped _formRevampedAlgorithm;
 
-        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr)
+        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm)
         {
             _eventRepository = eventRepository;
             _algorithmRepository = algorithmRepository;
             _topSpeedOnly = topSpeedOnly;
             _topSpeedRpr = topSpeedRpr;
+            _formRevampedAlgorithm = formRevampedAlgorithm;
         }
 
         public async Task<AlgorithmResult> ExecuteActiveAlgorithm()
@@ -57,6 +59,9 @@ namespace Core.Services
                         case AlgorithmEnum.FormOnly:
                             result = await _formAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
                             break;
+                        case AlgorithmEnum.FormRevamp:
+                            result = await _formRevampedAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
                     }
 
                     result.AlgorithmId = activeAlgorithm.algorithm_id;
@@ -64,7 +69,23 @@ namespace Core.Services
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error in Algorithm Service...{ex.Message}");
+                Logger.Error($"Error in Algorithm Service ExecuteActiveAlgorithm...{ex.Message}");
+            }
+
+            return result;
+        }
+
+        public AlgorithmEntity GetActiveAlgorithm() 
+        {
+            var result = new AlgorithmEntity();
+
+            try
+            {
+                result = _algorithmRepository.GetActiveAlgorithm();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error in Algorithm Service GetActiveAlgorithm...{ex.Message}");
             }
 
             return result;

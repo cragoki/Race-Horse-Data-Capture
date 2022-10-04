@@ -6,9 +6,11 @@ using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.Mail;
 using Infrastructure.PunterAdmin.Services;
+using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Text.Json;
@@ -28,10 +30,10 @@ namespace RHDCAutomation
         private IMailService _mailService;
         private IMappingTableRepository _mappingRepository;
         private IFormAlgorithm _form;
-        private IHorseRepository _horseRepository;
+        private IFormRevamped _formRevampedAlgorithm;
 
         private static Guid _batch;
-        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService)
+        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService, IFormRevamped formRevampedAlgorithm)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
@@ -41,7 +43,7 @@ namespace RHDCAutomation
             _mailService = mailService;
             _mappingRepository = mappingRepository;
             _form = form;
-            _horseRepository = horseRepository;
+            _formRevampedAlgorithm = formRevampedAlgorithm;
             _algorithmService = algorithmService;
         }
         private void OnStopping()
@@ -70,15 +72,15 @@ namespace RHDCAutomation
                         _batch = Guid.NewGuid();
                         int eventsFiltered = 0;
 
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("------------------------------------Fetch Automator Inilializing---------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("                                                                                                 ");
-                        Logger.Info($"                Batch Initialized with Identifier {_batch}          ");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("------------------------------------Fetch Automator Inilializing---------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("                                                                                                 ");
+                        Console.WriteLine($"                Batch Initialized with Identifier {_batch}          ");
 
 
                         //Initialize Diagnostics
@@ -100,26 +102,41 @@ namespace RHDCAutomation
                         }
 
                         //Trigger Algorithm for todays results.
+                        Console.WriteLine($"Running Predictions");
+                        var distances = _mappingRepository.GetDistanceTypes();
+                        var goings = _mappingRepository.GetGoingTypes();
+                        var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
+
+                        if (activeAlgorithm == null)
+                        {
+                            Console.WriteLine($"No Active Algorithm Detected");
+                            continue;
+                        }
+                        Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
+
+                        var settings = await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
 
                         foreach (var even in events)
                         {
                             var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.EventId);
-                            var distances = _mappingRepository.GetDistanceTypes();
-                            var goings = _mappingRepository.GetGoingTypes();
 
                             foreach (var race in races)
                             {
+                                var predictions = new List<FormResultModel>();
 
-                                var settings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.FormOnly);
-
-                                var predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
+                                if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly) 
+                                {
+                                    predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
+                                }
+                                else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormRevamp)
+                                {
+                                    predictions = await _formRevampedAlgorithm.FormCalculationPredictions(race, settings, distances, goings);
+                                }
 
                                 if (predictions == null || predictions.Count() == 0)
                                 {
                                     continue;
                                 }
-
-                                Console.WriteLine($"Populating prediction table for {predictions.Count} predictions");
 
                                 foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
                                 {
@@ -130,12 +147,11 @@ namespace RHDCAutomation
                                         var algorithmPrediction = new AlgorithmPredictionEntity() 
                                         {
                                             race_horse_id = prediction.value.RaceHorseId,
-                                            algorithm_id = (int)AlgorithmEnum.FormOnly,
+                                            algorithm_id = activeAlgorithm.algorithm_id,
                                             predicted_position = prediction.i + 1,
                                             points = prediction.value.Points ?? 0
                                         };
                                         _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
-                                        Console.WriteLine($"Prediction added for {algorithmPrediction.race_horse_id}");
                                     }
                                     catch (Exception ex) 
                                     {
@@ -144,6 +160,7 @@ namespace RHDCAutomation
                                 }
                             }
                         }
+                        Console.WriteLine($"Completed Algorithm Checks");
 
                         //Complete Diagnostics
                         diagnostics.EventsFiltered = eventsFiltered;
@@ -153,14 +170,14 @@ namespace RHDCAutomation
                         //Store Batch in the database
                         var diagnosticsString = JsonSerializer.Serialize(diagnostics);
                         _configService.AddBatch(_batch, diagnosticsString);
-                        Logger.Info(diagnosticsString);
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-----------------------------------Automator Terminating-----------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine(diagnosticsString);
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-----------------------------------Automator Terminating-----------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
                         Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
