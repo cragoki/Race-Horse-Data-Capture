@@ -368,7 +368,7 @@ namespace Core.Algorithms
                     {
                         if (placedInLastRace) 
                         {
-                            multiplierSetting = (multiplierSetting * 2);
+                            multiplierSetting = (multiplierSetting + formMultiplierSetting);
                         }
                         multiplier += multiplierSetting;
                         placedInLastRace = true;
