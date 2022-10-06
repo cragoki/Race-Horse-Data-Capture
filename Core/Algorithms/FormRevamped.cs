@@ -307,8 +307,11 @@ namespace Core.Algorithms
                     continue;
                 }
 
-                var allConditions = races.Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0)).ToList().Take(formLastXRacesSetting);
-                var distanceOnly = races.Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList().Take(formLastXRacesSetting - allConditions.Count());
+                var allConditions = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0)).ToList().Take(formLastXRacesSetting);
+                var distanceOnly = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList().Take(formLastXRacesSetting - allConditions.Count());
+                var allRaces = new List<RaceHorseEntity>();
+                allRaces.AddRange(allConditions.ToList());
+                allRaces.AddRange(distanceOnly.ToList());
 
                 //Loop through horses who have met the identical conditions within the last 6 months
                 if (allConditions.Count() > 0)
@@ -320,7 +323,7 @@ namespace Core.Algorithms
                         var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
                         if (idealRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + (points);
+                            toAdd.Points = toAdd.Points + (points * 2);
                         }
                         else if (idealRace.position <= placed && idealRace.position != 0)
                         {
@@ -336,21 +339,47 @@ namespace Core.Algorithms
                 {
                     foreach (var distanceOnlyRace in distanceOnly)
                     {
-                        //determine new points
-                        decimal points = formMultiplierSetting;
+                        decimal points = (formMultiplierSetting * distance);
 
                         var placed = SharedCalculations.GetTake(distanceOnlyRace.Race.no_of_horses ?? 0);
                         if (distanceOnlyRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + ((points * distance));
+                            toAdd.Points = toAdd.Points + (points * 2);
                         }
                         else if (distanceOnlyRace.position <= placed && distanceOnlyRace.position != 0)
                         {
                             //determine new points
-                            toAdd.Points = toAdd.Points + ((points * distance) * 0.75M);
+                            toAdd.Points = toAdd.Points + (points);
                         }
                     }
                 }
+
+                //Consecutive Placement Multiplier Setting (multiply points by setting and add result to points total)
+                var lastXRaces = allRaces.OrderByDescending(x => x.Race.Event.created).Where(x => x.position != 0).Take(formLastXRacesSetting);
+                var multiplierSetting = formMultiplierSetting;
+                decimal multiplier = 0;
+                var placedInLastRace = false;
+                //NEED TO TEST THIS OUT, SEE IF IT WORKS
+                foreach (var raceForm in lastXRaces) 
+                {
+                    var placed = SharedCalculations.GetTake(raceForm.Race.no_of_horses ?? 0);
+
+                    if (raceForm.position <= placed && raceForm.position != 0)
+                    {
+                        if (placedInLastRace) 
+                        {
+                            multiplierSetting = (multiplierSetting * 2);
+                        }
+                        multiplier += multiplierSetting;
+                        placedInLastRace = true;
+                    }
+                    else 
+                    {
+                        placedInLastRace = false;
+                    }
+                }
+
+                //Determine class step up/down to ammend the points
                 result.Add(toAdd);
             }
 
