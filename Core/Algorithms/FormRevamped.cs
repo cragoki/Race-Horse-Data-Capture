@@ -286,10 +286,7 @@ namespace Core.Algorithms
             var formMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
             var formLastXRacesSetting = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
             var consecutivePlacementMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.consecutivePlacementMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
-            var steppingUpMultiplierPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierPlaced.ToString()).FirstOrDefault().setting_value.ToString());
-            var steppingUpMultiplierNotPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierNotPlaced.ToString()).FirstOrDefault().setting_value.ToString());
-            var classLastXRacesSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
-            var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+
 
 
             foreach (var horse in race.RaceHorses)
@@ -360,30 +357,95 @@ namespace Core.Algorithms
                 decimal multiplier = 0;
                 var placedInLastRace = false;
                 //NEED TO TEST THIS OUT, SEE IF IT WORKS
-                foreach (var raceForm in lastXRaces) 
+                foreach (var raceForm in lastXRaces)
                 {
                     var placed = SharedCalculations.GetTake(raceForm.Race.no_of_horses ?? 0);
 
                     if (raceForm.position <= placed && raceForm.position != 0)
                     {
-                        if (placedInLastRace) 
+                        if (placedInLastRace)
                         {
                             multiplierSetting = (multiplierSetting + formMultiplierSetting);
                         }
                         multiplier += multiplierSetting;
                         placedInLastRace = true;
                     }
-                    else 
+                    else
                     {
                         placedInLastRace = false;
                     }
                 }
 
+                toAdd.Points = toAdd.Points + multiplier;
+
+                //ALSO NEED TO TEST THIS
                 //Determine class step up/down to ammend the points
+                toAdd.Points = CalculateClassAdjustmentMultiplier(settings, races, race, toAdd.Points);
                 result.Add(toAdd);
             }
 
             return result;
+        }
+
+        private decimal CalculateClassAdjustmentMultiplier(List<AlgorithmSettingsEntity> settings, List<RaceHorseEntity> races, RaceEntity race, decimal? points) 
+        {
+            var result = 0M;
+            var multiplier = 0M;
+            bool steppingUp = false;
+            bool steppingDown = false;
+            var steppingUpMultiplierPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierPlaced.ToString()).FirstOrDefault().setting_value.ToString());
+            var steppingUpMultiplierNotPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierNotPlaced.ToString()).FirstOrDefault().setting_value.ToString());
+            var classLastXRacesSetting = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
+            var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+
+            var racesToUse = races.OrderByDescending(x => x.Race.Event.created).Take(classLastXRacesSetting);
+
+
+
+            foreach (var raceToUse in racesToUse) 
+            {
+                //Stepping down
+                if (raceToUse.Race.race_class > race.race_class) 
+                {
+                    steppingDown = true;
+                }
+                //Stepping Up
+                if (raceToUse.Race.race_class < race.race_class)
+                {
+                    steppingUp = true;
+                    var positionToPlace = SharedCalculations.GetTake(race.no_of_horses ?? 0);
+
+                    if (raceToUse.position == 0)
+                    {
+                        continue;
+                    }
+                    else if (raceToUse.position <= positionToPlace)
+                    {
+                        multiplier += steppingUpMultiplierPlacedSetting;
+                    }
+                    else 
+                    {
+                        multiplier += steppingUpMultiplierNotPlacedSetting;
+                    }
+                }
+            }
+
+            //Stepping down
+            if (steppingDown && !steppingUp)
+            {
+                result = (points * steppingDownMultiplierSetting) ?? 0;
+            }
+            //Stepping up
+            else if (!steppingDown && steppingUp)
+            {
+                result = (points + multiplier) ?? 0;
+            }
+            else 
+            {
+                result = points;
+            }
+
+            return 0M;
         }
     }
 }
