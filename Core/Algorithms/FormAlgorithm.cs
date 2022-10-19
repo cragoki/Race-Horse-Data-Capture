@@ -18,15 +18,13 @@ namespace Core.Algorithms
     {
         private readonly IConfigurationRepository _configRepository;
         private readonly IMappingTableRepository _mappingRepository;
-        private readonly IAlgorithmService _algorithmService;
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public FormAlgorithm(IConfigurationRepository configRepository, IMappingTableRepository mappingRepository, IAlgorithmService algorithmService)
+        public FormAlgorithm(IConfigurationRepository configRepository, IMappingTableRepository mappingRepository)
         {
             _configRepository = configRepository;
             _mappingRepository = mappingRepository;
-            _algorithmService = algorithmService;
         }
         public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms)
         {
@@ -364,7 +362,7 @@ namespace Core.Algorithms
                 {
                     foreach (var idealRace in allConditions)
                     {
-                        var multiplier = _algorithmService.GetFormMultiplier(settings, idealRace, race.Event.created);
+                        var multiplier = GetFormMultiplier(settings, idealRace, race.Event.created);
                         decimal points = 3M;
 
                         var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
@@ -385,7 +383,7 @@ namespace Core.Algorithms
                 {
                     foreach (var distanceOnlyRace in distanceOnly)
                     {
-                        var multiplier = _algorithmService.GetFormMultiplier(settings, distanceOnlyRace, race.Event.created);
+                        var multiplier = GetFormMultiplier(settings, distanceOnlyRace, race.Event.created);
                         decimal points = 3M;
 
                         var placed = SharedCalculations.GetTake(distanceOnlyRace.Race.no_of_horses ?? 0);
@@ -401,6 +399,34 @@ namespace Core.Algorithms
                     }
                 }
                 result.Add(toAdd);
+            }
+
+            return result;
+        }
+
+        private decimal GetFormMultiplier(List<AlgorithmSettingsEntity> settings, RaceHorseEntity race, DateTime currentRaceDate)
+        {
+            var result = 0M;
+            var raceDate = race.Race.Event.created;
+            var monthDiff = ((currentRaceDate.Year - raceDate.Year) * 12) + currentRaceDate.Month - raceDate.Month;
+
+            switch (monthDiff)
+            {
+                case 0:
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierzerotoonemonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 1 || n == 2):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplieronetotwomonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 3):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultipliertwotothreemonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 4):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierthreetofourmonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
+                case int n when (n == 5 || n == 6):
+                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierfourtosixmonths.ToString()).FirstOrDefault().setting_value.ToString());
+                    break;
             }
 
             return result;

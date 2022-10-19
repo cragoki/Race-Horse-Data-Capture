@@ -149,7 +149,8 @@ namespace RHDCAutomation
                                             race_horse_id = prediction.value.RaceHorseId,
                                             algorithm_id = activeAlgorithm.algorithm_id,
                                             predicted_position = prediction.i + 1,
-                                            points = prediction.value.Points ?? 0
+                                            points = prediction.value.Points ?? 0,
+                                            points_description = prediction.value.PointsDescription
                                         };
                                         _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
                                     }

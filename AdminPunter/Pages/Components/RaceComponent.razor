@@ -36,7 +36,8 @@
                             <td>Points</td>
                            <td>Predictability</td>
                            <td>Predicted Position</td>
-                            <td></td>
+                           <td>Points Description</td>
+                           <td></td>
                         </tr>
                     </thead>
                 <tbody>
@@ -64,6 +65,7 @@
                             <td>@horse.Points</td>
                             <td>@horse.HorseReliability</td>
                             <td>@horse.PredictedPosition</td>
+                            <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                             <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                         </tr>
                         }
@@ -89,6 +91,7 @@
                                 <td>@horse.Points</td>
                                 <td>@horse.HorseReliability</td>
                                 <td>@horse.PredictedPosition</td>
+                                <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                 <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                             </tr>
                         }
@@ -114,6 +117,7 @@
                                 <td>@horse.Points</td>
                                 <td>@horse.HorseReliability</td>
                                 <td>@horse.PredictedPosition</td>
+                                <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                 <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                             </tr>
                         }
@@ -139,6 +143,7 @@
                                 <td>@horse.Points</td>
                                 <td>@horse.HorseReliability</td>
                                 <td>@horse.PredictedPosition</td>
+                                <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                 <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                             </tr>
                         }
@@ -164,6 +169,7 @@
                             <td>@horse.Points</td>
                             <td>@horse.HorseReliability</td>
                             <td>@horse.PredictedPosition</td>
+                            <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                             <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                         </tr>
                         }
@@ -209,7 +215,8 @@ else
                            <td>Points</td>
                            <td>Predictability</td>
                            <td>Predicted Position</td>
-                            <td></td>
+                           <td>Points Description</td>
+                           <td></td>
                         </tr>
                     </thead>
                 <tbody>
@@ -237,6 +244,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -262,6 +270,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -287,6 +296,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -312,6 +322,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -336,6 +347,7 @@ else
                                     <td>@position</td>
                                      <td>@horse.HorseReliability</td>
                                     <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                     <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                 </tr>
                                 }
@@ -378,6 +390,7 @@ else
                             <td>Points</td>
                            <td>Predictability</td>
                            <td>Predicted Position</td>
+                           <td>Points Description</td>
                             <td></td>
                         </tr>
                     </thead>
@@ -406,6 +419,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -431,6 +445,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -456,6 +471,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -481,6 +497,7 @@ else
                                         <td>@horse.Points</td>
                                         <td>@horse.HorseReliability</td>
                                         <td>@horse.PredictedPosition</td>
+                                        <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                         <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                     </tr>
                                 }
@@ -506,6 +523,7 @@ else
                                     <td>@horse.Points</td>
                                     <td>@horse.HorseReliability</td>
                                     <td>@horse.PredictedPosition</td>
+                                    <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
                                     <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
                                 </tr>
                                 }

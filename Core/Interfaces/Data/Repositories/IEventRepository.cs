@@ -7,6 +7,7 @@ namespace Core.Interfaces.Data.Repositories
     public interface IEventRepository
     {
         IEnumerable<EventEntity> GetEvents();
+        IEnumerable<RaceEntity> GetTodaysRacesTest();
         IEnumerable<EventEntity> GetTodaysEvents();
         EventEntity GetEventById(int eventId);
         CourseEntity GetCourseById(int courseId);

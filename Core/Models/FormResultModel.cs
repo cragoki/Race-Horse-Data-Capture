@@ -9,5 +9,6 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public int RaceHorseId { get; set; }
         public decimal? Predictability { get; set; }
         public decimal? Points { get; set; }
+        public string PointsDescription { get; set; }
     }
 }

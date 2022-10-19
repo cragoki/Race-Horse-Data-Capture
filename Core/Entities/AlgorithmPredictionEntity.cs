@@ -19,5 +19,7 @@ namespace Core.Entities
         public AlgorithmEntity Algorithm { get; set; }
         public int predicted_position { get; set; }
         public decimal points { get; set; }
+        public string points_description { get; set; }
+
     }
 }

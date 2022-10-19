@@ -14,6 +14,5 @@ namespace Core.Interfaces.Services
         Task StoreAlgorithmResults(AlgorithmResult result);
         Task<List<AlgorithmSettingsEntity>> GetSettingsForAlgorithm(int algorithm_id);
         void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction);
-        decimal GetFormMultiplier(List<AlgorithmSettingsEntity> settings, RaceHorseEntity race, DateTime currentRaceDate);
     }
 }

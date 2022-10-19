@@ -180,6 +180,10 @@ namespace Infrastructure.Data.Repositories
             _context.tb_course.Update(courseToUpdate);
             SaveChanges();
         }
+        public IEnumerable<RaceEntity> GetTodaysRacesTest()
+        {
+            return _context.tb_race.Where(x => x.Event.created.Date == DateTime.Now.Date).AsNoTracking();
+        }
         public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
         {
             return _context.tb_race.Where(x => x.event_id == eventId)

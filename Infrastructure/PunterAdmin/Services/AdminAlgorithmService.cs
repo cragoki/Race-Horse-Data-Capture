@@ -22,9 +22,10 @@ namespace Infrastructure.PunterAdmin.Services
         private ITopSpeedOnly _topSpeed;
         private ITsRPR _topSpeedRpr;
         private IFormAlgorithm _form;
+        private IFormRevamped _formRevamp;
 
 
-        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository)
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository, IFormRevamped formRevamp)
         {
             _algorithmRepository = algorithmRepository;
             _eventRepository = eventRepository;
@@ -33,6 +34,7 @@ namespace Infrastructure.PunterAdmin.Services
             _algorithmService = algorithmService;
             _form = form;
             _mappingRepository = mappingRepository;
+            _formRevamp = formRevamp;
         }
 
     public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
@@ -180,6 +182,43 @@ namespace Infrastructure.PunterAdmin.Services
                             }
                         }
                         break;
+                    case (int)AlgorithmEnum.FormRevamp:
+                        foreach (var even in events)
+                        {
+                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
+                            var distances = _mappingRepository.GetDistanceTypes();
+                            var goings = _mappingRepository.GetGoingTypes();
+
+                            foreach (var race in even.EventRaces)
+                            {
+                                race.Horses.Select(x => { x.PredictedPosition = null; return x; }).ToList();
+                            }
+
+                            foreach (var race in races)
+                            {
+
+                                var settings = await BuildAlgorithmSettings(algorithm);
+
+                                var predictions = await _formRevamp.FormCalculationPredictions(race, settings, distances, goings);
+
+                                if (predictions == null || predictions.Count() == 0)
+                                {
+                                    continue;
+                                }
+
+                                foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                {
+                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                    thisRace.AlgorithmRan = true;
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                                    horse.PredictedPosition = prediction.i + 1;
+                                    horse.HorseReliability = prediction.value.Predictability;
+                                    horse.Points = prediction.value.Points;
+                                    horse.PointsDescription = prediction.value.PointsDescription;
+                                }
+                            }
+                        }
+                        break;
                 }
             }
             catch(Exception ex)
@@ -227,6 +266,17 @@ namespace Infrastructure.PunterAdmin.Services
                             algorithmResult = await _form.GenerateAlgorithmResult(even.Races, variables);
                             //If race counter > 0
                             if (algorithmResult.RacesFiltered > 0) 
+                            {
+                                results.Add(algorithmResult);
+                            }
+                        }
+                        break;
+                    case (int)AlgorithmEnum.FormRevamp:
+                        foreach (var even in allEvents)
+                        {
+                            algorithmResult = await _formRevamp.GenerateAlgorithmResult(even.Races, variables);
+                            //If race counter > 0
+                            if (algorithmResult.RacesFiltered > 0)
                             {
                                 results.Add(algorithmResult);
                             }

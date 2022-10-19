@@ -196,6 +196,7 @@ namespace Infrastructure.PunterAdmin.Services
             foreach (var raceHorse in raceHorses)
             {
                 var racePredictedPosition = 0;
+                var pointsDescription = "";
                 decimal racePoints = 0;
                 var rpr = ConfigureRPR(raceHorse, even.created);
                 var ts = ConfigureTS(raceHorse, even.created);
@@ -206,6 +207,7 @@ namespace Infrastructure.PunterAdmin.Services
                 {
                     racePredictedPosition = predictedPosition.predicted_position;
                     racePoints = predictedPosition.points;
+                    pointsDescription = predictedPosition.points_description;
                 }
                 result.Add(new RaceHorseViewModel()
                 {
@@ -222,6 +224,7 @@ namespace Infrastructure.PunterAdmin.Services
                     Ts = ts,
                     RPR = rpr,
                     PredictedPosition = racePredictedPosition,
+                    PointsDescription = pointsDescription,
                     Points = racePoints
                 });
             }

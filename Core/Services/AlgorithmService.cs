@@ -1,4 +1,5 @@
 ﻿
+using Core.Algorithms;
 using Core.Entities;
 using Core.Enums;
 using Core.Helpers;
@@ -25,12 +26,13 @@ namespace Core.Services
         private static IFormAlgorithm _formAlgorithm;
         private static IFormRevamped _formRevampedAlgorithm;
 
-        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm)
+        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm, IFormAlgorithm formAlgorithm)
         {
             _eventRepository = eventRepository;
             _algorithmRepository = algorithmRepository;
             _topSpeedOnly = topSpeedOnly;
             _topSpeedRpr = topSpeedRpr;
+            _formAlgorithm = formAlgorithm;
             _formRevampedAlgorithm = formRevampedAlgorithm;
         }
 
@@ -167,34 +169,6 @@ namespace Core.Services
         public void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction) 
         {
             _algorithmRepository.AddAlgorithmPrediction(prediction);
-        }
-
-        public decimal GetFormMultiplier(List<AlgorithmSettingsEntity> settings, RaceHorseEntity race, DateTime currentRaceDate)
-        {
-            var result = 0M;
-            var raceDate = race.Race.Event.created;
-            var monthDiff = ((currentRaceDate.Year - raceDate.Year) * 12) + currentRaceDate.Month - raceDate.Month;
-
-            switch (monthDiff)
-            {
-                case 0:
-                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierzerotoonemonths.ToString()).FirstOrDefault().setting_value.ToString());
-                    break;
-                case int n when (n == 1 || n == 2):
-                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplieronetotwomonths.ToString()).FirstOrDefault().setting_value.ToString());
-                    break;
-                case int n when (n == 3):
-                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultipliertwotothreemonths.ToString()).FirstOrDefault().setting_value.ToString());
-                    break;
-                case int n when (n == 4):
-                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierthreetofourmonths.ToString()).FirstOrDefault().setting_value.ToString());
-                    break;
-                case int n when (n == 5 || n == 6):
-                    result = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formmultiplierfourtosixmonths.ToString()).FirstOrDefault().setting_value.ToString());
-                    break;
-            }
-
-            return result;
         }
 
     }
