@@ -201,7 +201,7 @@ namespace Infrastructure.PunterAdmin.Services
                 var rpr = ConfigureRPR(raceHorse, even.created);
                 var ts = ConfigureTS(raceHorse, even.created);
                 var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id);
-                var predictedPosition = predictedPositions.Where(x => x.algorithm_id == (int)AlgorithmEnum.FormOnly).FirstOrDefault();
+                var predictedPosition = predictedPositions.Where(x => x.algorithm_id == (int)AlgorithmEnum.FormRevamp).FirstOrDefault();
 
                 if (predictedPosition != null) 
                 {
