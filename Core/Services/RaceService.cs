@@ -103,12 +103,15 @@ namespace Core.Services
                 Logger.Info($"Processing...");
                 var raceHorses = await _scraperService.GetResultsForRace(race, raceHorseList.ToList());
 
+
+                var raceDb = _eventRepository.GetRaceById(race.race_id);
+
                 if (raceHorses != null || raceHorses.Count() != 0 && raceHorses.All(x => x.position != 0))
                 {
-                    race.completed = true;
+                    raceDb.completed = true;
                 }
 
-                _eventRepository.UpdateRace(race);
+                _eventRepository.UpdateRace(raceDb);
                 Logger.Info($"Update Complete!");
                 Logger.Info($"Finding next race...");
 
