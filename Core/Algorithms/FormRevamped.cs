@@ -294,8 +294,8 @@ namespace Core.Algorithms
                 toAdd.Points = 0;
                 toAdd.PointsDescription = $"";
                 toAdd.Horse = horse.Horse;
-                //Get races within the last 6 months
-                var races = horse.Horse.Races.Where(x => x.Race.Event.created > race.Event.created.AddMonths(-6) && x.Race.Event.created < race.Event.created).ToList();
+                //Get races within the last 9 months
+                var races = horse.Horse.Races.Where(x => x.Race.Event.created > race.Event.created.AddMonths(-9) && x.Race.Event.created < race.Event.created).ToList();
 
                 if (races.Count() == 0)
                 {
@@ -303,7 +303,7 @@ namespace Core.Algorithms
                     continue;
                 }
 
-                var allConditions = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0)).ToList().Take(formLastXRacesSetting);
+                var allConditions = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0) && x.race_class <= race.race_class).ToList().Take(formLastXRacesSetting);
                 var distanceOnly = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList().Take(formLastXRacesSetting - allConditions.Count());
                 var allRaces = new List<RaceHorseEntity>();
                 allRaces.AddRange(allConditions.ToList());
@@ -315,6 +315,12 @@ namespace Core.Algorithms
                     foreach (var idealRace in allConditions)
                     {
                         decimal points = formMultiplierSetting;
+
+                        if (idealRace.race_class < race.race_class) 
+                        {
+                            points = points * 2;
+
+                        }
 
                         var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
                         if (idealRace.position == 1)
@@ -373,6 +379,7 @@ namespace Core.Algorithms
                             multiplierSetting = (multiplierSetting + formMultiplierSetting);
                         }
                         multiplier += multiplierSetting;
+                        multiplierSetting = 0; //RESET THIS
                         placedInLastRace = true;
                     }
                     else
