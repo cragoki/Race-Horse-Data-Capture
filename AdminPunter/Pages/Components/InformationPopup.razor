@@ -1,0 +1,25 @@
+﻿@using AdminPunter.Pages.Races
+
+
+<div col-md-12>
+    @if (!isLoading)
+    {
+        <p>@Message</p>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</div>
+@code
+{
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [Parameter]
+    public bool isLoading { get; set; }
+    [Parameter]
+    public string Message { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}

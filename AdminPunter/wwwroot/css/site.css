@@ -178,6 +178,18 @@ table {
     text-align:center
 }
 
+.blazored-modal-xsm {
+    width: 20%;
+    height: 10%;
+    background-color: white !important;
+    border: 2px solid black;
+    color: green !important;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 200;
+    text-align: center
+}
+
     .blazored-modal-lg span {
         color: white !important;
         margin-right:5px;
@@ -323,4 +335,28 @@ span {
 
 .tooltip-wrapper:hover span {
     visibility: visible;
+}
+
+
+/*INDEX PAGE
+*/
+.home-container {
+    text-align: center;
+}
+
+.form-element {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 20px;
+    width: 50%;
+}
+
+.form-attr {
+    width: 50%;
+    padding:20px;
+}
+
+.form-attr-lg {
+    width: 80%;
+    padding: 20px;
 }

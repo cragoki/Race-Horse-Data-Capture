@@ -207,13 +207,9 @@ namespace Core.Algorithms
                 var listOfHorses = new List<HorseEntity>();
 
                 //NEW SETTINGS
-                var horseBreakSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseBreak.ToString()).FirstOrDefault().setting_value.ToString());
                 var formMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
                 var formLastXRacesSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
                 var consecutivePlacementMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.consecutivePlacementMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
-                var steppingUpMultiplierPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierPlaced.ToString()).FirstOrDefault().setting_value.ToString());
-                var steppingUpMultiplierNotPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierNotPlaced.ToString()).FirstOrDefault().setting_value.ToString());
-                var classLastXRacesSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
                 var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
 
 
@@ -280,12 +276,14 @@ namespace Core.Algorithms
         {
             var result = new List<FormResultModel>();
 
-            var horseBreakSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseBreak.ToString()).FirstOrDefault().setting_value.ToString());
             var formMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
             var formLastXRacesSetting = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.formMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
             var consecutivePlacementMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.consecutivePlacementMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
-
-
+            var steppingUpMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+            var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+            var numberOfHorsesMultiplier = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.numberOfHorsesMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
+            var reliablitygoing = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliablitygoing.ToString()).FirstOrDefault().setting_value.ToString());
+            var courseMultiplier = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.courseMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
 
             foreach (var horse in race.RaceHorses)
             {
@@ -299,72 +297,159 @@ namespace Core.Algorithms
 
                 if (races.Count() == 0)
                 {
+                    toAdd.PointsDescription = "No Historic Data";
                     result.Add(toAdd);
                     continue;
                 }
 
-                var allConditions = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && goingGroup.ElementIds.Contains(x.Race.going ?? 0) && x.race_class <= race.race_class).ToList().Take(formLastXRacesSetting);
-                var distanceOnly = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && !allConditions.Any(y => y.race_id == x.race_id)).ToList().Take(formLastXRacesSetting - allConditions.Count());
-                var allRaces = new List<RaceHorseEntity>();
-                allRaces.AddRange(allConditions.ToList());
-                allRaces.AddRange(distanceOnly.ToList());
+                var distanceOnly = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && x.position != 0).ToList().Take(formLastXRacesSetting);
 
-                //Loop through horses who have met the identical conditions within the last 6 months
-                if (allConditions.Count() > 0)
-                {
-                    foreach (var idealRace in allConditions)
-                    {
-                        decimal points = formMultiplierSetting;
-
-                        if (idealRace.race_class < race.race_class) 
-                        {
-                            points = points * 2;
-
-                        }
-
-                        var placed = SharedCalculations.GetTake(idealRace.Race.no_of_horses ?? 0);
-                        if (idealRace.position == 1)
-                        {
-                            toAdd.Points = toAdd.Points + (points * 2);
-                            toAdd.PointsDescription += $"Won at all Conditions +{points * 2} <br>";
-                        }
-                        else if (idealRace.position <= placed && idealRace.position != 0)
-                        {
-                            //determine new points
-                            points = (points * 0.75M);
-                            toAdd.Points = toAdd.Points + (points);
-                            toAdd.PointsDescription += $"Placed at all Conditions +{points} <br>";
-
-                        }
-                    }
-                }
-
-                //Loop through horses who have met the identical Distance within the last 6 months, then multiply the points assigned by the distance variance
+                decimal hasWonAtDistance = 0M;
+                decimal classMultiplierTotal = 0M;
+                decimal classDownMultiplierTotal = 0M;
+                decimal numberOfHorsesTotal = 0M;
+                decimal goingTotal = 0M;
+                decimal courseTotal = 0M;
+                decimal classAndDistanceTotal = 0M;
+                decimal consecutivePlacementMultiplier = 0M;
+                //Form at distance
                 if (distanceOnly.Count() > 0)
                 {
-                    foreach (var distanceOnlyRace in distanceOnly)
+                    foreach (var previousRace in distanceOnly)
                     {
-                        decimal points = (formMultiplierSetting * distance);
+                        var steppingDownMultiplier = 0M;
+                        var pointsForThisRace = 0M;
+                        var positionToPlace = SharedCalculations.GetTake(previousRace.Race.no_of_horses ?? 0);
 
-                        var placed = SharedCalculations.GetTake(distanceOnlyRace.Race.no_of_horses ?? 0);
-                        if (distanceOnlyRace.position == 1)
+                        //General Victory Mutliplier 
+                        if (previousRace.position == 1)
                         {
-                            toAdd.Points = toAdd.Points + (points * 2);
-                            toAdd.PointsDescription += $"Won at Distance Only +{points * 2} <br>";
+                            pointsForThisRace += (formMultiplierSetting * 2);
+                            hasWonAtDistance += formMultiplierSetting * 2;
+                        }
+                        else if (previousRace.position <= positionToPlace)
+                        {
+                            pointsForThisRace += (formMultiplierSetting);
+                            hasWonAtDistance += formMultiplierSetting;
+                        }
+
+                        //CLASS
+                        if (previousRace.Race.race_class < race.race_class)
+                        {
+                            if (previousRace.position <= positionToPlace)
+                            {
+                                pointsForThisRace += (steppingUpMultiplierSetting * 2);
+                                classMultiplierTotal += steppingUpMultiplierSetting * 2;
+                            }
+                            else
+                            {
+                                pointsForThisRace += (steppingUpMultiplierSetting);
+                                classMultiplierTotal += steppingUpMultiplierSetting;
+                            }
 
                         }
-                        else if (distanceOnlyRace.position <= placed && distanceOnlyRace.position != 0)
+                        else if (previousRace.Race.race_class > race.race_class)
                         {
-                            //determine new points
-                            toAdd.Points = toAdd.Points + (points);
-                            toAdd.PointsDescription += $"Placed at Distance Only +{points} <br>";
+                            if (previousRace.position <= positionToPlace)
+                            {
+                                steppingDownMultiplier = steppingDownMultiplierSetting;
+                                classDownMultiplierTotal += steppingDownMultiplierSetting;
+                            }
+                            else
+                            {
+                                steppingDownMultiplier = (steppingDownMultiplierSetting * 2);
+                                classDownMultiplierTotal += steppingDownMultiplierSetting * 2;
+                            }
+                        }
+
+
+
+                        //NUMBER OF HORSES IN FIELD
+                        if (race.no_of_horses > 8)
+                        {
+                            if (previousRace.Race.no_of_horses > 8) 
+                            {
+                                if (previousRace.position <= positionToPlace)
+                                {
+                                    numberOfHorsesTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * numberOfHorsesMultiplier);
+                                    pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * numberOfHorsesMultiplier);
+                                }
+                            }
+                        }
+                        else if(race.no_of_horses < 8)
+                        {
+                            if (previousRace.position <= positionToPlace)
+                            {
+                                numberOfHorsesTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * numberOfHorsesMultiplier);
+                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * numberOfHorsesMultiplier);
+                            }
+                        }
+
+                        //GOING
+                        if (goingGroup.ElementIds.Contains(previousRace.Race.going ?? 0)) 
+                        {
+                            if (previousRace.position == 1)
+                            {
+                                goingTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * (reliablitygoing * 2));
+                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * (reliablitygoing * 2));
+                            }
+                            else if (previousRace.position <= positionToPlace)
+                            {
+                                goingTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * reliablitygoing);
+                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * reliablitygoing);
+                            }
+                        }
+
+
+                        //COURSE
+                        if (previousRace.Race.Event.course_id == race.Event.course_id) 
+                        {
+                            if (previousRace.position == 1)
+                            {
+                                courseTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * (courseMultiplier * 2));
+                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * (courseMultiplier * 2));
+                            }
+                            if (previousRace.position <= positionToPlace)
+                            {
+                                courseTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * courseMultiplier);
+                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * courseMultiplier);
+                            }
+                        }
+
+
+                        //FORM OVER CLASS & DISTANCE
+                        var classAndDistance = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class && x.position != 0).ToList().Take(formLastXRacesSetting);
+                        decimal classAndDistancePoints = (formMultiplierSetting * 2);
+
+                        foreach (var cdRace in classAndDistance) 
+                        {
+                            var cdPositionToPlace = SharedCalculations.GetTake(cdRace.Race.no_of_horses ?? 0);
+                            if (cdRace.position == 1)
+                            {
+                                pointsForThisRace += (classAndDistancePoints * 2);
+                                classAndDistanceTotal += classAndDistancePoints * 2;
+                            }
+                            else if (cdRace.position <= cdPositionToPlace) 
+                            {
+                                pointsForThisRace += classAndDistancePoints;
+                                classAndDistanceTotal += classAndDistancePoints;
+                            }
+                        }
+
+                        if (steppingDownMultiplierSetting > 0)
+                        {
+                            toAdd.Points = (pointsForThisRace - (pointsForThisRace * steppingDownMultiplierSetting));
+                        }
+                        else 
+                        {
+                            toAdd.Points += pointsForThisRace;
                         }
                     }
                 }
 
                 //Consecutive Placement Multiplier Setting (multiply points by setting and add result to points total)
-                var lastXRaces = allRaces.OrderByDescending(x => x.Race.Event.created).Where(x => x.position != 0).Take(formLastXRacesSetting);
-                var multiplierSetting = formMultiplierSetting;
+                var lastXRaces = distanceOnly.OrderByDescending(x => x.Race.Event.created).Where(x => x.position != 0).Take(formLastXRacesSetting);
+                var multiplierSetting = consecutivePlacementMultiplierSetting;
                 decimal multiplier = 0;
                 var placedInLastRace = false;
                 //NEED TO TEST THIS OUT, SEE IF IT WORKS
@@ -379,88 +464,52 @@ namespace Core.Algorithms
                             multiplierSetting = (multiplierSetting + formMultiplierSetting);
                         }
                         multiplier += multiplierSetting;
-                        multiplierSetting = 0; //RESET THIS
                         placedInLastRace = true;
                     }
                     else
                     {
                         placedInLastRace = false;
+                        multiplierSetting = consecutivePlacementMultiplierSetting; //RESET THIS
                     }
                 }
 
-                toAdd.Points = toAdd.Points + multiplier;
-                toAdd.PointsDescription += $"Gained {multiplier} Points for Consecutive Placement Multiplier <br>";
+                consecutivePlacementMultiplier = multiplier;
+                toAdd.Points += toAdd.Points + multiplier;
 
-                //ALSO NEED TO TEST THIS
-                //Determine class step up/down to ammend the points
-                toAdd = CalculateClassAdjustmentMultiplier(settings, races, race, toAdd);
-                //HERE
+                if (hasWonAtDistance != 0) 
+                {
+                    toAdd.PointsDescription += $"Gained {hasWonAtDistance} for form at distance.\n";
+                }
+                if (classMultiplierTotal != 0) 
+                {
+                    toAdd.PointsDescription += $"Gained {classMultiplierTotal} for performances at a lower class.\n";
+                }
+                if (numberOfHorsesTotal != 0)
+                {
+                    toAdd.PointsDescription += $"Gained {numberOfHorsesTotal} for performances with a similar number of horses.\n";
+                }
+                if (goingTotal != 0)
+                {
+                    toAdd.PointsDescription += $"Gained {goingTotal} for performances at at the same going.\n";
+                }
+                if (courseTotal != 0)
+                {
+                    toAdd.PointsDescription += $"Gained {courseTotal} for performances at at the same course.\n";
+                }
+                if (classAndDistanceTotal != 0)
+                {
+                    toAdd.PointsDescription += $"Gained {classAndDistanceTotal} for performances at at the C&D.\n";
+                }
+                if (consecutivePlacementMultiplier != 0)
+                {
+                    toAdd.PointsDescription += $"Gained {consecutivePlacementMultiplier} for consecutive placements.\n";
+                }
+                if (classDownMultiplierTotal != 0)
+                {
+                    toAdd.PointsDescription += $"Class down multiplier applied to some races.";
+                }
+
                 result.Add(toAdd);
-            }
-
-            return result;
-        }
-
-        private FormResultModel CalculateClassAdjustmentMultiplier(List<AlgorithmSettingsEntity> settings, List<RaceHorseEntity> races, RaceEntity race, FormResultModel points) 
-        {
-            var result = points;
-            var multiplier = 0M;
-            bool steppingUp = false;
-            bool steppingDown = false;
-            var steppingUpMultiplierPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierPlaced.ToString()).FirstOrDefault().setting_value.ToString());
-            var steppingUpMultiplierNotPlacedSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierNotPlaced.ToString()).FirstOrDefault().setting_value.ToString());
-            var classLastXRacesSetting = Int32.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingUpMultiplierLastXRaces.ToString()).FirstOrDefault().setting_value.ToString());
-            var steppingDownMultiplierSetting = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.horseSteppingDownMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
-
-            var racesToUse = races.OrderByDescending(x => x.Race.Event.created).Take(classLastXRacesSetting);
-
-
-
-
-           //Stepping down
-           if (racesToUse.Where(x => x.position != 0).Any(x => x.Race.race_class > race.race_class) && racesToUse.Where(x => x.position != 0).All(x => x.Race.race_class != race.race_class)) 
-           {
-               steppingDown = true;
-           }
-           //Stepping Up
-           if (racesToUse.Where(x => x.position != 0).Any(x => x.Race.race_class < race.race_class) && racesToUse.Where(x => x.position != 0).All(x => x.Race.race_class != race.race_class))
-           {
-               steppingUp = true;
-               var positionToPlace = SharedCalculations.GetTake(race.no_of_horses ?? 0);
-
-
-               if (racesToUse.Any(x => x.position <= positionToPlace))
-               {
-                    //Get difference between classes
-                    var classDiff = race.race_class - (racesToUse.OrderBy(x => x.Race.race_class).FirstOrDefault().Race.race_class);
-                    var pointsToAdd = steppingUpMultiplierPlacedSetting * classDiff;
-                    multiplier += pointsToAdd ?? 0;
-               }
-               else 
-               {
-                    //Get difference between classes
-                    var classDiff = race.race_class - (racesToUse.OrderBy(x => x.Race.race_class).FirstOrDefault().Race.race_class);
-                    var pointsToAdd = steppingUpMultiplierNotPlacedSetting * classDiff;
-                    multiplier += pointsToAdd ?? 0;
-               }
-           }
-            
-
-            //Stepping down
-            if (steppingDown && !steppingUp)
-            {
-                result.PointsDescription += $"Multiplying {result.Points} by stepping down multiplier {steppingDownMultiplierSetting} as horse is stepping down classes. <br>";
-                result.Points = (result.Points * steppingDownMultiplierSetting) ?? 0;
-            }
-            //Stepping up
-            else if (!steppingDown && steppingUp)
-            {
-                points.PointsDescription += $"Adding {multiplier} to point total as horse is stepping up classes. <br>";
-                result.Points += (result.Points + multiplier) ?? 0;
-            }
-            else 
-            {
-                result.PointsDescription += $"No Class multiplier applied <br>";
             }
 
             return result;

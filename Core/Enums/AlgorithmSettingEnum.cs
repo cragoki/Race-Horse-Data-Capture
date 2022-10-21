@@ -28,11 +28,10 @@ namespace Core.Enums
         //Placed last 3 races, points += 0.75 - Totalling bonus points to 1.5
         consecutivePlacementMultiplier,
         //Both of the below -> check if horse is stepping up classes and has placed or hasnt placed, should still apply a multiplier
-        horseSteppingUpMultiplierPlaced,
-        horseSteppingUpMultiplierNotPlaced,
-        //Last x races to check for above settings
-        horseSteppingUpMultiplierLastXRaces,
-        //This will attribute a negative value for a horse who has never raced at the current class or lower, e.g. if the value is 0.5 -> horsePoints * 0.5 
-        horseSteppingDownMultiplier
+        horseSteppingUpMultiplier,
+        horseSteppingDownMultiplier,
+        numberOfHorsesMultiplier,
+        courseMultiplier
+
     }
 }

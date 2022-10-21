@@ -1,5 +1,86 @@
 ﻿@page "/"
+@using AdminPunter.Pages.Components
+@using Core.Enums
+@inject IAdminAlgorithmService algorithmService;
+@inject IModalService modal
 
 <PageTitle>Index</PageTitle>
 
-<h1>Project Punter</h1>
+<div class="home-container">
+    <div class="col-md-12">
+        <h1>Project Punter</h1>
+    </div>
+
+
+    <div class="col-md-12 form-element-lg">
+        <input class="form-attr" placeholder="RACE URL" @bind="@raceUrl" />
+    </div>
+
+    <div class="col-md-12 form-element">
+        @if (algorithms != null)
+        {
+            <select class="form-attr" @bind="@selectedAlgorithm">
+                @foreach (var algorithm in algorithms)
+                {
+                        <option class="form-attr" value="@algorithm.AlgorithmId">@algorithm.AlgorithmName</option>
+                }
+            </select>
+        }
+    </div>
+
+
+    <div class="col-md-12 form-element-lg">
+        <button class="btn btn-primary form-attr" @onclick="@(e => @GetRacePredictions())">Search</button>
+    </div>
+</div>
+
+@if (Race != null)
+{
+    <RaceComponent Race=Race />
+}
+
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    private RaceViewModel? Race;
+    private List<AlgorithmTableViewModel>? algorithms;
+    int selectedAlgorithm;
+    string raceUrl = "";
+    protected override async Task OnInitializedAsync()
+    {
+        algorithms = await algorithmService.GetAlgorithmTableData();
+        selectedAlgorithm = algorithms.Where(x => x.AlgorithmId == (int)AlgorithmEnum.FormRevamp).FirstOrDefault().AlgorithmId;
+    }
+
+    public async Task GetRacePredictions()
+    {
+        if (String.IsNullOrEmpty(raceUrl))
+        {
+            await ShowInformationPopup(false, "Enter a Race URL");
+            return;
+        }
+
+        try
+        {
+            Race = await algorithmService.GetRacePredictionsForURL(selectedAlgorithm, raceUrl);
+        }
+        catch (Exception ex) 
+        {
+            await ShowInformationPopup(false, ex.Message);
+        }
+    }
+
+    private async Task ShowInformationPopup(bool isLoading, string message)
+    {
+
+        var modalOptions = new ModalOptions();
+        modalOptions.Class = "blazored-modal-xsm";
+
+        //Run for one specific event
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(InformationPopup.isLoading), isLoading);
+        parameters.Add(nameof(InformationPopup.Message), message);
+        //Pass both into partial view below
+        var result = Modal.Show<InformationPopup>($"", parameters, modalOptions);
+    }
+}

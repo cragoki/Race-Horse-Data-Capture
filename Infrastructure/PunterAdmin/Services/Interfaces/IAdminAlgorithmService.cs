@@ -13,5 +13,6 @@ namespace Infrastructure.PunterAdmin.Services
         Task<AlgorithmTableViewModel> UpdateAlgorithmSettings(AlgorithmTableViewModel algorithm);
         Task<AlgorithmTableViewModel> UpdateAlgorithmVariables(AlgorithmTableViewModel algorithm);
         Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm);
+        Task<RaceViewModel> GetRacePredictionsForURL(int algorithmId, string raceUrl);
     }
 }

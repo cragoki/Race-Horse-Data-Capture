@@ -27,7 +27,7 @@ namespace Infrastructure.Data.Repositories
 
         public AlgorithmEntity GetAlgorithmById(int algorithmId)
         {
-            return _context.tb_algorithm.Where(x => x.algorithm_id == algorithmId).FirstOrDefault();
+            return _context.tb_algorithm.Include(x => x.Variables).Include(x => x.Settings).Where(x => x.algorithm_id == algorithmId).FirstOrDefault();
 
         }
 

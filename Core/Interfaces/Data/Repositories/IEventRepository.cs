@@ -26,6 +26,7 @@ namespace Core.Interfaces.Data.Repositories
         void AddRace(RaceEntity raceToUpdate);
         void UpdateRace(RaceEntity raceToUpdate);
         RaceEntity GetRaceById(int raceId);
+        RaceEntity GetRaceByURL(string raceURL);
         List<RaceHorseEntity> GetRaceHorsesForRace(int raceId);
         void SaveChanges();
         List<EventEntity> TestAlgorithmWithOneHundredEvents();

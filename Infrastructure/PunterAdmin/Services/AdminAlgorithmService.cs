@@ -10,6 +10,8 @@ using Core.Entities;
 using Core.Models.Algorithm;
 using Core.Interfaces.Services;
 using Core.Helpers;
+using Core.Models;
+using Org.BouncyCastle.Utilities;
 
 namespace Infrastructure.PunterAdmin.Services
 {
@@ -344,6 +346,71 @@ namespace Infrastructure.PunterAdmin.Services
             return algorithm;
         }
 
+        public async Task<RaceViewModel> GetRacePredictionsForURL(int algorithmId, string raceUrl) 
+        {
+            var result = new RaceViewModel();
+
+            try
+            {
+                //Get Race
+                raceUrl = raceUrl.Replace("https://www.racingpost.com", "");
+
+                var race = _eventRepository.GetRaceByURL(raceUrl);
+                var algorithm = new AlgorithmTableViewModel();
+                if (race == null) 
+                {
+                    throw new Exception("No race found with selected URL");
+                }
+
+                //Switch for algorithm
+                var algorithmEntity =  _algorithmRepository.GetAlgorithmById(algorithmId);
+                var settings = await GetAlgorithmSettings(algorithmEntity.Settings);
+                var variables = await GetAlgorithmVariables(algorithmEntity.Variables);
+                var distances = _mappingRepository.GetDistanceTypes();
+                var goings = _mappingRepository.GetGoingTypes();
+                var predictions = new List<FormResultModel>();
+
+                switch (algorithmEntity.algorithm_id) 
+                {
+                    case((int)AlgorithmEnum.FormOnly):
+                            predictions = await _form.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
+                        break;
+                    case ((int)AlgorithmEnum.FormRevamp):
+                            predictions = await _formRevamp.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
+                        break;
+                    default:
+                        throw new Exception("Selected Algorithm is not set up for URL Predictions");
+                }
+
+                if (predictions == null || predictions.Count() == 0)
+                {
+                    throw new Exception("No Predictions available for selected race");
+                }
+
+                var updatedHorses = new List<RaceHorseViewModel>();
+                foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                {  
+                    result = BuildTodaysRaceViewModel(race, race.Event.created);
+                    result.AlgorithmRan = true;
+                    var horse = result.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                    horse.PredictedPosition = prediction.i + 1;
+                    horse.HorseReliability = prediction.value.Predictability;
+                    horse.Points = prediction.value.Points;
+                    horse.PointsDescription = prediction.value.PointsDescription;
+                    updatedHorses.Add(horse);
+                }
+
+                result.Horses = updatedHorses;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
         #region private
         private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
         {
@@ -412,6 +479,126 @@ namespace Infrastructure.PunterAdmin.Services
                     threshold = variable.Threshold,
                     variable_id = variable.VariableId
                 });
+            }
+
+            return result;
+        }
+
+        private RaceViewModel BuildTodaysRaceViewModel(RaceEntity race, DateTime date)
+        {
+            var result = new RaceViewModel();
+
+            try
+            {
+                    result = new RaceViewModel()
+                    {
+                        RaceId = race.race_id,
+                        Date = date,
+                        Ages = race.Ages?.age_type,
+                        Completed = race.completed,
+                        Description = race.description,
+                        Distance = race.Distance?.distance_type,
+                        EventId = race.event_id,
+                        Going = $"Going: {race.Going?.going_type}",
+                        NumberOfHorses = $"{race.no_of_horses} Horses",
+                        RaceClass = $"Class: {race.race_class ?? 0}",
+                        RaceTime = race.race_time,
+                        RaceUrl = $"https://www.racingpost.com/{race.race_url}",
+                        Stalls = $"Stalls: {race.Stalls?.stalls_type}",
+                        Weather = $"Weather: {race.Weather?.weather_type}",
+                        Horses = BuildRaceHorseViewModel(race.RaceHorses, race.Event)
+                    };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        private List<RaceHorseViewModel> BuildRaceHorseViewModel(List<RaceHorseEntity> raceHorses, EventEntity even)
+        {
+            var result = new List<RaceHorseViewModel>();
+
+            foreach (var raceHorse in raceHorses)
+            {
+                var racePredictedPosition = 0;
+                var pointsDescription = "";
+                decimal racePoints = 0;
+                var rpr = ConfigureRPR(raceHorse, even.created);
+                var ts = ConfigureTS(raceHorse, even.created);
+                var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id);
+                var predictedPosition = predictedPositions.Where(x => x.algorithm_id == (int)AlgorithmEnum.FormRevamp).FirstOrDefault();
+
+                if (predictedPosition != null)
+                {
+                    racePredictedPosition = predictedPosition.predicted_position;
+                    racePoints = predictedPosition.points;
+                    pointsDescription = predictedPosition.points_description;
+                }
+                result.Add(new RaceHorseViewModel()
+                {
+                    RaceHorseId = raceHorse.race_horse_id,
+                    Name = raceHorse.Horse.horse_name,
+                    HorseId = raceHorse.horse_id,
+                    Age = raceHorse.age,
+                    Description = raceHorse.description,
+                    Position = raceHorse.position,
+                    RaceId = raceHorse.race_id,
+                    Weight = raceHorse.weight,
+                    JockeyName = raceHorse.Jockey?.jockey_name,
+                    TrainerName = raceHorse.Trainer?.trainer_name,
+                    Ts = ts,
+                    RPR = rpr,
+                    PredictedPosition = racePredictedPosition,
+                    PointsDescription = pointsDescription,
+                    Points = racePoints
+                });
+            }
+
+            return result;
+        }
+
+        private int? ConfigureRPR(RaceHorseEntity raceHorse, DateTime created)
+        {
+            var result = 0;
+
+            if (raceHorse.Horse.Archive != null && raceHorse.Horse.Archive.Count() != 0)
+            {
+                var archive = raceHorse.Horse.Archive;
+                var rprString = archive.Where(x => x.field_changed == "rpr" && x.date < created)
+                    .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
+
+                if (rprString != "-")
+                {
+                    if (Int32.TryParse(rprString, out var rprInt))
+                    {
+                        result = rprInt;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private int? ConfigureTS(RaceHorseEntity raceHorse, DateTime created)
+        {
+            var result = 0;
+
+            if (raceHorse.Horse.Archive != null && raceHorse.Horse.Archive.Count() != 0)
+            {
+                var archive = raceHorse.Horse.Archive;
+                var tsString = archive.Where(x => x.field_changed == "ts" && x.date < created)
+                    .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
+
+                if (tsString != "-")
+                {
+                    if (Int32.TryParse(tsString, out var tsInt))
+                    {
+                        result = tsInt;
+                    }
+                }
             }
 
             return result;
