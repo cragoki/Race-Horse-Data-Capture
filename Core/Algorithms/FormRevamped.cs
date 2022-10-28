@@ -285,8 +285,14 @@ namespace Core.Algorithms
             var reliablitygoing = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliablitygoing.ToString()).FirstOrDefault().setting_value.ToString());
             var courseMultiplier = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.courseMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
 
-            foreach (var horse in race.RaceHorses)
+            foreach (var horse in race.RaceHorses) 
             {
+
+                //if (horse.horse_id == 26186) // Makin your mind up
+                //{ 
+                
+                //}
+
                 var toAdd = new FormResultModel();
                 toAdd.RaceHorseId = horse.race_horse_id;
                 toAdd.Points = 0;
@@ -329,12 +335,28 @@ namespace Core.Algorithms
                         }
                         else if (previousRace.position <= positionToPlace)
                         {
-                            pointsForThisRace += (formMultiplierSetting);
-                            hasWonAtDistance += formMultiplierSetting;
+                            var placePoints = formMultiplierSetting;
+                            if (previousRace.position == 2)
+                            {
+                                pointsForThisRace += (placePoints);
+                                hasWonAtDistance += placePoints;
+                            }
+                            else if (previousRace.position == 3)
+                            {
+                                placePoints = placePoints - 0.10M;
+                                pointsForThisRace += (placePoints);
+                                hasWonAtDistance += placePoints;
+                            }
+                            else 
+                            {
+                                placePoints = placePoints - 0.20M;
+                                pointsForThisRace += (placePoints);
+                                hasWonAtDistance += placePoints;
+                            }
                         }
 
                         //CLASS
-                        if (previousRace.Race.race_class < race.race_class)
+                        if (previousRace.Race.race_class != 0 && previousRace.Race.race_class < race.race_class)
                         {
                             if (previousRace.position <= positionToPlace)
                             {
@@ -348,7 +370,7 @@ namespace Core.Algorithms
                             }
 
                         }
-                        else if (previousRace.Race.race_class > race.race_class)
+                        else if (previousRace.Race.race_class != 0 && previousRace.Race.race_class > race.race_class)
                         {
                             if (previousRace.position <= positionToPlace)
                             {
@@ -406,52 +428,54 @@ namespace Core.Algorithms
                         {
                             if (previousRace.position == 1)
                             {
-                                courseTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * (courseMultiplier * 2));
-                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * (courseMultiplier * 2));
+                                courseTotal += (courseMultiplier * 2);
+                                pointsForThisRace += (courseMultiplier * 2);
                             }
                             if (previousRace.position <= positionToPlace)
                             {
-                                courseTotal += (pointsForThisRace == 0 ? 1 : pointsForThisRace * courseMultiplier);
-                                pointsForThisRace += (pointsForThisRace == 0 ? 1 : pointsForThisRace * courseMultiplier);
+                                courseTotal += courseMultiplier;
+                                pointsForThisRace += courseMultiplier;
                             }
                         }
 
 
-                        //FORM OVER CLASS & DISTANCE
-                        var classAndDistance = races.OrderByDescending(x => x.Race.Event.created).Where(x => distanceGroup.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class && x.position != 0).ToList().Take(formLastXRacesSetting);
+                        //Class and distance
                         decimal classAndDistancePoints = (formMultiplierSetting * 2);
-
-                        foreach (var cdRace in classAndDistance) 
+                        if (previousRace.Race.race_class <= race.race_class && distanceGroup.DistanceIds.Contains(previousRace.Race.distance ?? 0)) 
                         {
-                            var cdPositionToPlace = SharedCalculations.GetTake(cdRace.Race.no_of_horses ?? 0);
-                            if (cdRace.position == 1)
+                            if (previousRace.position == 1)
                             {
                                 pointsForThisRace += (classAndDistancePoints * 2);
                                 classAndDistanceTotal += classAndDistancePoints * 2;
                             }
-                            else if (cdRace.position <= cdPositionToPlace) 
+                            else if (previousRace.position <= positionToPlace)
                             {
                                 pointsForThisRace += classAndDistancePoints;
                                 classAndDistanceTotal += classAndDistancePoints;
                             }
                         }
 
-                        if (steppingDownMultiplierSetting > 0)
+
+                        //HERE we need to get which race this is in terms of order, and apply a negative multiplier depending on how long ago the race is, (potential new setting RaceDegredation multiplier)
+                        //IE, the most recent race, no multiplier applied,
+                        //The race before that = 1 - 0.10 (0.10 being the multiplier) and then multiply the result of that by the race points
+                        //so in this case the second most recent race would be points * 0.9
+
+                        if (steppingDownMultiplier > 0 && pointsForThisRace > 0)
                         {
-                            toAdd.Points = (pointsForThisRace - (pointsForThisRace * steppingDownMultiplierSetting));
+                            pointsForThisRace = (pointsForThisRace * steppingDownMultiplier);
                         }
-                        else 
-                        {
-                            toAdd.Points += pointsForThisRace;
-                        }
+
+                        toAdd.Points += pointsForThisRace;
                     }
                 }
 
                 //Consecutive Placement Multiplier Setting (multiply points by setting and add result to points total)
-                var lastXRaces = distanceOnly.OrderByDescending(x => x.Race.Event.created).Where(x => x.position != 0).Take(formLastXRacesSetting);
+                var lastXRaces = distanceOnly.OrderBy(x => x.Race.Event.created).Where(x => x.position != 0).Take(formLastXRacesSetting);
                 var multiplierSetting = consecutivePlacementMultiplierSetting;
                 decimal multiplier = 0;
                 var placedInLastRace = false;
+
                 //NEED TO TEST THIS OUT, SEE IF IT WORKS
                 foreach (var raceForm in lastXRaces)
                 {
@@ -463,7 +487,14 @@ namespace Core.Algorithms
                         {
                             multiplierSetting = (multiplierSetting + formMultiplierSetting);
                         }
-                        multiplier += multiplierSetting;
+                        if (raceForm.position == 1)
+                        {
+                            multiplier += (multiplierSetting * 2);
+                        }
+                        else 
+                        {
+                            multiplier += multiplierSetting;
+                        }
                         placedInLastRace = true;
                     }
                     else
@@ -474,7 +505,7 @@ namespace Core.Algorithms
                 }
 
                 consecutivePlacementMultiplier = multiplier;
-                toAdd.Points += toAdd.Points + multiplier;
+                toAdd.Points += multiplier;
 
                 if (hasWonAtDistance != 0) 
                 {
