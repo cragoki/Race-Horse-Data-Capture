@@ -450,8 +450,26 @@ namespace Core.Algorithms
                             }
                             else if (previousRace.position <= positionToPlace)
                             {
-                                pointsForThisRace += classAndDistancePoints;
-                                classAndDistanceTotal += classAndDistancePoints;
+                                var points = classAndDistancePoints;
+                                if (previousRace.position == 2)
+                                {
+                                    pointsForThisRace += (points);
+                                    classAndDistanceTotal += points;
+                                }
+                                else if (previousRace.position == 3)
+                                {
+                                    points = points - 0.10M;
+                                    pointsForThisRace += (points);
+                                    classAndDistanceTotal += points;
+                                }
+                                else
+                                {
+                                    points = points - 0.20M;
+                                    pointsForThisRace += (points);
+                                    hasWonAtDistance += points;
+                                }
+                                pointsForThisRace += points;
+                                classAndDistanceTotal += points;
                             }
                         }
 
@@ -491,10 +509,19 @@ namespace Core.Algorithms
                         {
                             multiplier += (multiplierSetting * 2);
                         }
-                        else 
+                        else if (raceForm.position == 2)
                         {
-                            multiplier += multiplierSetting;
+                            multiplier += (multiplierSetting);
                         }
+                        else if (raceForm.position == 3)
+                        {
+                            multiplier += (multiplierSetting - 0.10M);
+                        }
+                        else
+                        {
+                            multiplier += (multiplierSetting - 0.20M);
+                        }
+
                         placedInLastRace = true;
                     }
                     else
