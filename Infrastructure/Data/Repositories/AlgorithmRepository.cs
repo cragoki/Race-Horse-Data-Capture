@@ -4,7 +4,6 @@ using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -77,6 +76,16 @@ namespace Infrastructure.Data.Repositories
         public List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
         {
             return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).ToList();
+        }
+        public List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id)
+        {
+            return _context.tb_algorithm_prediction
+                .Include(x => x.RaceHorse)
+                    .ThenInclude(x => x.Horse)
+                .Include(x => x.RaceHorse)
+                    .ThenInclude(x => x.Race)
+                        .ThenInclude(x => x.Event)
+                .Where(x => x.RaceHorse.Horse.horse_id == horse_id).ToList();
         }
         public void SaveChanges()
         {

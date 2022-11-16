@@ -18,5 +18,6 @@ namespace Core.Interfaces.Data.Repositories
         void UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables);
         void AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction);
         List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id);
+        List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id);
     }
 }

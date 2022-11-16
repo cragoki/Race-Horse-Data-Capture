@@ -22,7 +22,7 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public string Description { get; set; }
         public decimal? Points { get; set; }
         public string PointsDescription { get; set; }
-        public decimal? HorseReliability { get; set; }
+        public string HorseReliability { get; set; }
 
     }
 }

@@ -9,6 +9,7 @@ using Infrastructure.PunterAdmin.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Core.Algorithms
@@ -17,13 +18,15 @@ namespace Core.Algorithms
     {
         private readonly IConfigurationRepository _configRepository;
         private readonly IMappingTableRepository _mappingRepository;
+        private readonly IAlgorithmRepository _algorithmRepository;
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public FormRevamped(IConfigurationRepository configRepository, IMappingTableRepository mappingRepository)
+        public FormRevamped(IConfigurationRepository configRepository, IMappingTableRepository mappingRepository, IAlgorithmRepository algorithmRepository)
         {
             _configRepository = configRepository;
             _mappingRepository = mappingRepository;
+            _algorithmRepository = algorithmRepository;
         }
 
         public async Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races, List<AlgorithmVariableEntity> algorithms)
@@ -260,7 +263,7 @@ namespace Core.Algorithms
 
                 foreach (var horse in result)
                 {
-                    var horsePredictability = 0;// await CalculateHorsePredictability(settings, horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
+                    var horsePredictability = await CalculateHorsePredictability(horse.Horse.horse_id, race.Event.created, race, goingGroup, distanceGroup);
                     horse.Predictability = horsePredictability;
                 }
             }
@@ -270,6 +273,48 @@ namespace Core.Algorithms
             }
 
             return result;
+        }
+
+        private async Task<string> CalculateHorsePredictability(int horseId, DateTime dateOfRace, RaceEntity race, GoingGroupModel goingGroup, DistanceGroupModel distanceGroup) 
+        {
+            //IMPROVEMENT SUGGESTION : PASS IN RACE ENTITY AND ONLY GET PREDICTIONS FOR GOING GROUP, CLASS & DISTANCE
+            var result = 0M;
+
+            try
+            {
+                //Get all prediction_results for horse
+                var predictionResults = _algorithmRepository.GetAlgorithmPredictionForHorse(horseId).Where(x => x.RaceHorse.Race.race_class == race.race_class && goingGroup.ElementIds.Contains(x.RaceHorse.Race.going ?? 0) && distanceGroup.DistanceIds.Contains(x.RaceHorse.Race.distance ?? 0) && x.RaceHorse.Race.race_id != race.race_id).ToList();
+                var correctPrediction = 0;
+
+                if(predictionResults.Count() == 0)
+                {
+                    return "No Data";
+                }
+                //foreach prediction result
+                foreach (var predictionResult in predictionResults.Where(x => x.RaceHorse.Race.Event.created < dateOfRace)) 
+                {
+                    //Get place for number of horses
+                    var placed = SharedCalculations.GetTake(predictionResult.RaceHorse.Race.no_of_horses ?? 0);
+
+                    if (predictionResult.RaceHorse.position != 0 && predictionResult.predicted_position <= placed && predictionResult.RaceHorse.position <= placed)
+                    {
+                        correctPrediction = correctPrediction + 1;
+                    }
+                    else if (predictionResult.RaceHorse.position != 0 && predictionResult.predicted_position > placed && predictionResult.RaceHorse.position > placed) 
+                    {
+                        correctPrediction = correctPrediction + 1;
+                    }
+                }
+
+                //get the % of number of predictions vs number of predictions where predicted result <= place positions
+                result = ((decimal)correctPrediction / (decimal)predictionResults.Count()) * 100;
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result.ToString("0.00");
         }
 
         private async Task<List<FormResultModel>> AssignHorsePoints(List<AlgorithmSettingsEntity> settings, RaceEntity race, DistanceGroupModel distanceGroup, GoingGroupModel goingGroup, decimal distance)

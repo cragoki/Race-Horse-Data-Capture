@@ -253,7 +253,7 @@ namespace Core.Algorithms
 
                 foreach (var horse in result) 
                 {
-                    var horsePredictability = 0;// await CalculateHorsePredictability(settings, horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
+                    var horsePredictability = "0";// await CalculateHorsePredictability(settings, horse.Horse, race.race_id, distanceGroups, goingGroups, distance);
                     horse.Predictability = horsePredictability;
                 }
             }
