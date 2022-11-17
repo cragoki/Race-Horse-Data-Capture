@@ -150,7 +150,8 @@ namespace RHDCAutomation
                                             algorithm_id = activeAlgorithm.algorithm_id,
                                             predicted_position = prediction.i + 1,
                                             points = prediction.value.Points ?? 0,
-                                            points_description = prediction.value.PointsDescription
+                                            points_description = prediction.value.PointsDescription,
+                                            horse_predictability = prediction.value.Predictability
                                         };
                                         _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
                                     }

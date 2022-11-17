@@ -225,7 +225,8 @@ namespace Infrastructure.PunterAdmin.Services
                     RPR = rpr,
                     PredictedPosition = racePredictedPosition,
                     PointsDescription = pointsDescription,
-                    Points = racePoints
+                    Points = racePoints,
+                    HorseReliability = predictedPosition.horse_predictability
                 });
             }
 

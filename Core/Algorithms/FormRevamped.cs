@@ -277,7 +277,6 @@ namespace Core.Algorithms
 
         private async Task<string> CalculateHorsePredictability(int horseId, DateTime dateOfRace, RaceEntity race, GoingGroupModel goingGroup, DistanceGroupModel distanceGroup) 
         {
-            //IMPROVEMENT SUGGESTION : PASS IN RACE ENTITY AND ONLY GET PREDICTIONS FOR GOING GROUP, CLASS & DISTANCE
             var result = 0M;
 
             try
