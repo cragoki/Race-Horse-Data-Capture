@@ -41,6 +41,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<ITsRPR, TsRPR>();
             container.RegisterScoped<IFormAlgorithm, FormAlgorithm>();
             container.RegisterScoped<IFormRevamped, FormRevamped>();
+            container.RegisterScoped<IBentnersModel, BentnersModel>();
 
             //Punter Admin
             container.RegisterScoped<IAdminAlgorithmService, AdminAlgorithmService>();

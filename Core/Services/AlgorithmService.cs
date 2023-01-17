@@ -25,8 +25,9 @@ namespace Core.Services
         private static ITsRPR _topSpeedRpr;
         private static IFormAlgorithm _formAlgorithm;
         private static IFormRevamped _formRevampedAlgorithm;
+        private static IBentnersModel _bentnersAlgorithm;
 
-        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm, IFormAlgorithm formAlgorithm)
+        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm, IFormAlgorithm formAlgorithm, IBentnersModel bentnersAlgorithm)
         {
             _eventRepository = eventRepository;
             _algorithmRepository = algorithmRepository;
@@ -34,6 +35,7 @@ namespace Core.Services
             _topSpeedRpr = topSpeedRpr;
             _formAlgorithm = formAlgorithm;
             _formRevampedAlgorithm = formRevampedAlgorithm;
+            _bentnersAlgorithm = bentnersAlgorithm;
         }
 
         public async Task<AlgorithmResult> ExecuteActiveAlgorithm()
@@ -63,6 +65,9 @@ namespace Core.Services
                             break;
                         case AlgorithmEnum.FormRevamp:
                             result = await _formRevampedAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
+                            break;
+                        case AlgorithmEnum.BentnersModel:
+                            result = await _bentnersAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
                             break;
                     }
 

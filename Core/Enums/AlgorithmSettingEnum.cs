@@ -31,7 +31,12 @@ namespace Core.Enums
         horseSteppingUpMultiplier,
         horseSteppingDownMultiplier,
         numberOfHorsesMultiplier,
-        courseMultiplier
-
+        courseMultiplier,
+        //Bentners Model
+        reliabilityCurrentCondition,
+        reliabilityPastPerformance,
+        reliabilityAdjustmentsPastPerformance,
+        reliabilityPresentRaceFactors,
+        reliabilityHorsePreferences
     }
 }
