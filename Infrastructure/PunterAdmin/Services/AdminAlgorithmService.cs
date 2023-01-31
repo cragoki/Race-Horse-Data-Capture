@@ -240,23 +240,23 @@ namespace Infrastructure.PunterAdmin.Services
 
                                 var settings = await BuildAlgorithmSettings(algorithm);
 
-                                var predictions = await _bentnersModel.FormCalculationPredictions(race, settings, distances, goings);
+                                //var predictions = await _bentnersModel.FormCalculationPredictions(race, settings, distances, goings);
 
-                                if (predictions == null || predictions.Count() == 0)
-                                {
-                                    continue;
-                                }
+                                //if (predictions == null || predictions.Count() == 0)
+                                //{
+                                //    continue;
+                                //}
 
-                                foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
-                                {
-                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
-                                    thisRace.AlgorithmRan = true;
-                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
-                                    horse.PredictedPosition = prediction.i + 1;
-                                    horse.HorseReliability = prediction.value.Predictability;
-                                    horse.Points = prediction.value.Points;
-                                    horse.PointsDescription = prediction.value.PointsDescription;
-                                }
+                                //foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                //{
+                                //    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                //    thisRace.AlgorithmRan = true;
+                                //    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                                //    horse.PredictedPosition = prediction.i + 1;
+                                //    horse.HorseReliability = prediction.value.Predictability;
+                                //    horse.Points = prediction.value.Points;
+                                //    horse.PointsDescription = prediction.value.PointsDescription;
+                                //}
                             }
                         }
                         break;
@@ -326,7 +326,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.BentnersModel:
                         foreach (var even in allEvents)
                         {
-                            algorithmResult = await _bentnersModel.GenerateAlgorithmResult(even.Races, variables);
+                            algorithmResult = await _bentnersModel.GenerateAlgorithmResult(even.Races);
                             //If race counter > 0
                             if (algorithmResult.RacesFiltered > 0)
                             {
@@ -461,8 +461,23 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        #region private
-        private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
+        public async Task<string> GenerateUnitTestEntities(int raceId, string unitTestTitle)
+        {
+            var result = "";
+
+            try
+            {
+                result = "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+            #region private
+            private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
         {
             var result = new List<AlgorithSettingsTableViewModel>();
 

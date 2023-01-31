@@ -1,0 +1,70 @@
+﻿@page "/TestCase/TestCaseGenerator"
+@using AdminPunter.Pages.Components
+@inject IAdminAlgorithmService algorithmService;
+@inject IModalService modal
+
+<PageTitle>Test Case Generator</PageTitle>
+
+<div class="home-container">
+    <div class="col-md-12">
+        <h1>Test Case Generator</h1>
+    </div>
+
+
+    <div class="col-md-12 form-element-lg">
+        <input class="form-attr" placeholder="Test Case Title" @bind="@testCaseTitle" />
+    </div>
+
+    <div class="col-md-12 form-element">
+        <input class="form-attr" placeholder="Race Id" @bind="@raceId" />
+    </div>
+
+
+    <div class="col-md-12 form-element-lg">
+        <button class="btn btn-primary form-attr search-btn" @onclick="@(e => @GenerateUnitTestEntities())">Submit</button>
+    </div>
+
+    <div class="col-md-12 form-element">
+        <textarea cols="125" rows="20" type="box" @bind="@testCase" />
+    </div>
+</div>
+
+
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+    int raceId;
+    string testCaseTitle = "";
+    string testCase = "";
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    public async Task GenerateUnitTestEntities()
+    {
+        try
+        {
+            testCase = await algorithmService.GenerateUnitTestEntities(raceId, testCaseTitle);
+            //await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex) 
+        {
+            await ShowInformationPopup(false, ex.Message);
+        }
+    }
+
+    private async Task ShowInformationPopup(bool isLoading, string message)
+    {
+
+        var modalOptions = new ModalOptions();
+        modalOptions.Class = "blazored-modal-xsm";
+
+        //Run for one specific event
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(InformationPopup.isLoading), isLoading);
+        parameters.Add(nameof(InformationPopup.Message), message);
+        //Pass both into partial view below
+        var result = Modal.Show<InformationPopup>($"", parameters, modalOptions);
+    }
+}

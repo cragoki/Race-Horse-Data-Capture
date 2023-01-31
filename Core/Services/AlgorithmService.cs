@@ -67,7 +67,7 @@ namespace Core.Services
                             result = await _formRevampedAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
                             break;
                         case AlgorithmEnum.BentnersModel:
-                            result = await _bentnersAlgorithm.GenerateAlgorithmResult(races, algorithmVariables);
+                            result = await _bentnersAlgorithm.GenerateAlgorithmResult(races);
                             break;
                     }
 

@@ -1,9 +1,11 @@
 ﻿
 using Core.Algorithms;
 using Core.Interfaces.Algorithms;
+using Core.Interfaces.Data;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Services;
+using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
 using Infrastructure.PunterAdmin.Services;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +37,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IConfigurationRepository, ConfigurationRepository>();
             container.RegisterScoped<IAlgorithmRepository, AlgorithmRepository>();
             container.RegisterScoped<IMappingTableRepository, MappingTableRepository>();
+            container.RegisterScoped<IDbContextData, DbContextData>();
 
             //Algorithms
             container.RegisterScoped<ITopSpeedOnly, TopSpeedOnly>();

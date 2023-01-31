@@ -75,7 +75,7 @@ namespace Infrastructure.Data.Repositories
         }
         public List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
         {
-            return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).ToList();
+            return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).Include(x => x.Algorithm).ToList();
         }
         public List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id)
         {

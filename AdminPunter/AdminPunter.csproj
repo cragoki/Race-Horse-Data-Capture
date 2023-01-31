@@ -20,6 +20,9 @@
     <Content Update="Pages\Components\InformationPopup.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
+    <Content Update="Pages\TestCase\TestCaseGenerator.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>
