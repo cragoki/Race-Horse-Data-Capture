@@ -218,6 +218,7 @@ namespace RHDCAutomation
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
+                    Thread.Sleep((int)TimeSpan.FromMinutes(30).TotalMilliseconds);
 
                     var email = new MailModel()
                     {
