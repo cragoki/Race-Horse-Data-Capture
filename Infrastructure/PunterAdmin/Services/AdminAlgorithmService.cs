@@ -467,6 +467,18 @@ namespace Infrastructure.PunterAdmin.Services
 
             try
             {
+                var race = _eventRepository.GetAllRaceDataById(raceId);
+
+                if (race == null) 
+                {
+                    throw new Exception($"Could not find race with ID {raceId}");
+                }
+
+                result += $"public static RaceEntity {unitTestTitle}()";
+                result += "{ return new RaceEntity() {";
+                result += $"race_id = {raceId},";
+                result += $"event_id = {race.event_id},";
+                result += "}}";
                 result = "Success";
             }
             catch (Exception ex)

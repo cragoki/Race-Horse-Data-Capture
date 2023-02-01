@@ -166,10 +166,11 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_event.Where(x => x.course_id == courseId).ToList();
         }
-        public void AddEvent(EventEntity eventToAdd)
+        public int AddEvent(EventEntity eventToAdd)
         {
             _context.tb_event.Add(eventToAdd);
             SaveChanges();
+            return eventToAdd.event_id;
         }
         public void AddCourse(CourseEntity courseToAdd)
         {
@@ -185,6 +186,7 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_race.Where(x => x.Event.created.Date == DateTime.Now.Date).AsNoTracking();
         }
+
         public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
         {
             return _context.tb_race.Where(x => x.event_id == eventId)
@@ -236,6 +238,31 @@ namespace Infrastructure.Data.Repositories
         public RaceEntity GetRaceById(int raceId)
         {
             return _context.tb_race.Where(x => x.race_id == raceId).FirstOrDefault();
+        }
+
+        public RaceEntity GetAllRaceDataById(int raceId)
+        {
+            return _context.tb_race
+                .Include(x => x.Event)
+                    .ThenInclude(x => x.Surface)
+                .Include(x => x.Event)
+                    .ThenInclude(x => x.Course)
+                .Include(x => x.Event)
+                    .ThenInclude(x => x.MeetingType)
+                .Include(x => x.Ages)
+                .Include(x => x.Weather)
+                .Include(x => x.Distance)
+                .Include(x => x.Going)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.Event)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Jockey)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Trainer)
+                .Where(x => x.race_id == raceId).FirstOrDefault();
         }
 
         public RaceEntity GetRaceByURL(string raceURL) 

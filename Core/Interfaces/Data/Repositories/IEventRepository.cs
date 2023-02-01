@@ -19,7 +19,7 @@ namespace Core.Interfaces.Data.Repositories
         IEnumerable<EventEntity> GetEventByCourse(int courseId);
         void AddCourse(CourseEntity courseToAdd);
         void UpdateCourse(CourseEntity courseToUpdate);
-        void AddEvent(EventEntity eventToAdd);
+        int AddEvent(EventEntity eventToAdd);
         List<CourseEntity> GetCourses();
         List<RaceEntity> GetAllRaces();
         IEnumerable<RaceEntity> GetRacesForEvent(int eventId);
@@ -30,5 +30,6 @@ namespace Core.Interfaces.Data.Repositories
         List<RaceHorseEntity> GetRaceHorsesForRace(int raceId);
         void SaveChanges();
         List<EventEntity> TestAlgorithmWithOneHundredEvents();
+        RaceEntity GetAllRaceDataById(int raceId);
     }
 }

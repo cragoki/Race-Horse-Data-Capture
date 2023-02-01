@@ -5,8 +5,10 @@ using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.GetRace;
+using Core.Models.RP.GetRaceNew;
 using Core.Models.Settings;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -50,10 +52,16 @@ namespace Core.Services
                 htmlDoc.LoadHtml(page);
 
                 //Now we have the page we must parse the table into individual elements.
-                var getTableRows = await ExtractJson(page, "cardsMatrix\":", "}]}]");
+                var getTableRows = await ExtractJson(page, "byDate\":", "\"dates\":[", 0, 1);
 
-                //Convert Json to model
-                result = JsonConvert.DeserializeObject<DailyRaces>(getTableRows + "}");
+                //For new Structure, cheers racing post for ruining my day and changing stuff on your UI :(
+                var startString = DateTime.Now.Date.ToUniversalTime().ToString("yyyy-MM-dd");
+                var endString = DateTime.Now.Date.AddDays(1).ToUniversalTime().ToString("yyyy-MM-dd");
+                getTableRows = await ExtractJson(getTableRows, startString, endString, 2, 2);
+
+                //New Objects for RP restructure
+
+                result = await ConvertNewRPStructureToOld(getTableRows);
             }
             catch (Exception ex)
             {
@@ -107,57 +115,6 @@ namespace Core.Services
             {
                 Logger.Error($"!!! Failed to retrieve todays events.  Terminating process. {ex.Message} !!!");
                 throw new Exception(ex.Message);
-            }
-
-            return result;
-        }
-
-        public async Task<RaceModel> RetrieveRacesForEvent(EventEntity eventEntity)
-        {
-            var result = new RaceModel();
-            result.RaceEntities = new List<RaceEntity>();
-            //Retrieve the event info from the DB
-            try
-            {
-                //Build the URL
-                var url = $"{_racingPostConfig.BaseUrl + eventEntity.meeting_url}";
-                Thread.Sleep(2500);
-                //Get the raw HTML
-                var page = await CallUrl(url);
-                HtmlDocument htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(page);
-
-                result.CourseUrl = await ExtractCourseUrl(htmlDoc);
-                result.Weather = await ExtractWeather(htmlDoc);
-
-                var divs = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'RC-meetingDay__race')]").Where(x => x.Attributes.Contains("data-diffusion-racetime"));
-
-                foreach (HtmlNode div in divs)
-                {
-                    var raceTime = div.Attributes["data-diffusion-racetime"].Value;
-                    var rpRaceId = div.Attributes["data-diffusion-race-id"].Value;
-                    var raceUrl = $"{eventEntity.meeting_url}/{rpRaceId}";
-
-                    var race = new RaceEntity()
-                    {
-                        race_time = raceTime,
-                        rp_race_id = Int32.Parse(rpRaceId),
-                        race_url = raceUrl,
-                        event_id = eventEntity.event_id,
-                        weather = _mappingTableRepository.AddOrReturnWeatherType(result.Weather),
-                        completed = false
-                    };
-                    race = await ExtractRaceInfo(div, race);
-
-                    result.RaceEntities.Add(race);
-
-                    //race horse extraction
-
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to retrieve races for event {eventEntity.event_id} ... {ex.Message}");
             }
 
             return result;
@@ -518,7 +475,7 @@ namespace Core.Services
             }
         }
 
-        private async Task<string> ExtractJson(string strSource, string strStart, string strEnd) 
+        private async Task<string> ExtractJson(string strSource, string strStart, string strEnd, int trimStart, int trimEnd) 
         {
             var result = "";
 
@@ -529,7 +486,9 @@ namespace Core.Services
                     int Start, End;
                     Start = strSource.IndexOf(strStart, 0) + strStart.Length;
                     End = strSource.IndexOf(strEnd, Start);
-                    return strSource.Substring(Start, End + strEnd.Length - Start);
+                    result = strSource.Substring(Start, End + strEnd.Length - Start);
+                    result = result.Substring(0, result.Length - (strEnd.Length + trimEnd));
+                    result = result.Substring(trimStart);
                 }
             }
             catch (Exception ex) 
@@ -545,6 +504,100 @@ namespace Core.Services
             var rpHorseIdSubstr = horseUrl.Substring(15);
             var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
             return Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
+        }
+
+        private async Task<DailyRaces> ConvertNewRPStructureToOld(string page) 
+        {
+            var result = new DailyRaces();
+            result.Courses = new List<Course>();
+            try
+            {
+                var events = new List<SubMeeting>();
+
+                //Convert Json to model
+                var meetingAndRaceIds = JsonConvert.DeserializeObject<GetRaceBase>(page);
+
+                foreach (var eventId in meetingAndRaceIds.Meetings.EventIds)
+                {
+                    var eventData = await ExtractJson(page, $"\"{eventId.ToString()}\":", "},", 0, 0);
+                    eventData = FormatJsonString(eventData);
+                    events.Add(JsonConvert.DeserializeObject<SubMeeting>(eventData));
+                }
+
+                foreach (var even in events) 
+                {
+                    var races = new List<NewRaceModel>();
+
+                    foreach (var raceId in even.RaceIds) 
+                    {
+                        var raceData = await ExtractJson(page, $"\"{raceId.ToString()}\":", ",\"startScheduledDatetimeUTC\"", 0, 0);
+                        raceData = FormatJsonString(raceData);
+                        races.Add(JsonConvert.DeserializeObject<NewRaceModel>(raceData));
+                    }
+
+                    var racesToAdd = new List<Race>();
+
+                    foreach (var race in races) 
+                    {
+                        racesToAdd.Add(new Race()
+                        {
+                            Id = race.RPRaceId,
+                            RaceURL = race.RaceUrl,
+                            Date = race.Date,
+                            Abandoned = race.Abandoned,
+                            HasRaceOffers = false,
+                            IsNextRace = false,
+                            IsThirthyMinToNextRace = false,
+                            Result = false,
+                            Runners = race.Runners,
+                            Started = "",
+                            Time = race.Time,
+                            Title = race.Title,
+                            RaceClass = String.IsNullOrEmpty(race.Class) ? 0 : Int32.Parse(race.Class),
+                            Distance = race.Distance,
+                            Ages = race.Ages,
+                            Weather = even.Weather,
+                            Going = race.Going
+                        });
+                    }
+
+                    result.Courses.Add(new Course()
+                    {
+                        Id = even.RacingPostId,
+                        Name = even.Name,
+                        Races = racesToAdd,
+                        Abandoned = even.IsAbandoned,
+                        AllWeather = false,
+                        Colour = 0,
+                        CountryCode = even.CountryCode,
+                        HashName = even.HashName,
+                        SurfaceType = even.SurfaceType, //This will be taken from Race Now
+                        meetingTypeCode = even.MeetingType,
+                        MeetingUrl = "" //No longer have this :(
+                    });
+                }
+
+               
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        private string FormatJsonString(string jsonString) 
+        {
+            if (jsonString.Last().ToString() != "}")
+            {
+                jsonString = jsonString + "}";
+            }
+            if (jsonString.First().ToString() != "{")
+            {
+                jsonString = "{" + jsonString;
+            }
+            return jsonString;
         }
     }
 }

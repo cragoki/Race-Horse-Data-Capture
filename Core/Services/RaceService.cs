@@ -38,23 +38,11 @@ namespace Core.Services
                     Logger.Info($"Fetching Races for event {even.name}.");
 
                     //Get all of the raceUrls/Weather/course Url for this event
-                    var races = await _scraperService.RetrieveRacesForEvent(even);
-
-                    //Add course URL if one does not already exist
-                    var course = _eventRepository.GetCourseById(even.course_id);
-                    if (string.IsNullOrEmpty(course.course_url)) 
-                    {
-                        course.course_url = races.CourseUrl;
-                        course.rp_course_id = Int32.Parse(Regex.Match(course.course_url, @"\d+").Value);
-                        _eventRepository.UpdateCourse(course);
-                    }
+                    var races = _eventRepository.GetRacesForEvent(EventId);
 
                     //Add Each race
-                    foreach (var race in races.RaceEntities) 
+                    foreach (var race in races) 
                     {
-                        //Add to database
-                        _eventRepository.AddRace(race);
-
                         //Now use the race URL to fetch the Horses/Trainers/Owners
                         var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
 

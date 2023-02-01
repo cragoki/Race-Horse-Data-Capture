@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Core.Models.RP.GetRaceNew;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -54,9 +55,14 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_surface_type.Where(x => x.surface_type_id == surface).FirstOrDefault().surface_type;
         }
 
-        public int AddOrReturnAgeType(string age)
+        public int? AddOrReturnAgeType(string age)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(age))
+            {
+                return null;
+            }
 
             var existing = _context.tb_age_type.Where(x => x.age_type == age).FirstOrDefault();
 
@@ -80,9 +86,14 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int AddOrReturnDistanceType(string distance)
+        public int? AddOrReturnDistanceType(string distance)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(distance))
+            {
+                return null;
+            }
 
             var existing = _context.tb_distance_type.Where(x => x.distance_type == distance).FirstOrDefault();
 
@@ -106,9 +117,14 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int AddOrReturnGoingType(string going)
+        public int? AddOrReturnGoingType(string going)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(going))
+            {
+                return null;
+            }
 
             var existing = _context.tb_going_type.Where(x => x.going_type == going).FirstOrDefault();
 
@@ -132,9 +148,14 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int AddOrReturnMeetingType(string meeting)
+        public int? AddOrReturnMeetingType(string meeting)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(meeting))
+            {
+                return null;
+            }
 
             var existing = _context.tb_meeting_type.Where(x => x.meeting_type == meeting).FirstOrDefault();
 
@@ -158,9 +179,14 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int AddOrReturnStallsType(string stalls)
+        public int? AddOrReturnStallsType(string stalls)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(stalls))
+            {
+                return null;
+            }
 
             var existing = _context.tb_stalls_type.Where(x => x.stalls_type == stalls).FirstOrDefault();
 
@@ -184,9 +210,14 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int AddOrReturnSurfaceType(string surface)
+        public int? AddOrReturnSurfaceType(string surface)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(surface))
+            {
+                return null;
+            }
 
             var existing = _context.tb_surface_type.Where(x => x.surface_type == surface).FirstOrDefault();
 
@@ -210,9 +241,14 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int AddOrReturnWeatherType(string weather)
+        public int? AddOrReturnWeatherType(string weather)
         {
             int result = 0;
+
+            if (string.IsNullOrEmpty(weather)) 
+            {
+                return null;
+            }
 
             var existing = _context.tb_weather_type.Where(x => x.weather_type == weather).FirstOrDefault();
 

@@ -43,5 +43,15 @@ namespace Core.Models.GetRace
 
         [JsonProperty("isThirthyMinToNextRace")]
         public bool IsThirthyMinToNextRace { get; set; }
+        [JsonProperty("raceClass")]
+        public int RaceClass { get; set; }
+        [JsonProperty("displayDistance")]
+        public string Distance { get; set; }
+        [JsonProperty("ageRestriction")]
+        public string Ages { get; set; }
+        [JsonProperty("going")]
+        public string Going { get; set; }
+        [JsonProperty("weather")]
+        public string Weather { get; set; }
     }
 }

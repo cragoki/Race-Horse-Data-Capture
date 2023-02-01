@@ -28,6 +28,7 @@ namespace Core.Services
         public async Task<List<Event>> GetTodaysEvents(Guid batch)
         {
             var result = new List<Event>();
+            var races = new List<Event>();
 
             try
             {
@@ -38,7 +39,7 @@ namespace Core.Services
                 //Return necessary information
                 foreach (var even in todaysRaces.Courses)
                 {
-                    AddDbInfoForEvent(even, batch);
+                    AddDbInfoForEventAndRaces(even, batch);
 
                     //Now Collect the generated event_id based on the course and batch
                     var res = new Event()
@@ -113,7 +114,7 @@ namespace Core.Services
             return result;
         }
 
-        private void AddDbInfoForEvent(Course even, Guid batchId)
+        private void AddDbInfoForEventAndRaces(Course even, Guid batchId)
         {
             var eventName = $"{even.Name}_{DateTime.Now.ToShortDateString()}";
             int? surfaceTypeId = null;
@@ -157,7 +158,29 @@ namespace Core.Services
                     batch_id = batchId
                 };
 
-                _eventRepository.AddEvent(ev);
+                int eventId = _eventRepository.AddEvent(ev);
+                CheckAndAddCourse(course);
+
+                foreach (var race in even.Races) 
+                {
+                    var raceEntity = new RaceEntity()
+                    {
+                        event_id = eventId,
+                        no_of_horses = race.Runners,
+                        race_class = race.RaceClass,
+                        distance = _mappingTableRepository.AddOrReturnDistanceType(race.Distance),
+                        ages = _mappingTableRepository.AddOrReturnAgeType(race.Ages),
+                        description = "",
+                        completed = false,
+                        going = _mappingTableRepository.AddOrReturnGoingType(race.Going),
+                        race_time = race.Time,
+                        race_url = race.RaceURL,
+                        weather = _mappingTableRepository.AddOrReturnWeatherType(race.Weather),
+                        rp_race_id = race.Id
+                    };
+
+                    _eventRepository.AddRace(raceEntity);
+                }
             }
             catch (Exception ex) 
             {
@@ -183,6 +206,28 @@ namespace Core.Services
                 }
             }
             catch (Exception ex) 
+            {
+                Logger.Error($"!!! Error attempting to store course {course.name}.. {ex.Message} !!!");
+            }
+        }
+
+        private void CheckAndAddDistance(CourseEntity course)
+        {
+            try
+            {
+                var courses = _eventRepository.GetCourses();
+
+                if (courses.Any(x => x.course_id == course.course_id))
+                {
+                    Logger.Info($"{course.name} already exists in the database.");
+                }
+                else
+                {
+                    _eventRepository.AddCourse(course);
+                    _eventRepository.SaveChanges();
+                }
+            }
+            catch (Exception ex)
             {
                 Logger.Error($"!!! Error attempting to store course {course.name}.. {ex.Message} !!!");
             }

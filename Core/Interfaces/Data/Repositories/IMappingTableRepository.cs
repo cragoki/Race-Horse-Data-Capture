@@ -14,13 +14,13 @@ namespace Core.Interfaces.Data.Repositories
         string GetStallsType(int stalls);
         string GetWeatherType(int weather);
         string GetSurfaceType(int surface);
-        int AddOrReturnAgeType(string age);
-        int AddOrReturnDistanceType(string distance);
-        int AddOrReturnGoingType(string going);
-        int AddOrReturnMeetingType(string meeting);
-        int AddOrReturnStallsType(string stalls);
-        int AddOrReturnSurfaceType(string surface);
-        int AddOrReturnWeatherType(string weather);
+        int? AddOrReturnAgeType(string age);
+        int? AddOrReturnDistanceType(string distance);
+        int? AddOrReturnGoingType(string going);
+        int? AddOrReturnMeetingType(string meeting);
+        int? AddOrReturnStallsType(string stalls);
+        int? AddOrReturnSurfaceType(string surface);
+        int? AddOrReturnWeatherType(string weather);
         void SaveChanges();
     }
 }
