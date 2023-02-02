@@ -25,13 +25,13 @@ namespace Infrastructure.Data.Repositories
 
         public BatchEntity GetMostRecentBatch()
         {
-            return _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).FirstOrDefault();
+            return _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).ToList().FirstOrDefault();
         }
 
         public BatchEntity GetNextBatch(Guid currentBatch)
         {
             var batches = _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).ToList();
-            Int32 index = batches.IndexOf(batches.Where(x => x.batch_id == currentBatch).FirstOrDefault());
+            Int32 index = batches.IndexOf(batches.Where(x => x.batch_id == currentBatch).ToList().FirstOrDefault());
             if (index == 0)
             {
                 return new BatchEntity();
@@ -42,13 +42,13 @@ namespace Infrastructure.Data.Repositories
         public BatchEntity GetPreviousBatch(Guid currentBatch)
         {
             var batches = _context.tb_batch.AsNoTracking().OrderByDescending(x => x.date).ToList();
-            Int32 index = batches.IndexOf(batches.Where(x => x.batch_id == currentBatch).FirstOrDefault());
+            Int32 index = batches.IndexOf(batches.Where(x => x.batch_id == currentBatch).ToList().FirstOrDefault());
             return batches.ElementAt(index + 1) ?? null;
         }
 
         public BacklogDateEntity GetBacklogDate()
         {
-            return _context.tb_backlog_date.FirstOrDefault();
+            return _context.tb_backlog_date.ToList().FirstOrDefault();
         }
         public void UpdateBacklogDate(DateTime date)
         {
@@ -59,7 +59,7 @@ namespace Infrastructure.Data.Repositories
 
         public JobEntity GetJobInfo(JobEnum job)
         {
-            return _context.tb_job.Where(x => x.job_id == (int)job).FirstOrDefault();
+            return _context.tb_job.Where(x => x.job_id == (int)job).ToList().FirstOrDefault();
         }
 
         public List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId)
@@ -69,7 +69,7 @@ namespace Infrastructure.Data.Repositories
 
         public void UpdateNextExecution(JobEnum job)
         {
-            var jobDb = _context.tb_job.Where(x => x.job_id == (int)job).FirstOrDefault();
+            var jobDb = _context.tb_job.Where(x => x.job_id == (int)job).ToList().FirstOrDefault();
             var tomorrow = DateTime.Now.AddDays(1);
             switch (job) 
             {

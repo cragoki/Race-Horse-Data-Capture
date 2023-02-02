@@ -26,19 +26,19 @@ namespace Infrastructure.Data.Repositories
 
         public AlgorithmEntity GetAlgorithmById(int algorithmId)
         {
-            return _context.tb_algorithm.Include(x => x.Variables).Include(x => x.Settings).Where(x => x.algorithm_id == algorithmId).FirstOrDefault();
+            return _context.tb_algorithm.Include(x => x.Variables).Include(x => x.Settings).Where(x => x.algorithm_id == algorithmId).ToList().FirstOrDefault();
 
         }
 
         public VariableEntity GetVariableById(int variableId)
         {
-            return _context.tb_variable.Where(x => x.variable_id == variableId).FirstOrDefault();
+            return _context.tb_variable.Where(x => x.variable_id == variableId).ToList().FirstOrDefault();
 
         }
 
         public AlgorithmVariableEntity GetAlgorithmVariableById(int algorithmVariableId)
         {
-            return _context.tb_algorithm_variable.Where(x => x.algorithm_variable_id == algorithmVariableId).FirstOrDefault();
+            return _context.tb_algorithm_variable.Where(x => x.algorithm_variable_id == algorithmVariableId).ToList().FirstOrDefault();
         }
         public List<AlgorithmVariableEntity> GetAlgorithmVariableByAlgorithmId(int algorithmId)
         {
@@ -47,7 +47,7 @@ namespace Infrastructure.Data.Repositories
 
         public AlgorithmEntity GetActiveAlgorithm()
         {
-            return _context.tb_algorithm.Where(x => x.active == true).FirstOrDefault();
+            return _context.tb_algorithm.Where(x => x.active == true).ToList().FirstOrDefault();
         }
 
         public void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity)

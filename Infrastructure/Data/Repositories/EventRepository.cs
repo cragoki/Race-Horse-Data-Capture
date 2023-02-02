@@ -115,24 +115,25 @@ namespace Infrastructure.Data.Repositories
         }
         public CourseEntity GetCourseById(int courseId)
         {
-            return _context.tb_course.Where(x => x.course_id == courseId).FirstOrDefault();
+            return _context.tb_course.Where(x => x.course_id == courseId).ToList().FirstOrDefault();
         }
         public MeetingType GetMeetingTypeById(int meetingTypeId)
         {
-            return _context.tb_meeting_type.Where(x => x.meeting_type_id == meetingTypeId).FirstOrDefault();
+            return _context.tb_meeting_type.Where(x => x.meeting_type_id == meetingTypeId).ToList().FirstOrDefault();
         }
         public SurfaceType GetSurfaceTypeById(int surfaceTypeId)
         {
-            return _context.tb_surface_type.Where(x => x.surface_type_id == surfaceTypeId).FirstOrDefault();
+            return _context.tb_surface_type.Where(x => x.surface_type_id == surfaceTypeId).ToList().FirstOrDefault();
         }
         public EventEntity GetEventById(int eventId)
+        
         {
-            return _context.tb_event.Find(eventId);
+            return _context.tb_event.Where(x => x.event_id == eventId).ToList().FirstOrDefault();
         }
 
         public EventEntity GetEventByBatch(int courseId, Guid batch) 
         {
-            return _context.tb_event.Where(x => x.course_id == courseId && x.batch_id == batch).FirstOrDefault();
+            return _context.tb_event.Where(x => x.course_id == courseId && x.batch_id == batch).ToList().FirstOrDefault();
         }
         public List<EventEntity> GetEventsByBatch(Guid batch)
         {
@@ -187,7 +188,7 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_race.Where(x => x.Event.created.Date == DateTime.Now.Date).AsNoTracking();
         }
 
-        public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
+        public List<RaceEntity> GetRacesForEvent(int eventId)
         {
             return _context.tb_race.Where(x => x.event_id == eventId)
                 .Include(x => x.RaceHorses)
@@ -207,7 +208,7 @@ namespace Infrastructure.Data.Repositories
                                         .ThenInclude(x => x.Races)
                                             .ThenInclude(x => x.Race)
                                                 .ThenInclude(x => x.Event)
-                .Include(x => x.Event).AsNoTrackingWithIdentityResolution();
+                .Include(x => x.Event).ToList();
         }
 
         public IEnumerable<RaceEntity> GetRacesForBatch(Guid batchId)
@@ -237,7 +238,7 @@ namespace Infrastructure.Data.Repositories
 
         public RaceEntity GetRaceById(int raceId)
         {
-            return _context.tb_race.Where(x => x.race_id == raceId).FirstOrDefault();
+            return _context.tb_race.Where(x => x.race_id == raceId).ToList().FirstOrDefault();
         }
 
         public RaceEntity GetAllRaceDataById(int raceId)
@@ -262,7 +263,7 @@ namespace Infrastructure.Data.Repositories
                     .ThenInclude(x => x.Jockey)
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Trainer)
-                .Where(x => x.race_id == raceId).FirstOrDefault();
+                .Where(x => x.race_id == raceId).ToList().FirstOrDefault();
         }
 
         public RaceEntity GetRaceByURL(string raceURL) 
@@ -285,7 +286,7 @@ namespace Infrastructure.Data.Repositories
                                             .ThenInclude(x => x.Race)
                                                 .ThenInclude(x => x.Event)
                 .Include(x => x.Event)
-                .Where(x => x.race_url == raceURL).FirstOrDefault();
+                .Where(x => x.race_url == raceURL).ToList().FirstOrDefault();
         }
         public List<RaceEntity> GetAllRaces()
         {

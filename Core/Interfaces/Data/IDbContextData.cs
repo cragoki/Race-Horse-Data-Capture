@@ -29,5 +29,6 @@ namespace Core.Interfaces.Data
         DbSet<WeatherType> tb_weather_type { get; set; }
         DbSet<AlgorithmSettingsEntity> tb_algorithm_settings { get; set; }
         DbSet<AlgorithmPredictionEntity> tb_algorithm_prediction { get; set; }
+        void DetachAllEntities();
     }
 }

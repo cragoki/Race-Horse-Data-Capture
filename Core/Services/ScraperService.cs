@@ -136,7 +136,7 @@ namespace Core.Services
 
                 var horseContainers = htmlDoc.DocumentNode.SelectNodes("//div[contains(@class,'RC-runnerCardWrapper')]");
 
-                foreach (var horse in horseContainers)
+                foreach (var horse in horseContainers.ToList())
                 {
                     var raceHorse = new RaceHorseEntity()
                     {
@@ -388,7 +388,7 @@ namespace Core.Services
                             date = DateTime.Now
                         };
                         existingHorse.rpr = horse.rpr;
-                        _horseRepository.AddArchiveHorse(horseArchiveRPR);
+                        existingHorse.Archive.Add(horseArchiveRPR);
                     }
                     if (horse.top_speed != existingHorse.top_speed)
                     {
@@ -401,7 +401,7 @@ namespace Core.Services
                             date = DateTime.Now
                         };
                         existingHorse.top_speed = horse.top_speed;
-                        _horseRepository.AddArchiveHorse(horseArchiveTS);
+                        existingHorse.Archive.Add(horseArchiveTS);
                     }
 
                     _horseRepository.UpdateHorse(existingHorse);

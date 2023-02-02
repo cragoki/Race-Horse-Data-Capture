@@ -19,7 +19,7 @@ namespace Infrastructure.Data.Repositories
 
         public HorseEntity GetHorse(int horse_id)
         {
-            return _context.tb_horse.Where(x => x.horse_id == horse_id).FirstOrDefault();
+            return _context.tb_horse.Where(x => x.horse_id == horse_id).ToList().FirstOrDefault();
         }
         public HorseEntity GetHorseWithRaces(int horse_id)
         {
@@ -51,11 +51,12 @@ namespace Infrastructure.Data.Repositories
                     .ThenInclude(x => x.Race)
                         .ThenInclude(x => x.RaceHorses)
                             .ThenInclude(x => x.Horse)
-                .FirstOrDefault();
+                .ToList().FirstOrDefault();
         }
         public HorseEntity GetHorseByRpId(int rp_id)
         {
-            return _context.tb_horse.Where(x => x.rp_horse_id == rp_id).FirstOrDefault();
+            var result = _context.tb_horse.Include(x => x.Archive).Where(x => x.rp_horse_id == rp_id).ToList().FirstOrDefault();
+            return result;
         }
         public List<HorseArchiveEntity> GetHorseArchive(int horse_id)
         {
@@ -63,6 +64,7 @@ namespace Infrastructure.Data.Repositories
         }
         public int AddHorse(HorseEntity horse)
         {
+            _context.DetachAllEntities();
             _context.tb_horse.Add(horse);
             SaveChanges();
 
@@ -74,6 +76,7 @@ namespace Infrastructure.Data.Repositories
         }
         public void AddRaceHorse(RaceHorseEntity horse)
         {
+            _context.DetachAllEntities();
             _context.tb_race_horse.Add(horse);
             SaveChanges();
         }
@@ -86,24 +89,28 @@ namespace Infrastructure.Data.Repositories
 
         public void AddArchiveHorse(HorseArchiveEntity horse)
         {
+            _context.DetachAllEntities();
             _context.tb_archive_horse.Add(horse);
             SaveChanges();
         }
 
         public void UpdateHorse(HorseEntity horse)
         {
+            _context.DetachAllEntities();
             _context.tb_horse.Update(horse);
             SaveChanges();
         }
 
         public void UpdateHorseArchive(HorseArchiveEntity horse)
         {
+            _context.DetachAllEntities();
             _context.tb_archive_horse.Update(horse);
             SaveChanges();
         }
 
         public int AddJockey(JockeyEntity jockey)
         {
+            _context.DetachAllEntities();
             _context.tb_jockey.Add(jockey);
             SaveChanges();
 
@@ -112,6 +119,7 @@ namespace Infrastructure.Data.Repositories
 
         public int AddTrainer(TrainerEntity trainer)
         {
+            _context.DetachAllEntities();
             _context.tb_trainer.Add(trainer);
             SaveChanges();
 
@@ -120,12 +128,12 @@ namespace Infrastructure.Data.Repositories
 
         public JockeyEntity GetJockeyByName(string name)
         {
-            return _context.tb_jockey.Where(x => x.jockey_name == name).FirstOrDefault();
+            return _context.tb_jockey.Where(x => x.jockey_name == name).ToList().FirstOrDefault();
         }
 
         public JockeyEntity GetJockeyById(int id) 
         {
-            return _context.tb_jockey.Where(x => x.jockey_id == id).FirstOrDefault();
+            return _context.tb_jockey.Where(x => x.jockey_id == id).ToList().FirstOrDefault();
         }
         public TrainerEntity GetTrainerByName(string name)
         {
@@ -133,7 +141,7 @@ namespace Infrastructure.Data.Repositories
         }
         public TrainerEntity GetTrainerById(int id)
         {
-            return _context.tb_trainer.Where(x => x.trainer_id == id).FirstOrDefault();
+            return _context.tb_trainer.Where(x => x.trainer_id == id).ToList().FirstOrDefault();
         }
 
         public IEnumerable<RaceEntity> GetNoResultRaces()

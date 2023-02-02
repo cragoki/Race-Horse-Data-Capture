@@ -20,11 +20,11 @@ namespace Infrastructure.Data.Repositories
 
         public string GetAgeType(int age)
         {
-            return _context.tb_age_type.Where(x => x.age_type_id == age).FirstOrDefault().age_type;
+            return _context.tb_age_type.Where(x => x.age_type_id == age).ToList().FirstOrDefault().age_type;
         }
         public string GetDistanceType(int distance)
         {
-            return _context.tb_distance_type.Where(x => x.distance_type_id == distance).FirstOrDefault().distance_type;
+            return _context.tb_distance_type.Where(x => x.distance_type_id == distance).ToList().FirstOrDefault().distance_type;
         }
         public List<DistanceType> GetDistanceTypes()
         {
@@ -32,7 +32,7 @@ namespace Infrastructure.Data.Repositories
         }
         public string GetGoingType(int going)
         {
-            return _context.tb_going_type.Where(x => x.going_type_id == going).FirstOrDefault().going_type;
+            return _context.tb_going_type.Where(x => x.going_type_id == going).ToList().FirstOrDefault().going_type;
         }
         public List<GoingType> GetGoingTypes()
         {
@@ -40,19 +40,19 @@ namespace Infrastructure.Data.Repositories
         }
         public string GetMeetingType(int meeting)
         {
-            return _context.tb_meeting_type.Where(x => x.meeting_type_id == meeting).FirstOrDefault().meeting_type;
+            return _context.tb_meeting_type.Where(x => x.meeting_type_id == meeting).ToList().FirstOrDefault().meeting_type;
         }
         public string GetStallsType(int stalls)
         {
-            return _context.tb_stalls_type.Where(x => x.stalls_type_id == stalls).FirstOrDefault().stalls_type;
+            return _context.tb_stalls_type.Where(x => x.stalls_type_id == stalls).ToList().FirstOrDefault().stalls_type;
         }
         public string GetWeatherType(int weather)
         {
-            return _context.tb_weather_type.Where(x => x.weather_type_id == weather).FirstOrDefault().weather_type;
+            return _context.tb_weather_type.Where(x => x.weather_type_id == weather).ToList().FirstOrDefault().weather_type;
         }
         public string GetSurfaceType(int surface)
         {
-            return _context.tb_surface_type.Where(x => x.surface_type_id == surface).FirstOrDefault().surface_type;
+            return _context.tb_surface_type.Where(x => x.surface_type_id == surface).ToList().FirstOrDefault().surface_type;
         }
 
         public int? AddOrReturnAgeType(string age)
@@ -64,7 +64,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_age_type.Where(x => x.age_type == age).FirstOrDefault();
+            var existing = _context.tb_age_type.Where(x => x.age_type == age).ToList().FirstOrDefault();
 
             if (existing == null)
             {
@@ -95,7 +95,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_distance_type.Where(x => x.distance_type == distance).FirstOrDefault();
+            var existing = _context.tb_distance_type.Where(x => x.distance_type == distance).ToList().FirstOrDefault();
 
             if (existing == null)
             {
@@ -126,7 +126,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_going_type.Where(x => x.going_type == going).FirstOrDefault();
+            var existing = _context.tb_going_type.Where(x => x.going_type == going).ToList().FirstOrDefault();
 
             if (existing == null)
             {
@@ -157,7 +157,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_meeting_type.Where(x => x.meeting_type == meeting).FirstOrDefault();
+            var existing = _context.tb_meeting_type.Where(x => x.meeting_type == meeting).ToList().FirstOrDefault();
 
             if (existing == null)
             {
@@ -188,7 +188,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_stalls_type.Where(x => x.stalls_type == stalls).FirstOrDefault();
+            var existing = _context.tb_stalls_type.Where(x => x.stalls_type == stalls).ToList().FirstOrDefault();
 
             if (existing == null)
             {
@@ -219,7 +219,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_surface_type.Where(x => x.surface_type == surface).FirstOrDefault();
+            var existing = _context.tb_surface_type.Where(x => x.surface_type == surface).ToList().FirstOrDefault();
 
             if (existing == null)
             {
@@ -250,7 +250,7 @@ namespace Infrastructure.Data.Repositories
                 return null;
             }
 
-            var existing = _context.tb_weather_type.Where(x => x.weather_type == weather).FirstOrDefault();
+            var existing = _context.tb_weather_type.Where(x => x.weather_type == weather).ToList().FirstOrDefault();
 
             if (existing == null)
             {
