@@ -259,10 +259,14 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Races)
                             .ThenInclude(x => x.Race)
                                 .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.Course)
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Jockey)
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Trainer)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Archive)
                 .Where(x => x.race_id == raceId).ToList().FirstOrDefault();
         }
 
