@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Models.Algorithm;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 
@@ -19,41 +20,48 @@ namespace Core.Helpers
             {
                 foreach (var distance in distances)
                 {
-                    var distanceParsed = DistanceBuilder(distance.distance_type);
-
-                    //Sprints and specialist have no miles
-                    if (distanceParsed.Miles == 0)
+                    try
                     {
-                        if (distanceParsed.Furlongs > 0)
+                        var distanceParsed = DistanceBuilder(distance.distance_type);
+
+                        //Sprints and specialist have no miles
+                        if (distanceParsed.Miles == 0)
                         {
-                            if (distanceParsed.Furlongs >= 7)
+                            if (distanceParsed.Furlongs > 0)
                             {
-                                specialist.DistanceIds.Add(distance.distance_type_id);
-                            }
-                            else
-                            {
-                                sprints.DistanceIds.Add(distance.distance_type_id);
+                                if (distanceParsed.Furlongs >= 7)
+                                {
+                                    specialist.DistanceIds.Add(distance.distance_type_id);
+                                }
+                                else
+                                {
+                                    sprints.DistanceIds.Add(distance.distance_type_id);
+                                }
                             }
                         }
-                    }
-                    else 
-                    {
-                        //Determine between staying and middle
-                        if (distanceParsed.Miles == 1)
+                        else
                         {
-                            if (distanceParsed.Furlongs <= 5)
+                            //Determine between staying and middle
+                            if (distanceParsed.Miles == 1)
                             {
-                                middle.DistanceIds.Add(distance.distance_type_id);
+                                if (distanceParsed.Furlongs <= 5)
+                                {
+                                    middle.DistanceIds.Add(distance.distance_type_id);
+                                }
+                                else
+                                {
+                                    staying.DistanceIds.Add(distance.distance_type_id);
+                                }
                             }
-                            else 
+                            else
                             {
                                 staying.DistanceIds.Add(distance.distance_type_id);
                             }
                         }
-                        else 
-                        {
-                            staying.DistanceIds.Add(distance.distance_type_id);
-                        }
+                    }
+                    catch (Exception ex) 
+                    {
+                        //Ignore those with incorrect format
                     }
                 }
             }
@@ -156,8 +164,17 @@ namespace Core.Helpers
         public static DistanceModel DistanceBuilder(string distance)
         {
             var result = new DistanceModel();
-
             var distanceArray = distance.ToCharArray();
+            string str = new string(distanceArray);
+
+            int? index = str.IndexOf('½');
+            if (index != -1)
+            {
+                str = str.Remove(index ?? 0, 1);
+            }
+
+            distanceArray = str.ToCharArray();
+
             foreach (var character in distanceArray)
             {
                 if (Char.IsLetter(character))
@@ -186,6 +203,7 @@ namespace Core.Helpers
         {
             var index = Array.IndexOf(distanceArray, character);
             var numberString = "";
+
             for (int i = index - 1; Char.IsDigit(distanceArray[i]); i--)
             {
                 if (Char.IsLetter(distanceArray[i]))

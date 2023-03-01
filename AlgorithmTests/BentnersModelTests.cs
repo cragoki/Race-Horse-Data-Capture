@@ -1,12 +1,13 @@
 using Core.Algorithms;
-using Core.Entities;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data;
 using Core.Interfaces.Data.Repositories;
 using Core.Models.Algorithm;
 using Moq;
 using System.Collections.Generic;
-using TestHelpers;
+using TestHelpers.GetCurrentCondition;
+using TestHelpers.MappingTables;
+using TestHelpers.Settings;
 using Xunit;
 
 namespace AlgorithmTests
@@ -16,45 +17,28 @@ namespace AlgorithmTests
 
         #region Individual Methods
         [Fact]
-        public async void ShouldGetCurrentConditionEasyLastTwoRacesOnly()
+        public async void ShouldGetCurrentConditionLastTwoRacesOnly()
         {
 
             var algorithm = InstantiateAlgorithmIndividualMethods();
             var winningHorseId = 1;
             int numberOfHorses = 5;
 
-            //Build Current Event
-            var eventEntity = EventEntityGenerator.GetCurentEvent();
-            //Get RaceHorses for Race
-            var raceHorses = new List<RaceHorseEntity>();
-            for (int i = 0; i >= numberOfHorses; i++)
-            {
-                var index = i + 1;
-                var raceHorse = new RaceHorseEntity();
-                if (index == winningHorseId)
-                {
-
-                }
-                else 
-                {
-                    raceHorse = RaceHorseEntityGenerator.GenerateBasicCurrentRaceHorseEntityNoHistory(i + 1);
-                }
-
-                raceHorses.Add(raceHorse);
-            }
             //Generate Race
-            var race = RaceEntityGenerator.GenerateCurrentRaceEntity(eventEntity, raceHorses);
+            var race = ShouldGetCurrentConditionLastTwoRacesOnlyGenerator.ShouldGetCurrentConditionLastTwoRacesOnlyEntity();
+            var settings = SettingsGenerator.GenerateAlgorithmSettings();
 
-
-            var settings = new List<AlgorithmSettingsEntity>();
             var result = new List<HorsePredictionModel>();
 
-            foreach (var horse in race.RaceHorses) 
+            foreach (var horse in race.RaceHorses)
             {
                 var toAdd = new HorsePredictionModel();
+                toAdd.horse_id = horse.horse_id;
                 toAdd.points += await algorithm.GetCurrentCondition(race, horse.Horse, settings);
                 result.Add(toAdd);
             }
+
+            var a = result;
         }
 
         [Fact]
@@ -127,6 +111,8 @@ namespace AlgorithmTests
             Mock<IMappingTableRepository> mappingRepoMock = new Mock<IMappingTableRepository>();
             Mock<IAlgorithmRepository> algoRepoMock = new Mock<IAlgorithmRepository>();
             Mock<IDbContextData> context = new Mock<IDbContextData>();
+
+            mappingRepoMock.Setup(x => x.GetDistanceTypes()).Returns(GenerateDistanceType.GenerateDistanceTypes());
 
             return new BentnersModel(configRepoMock.Object, mappingRepoMock.Object, algoRepoMock.Object, context.Object);
         }

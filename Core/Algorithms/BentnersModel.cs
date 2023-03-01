@@ -157,6 +157,7 @@ namespace Core.Algorithms
                 }
             }
 
+            //CONSIDERATION : I THINK IF THERE ARE 2 HORSES. HORSE 1: WON LAST RACE, CAME SECOND IN RACE BEFORE. HORSE 2: CAME SECOND IN LAST RACE AND WON THE RACE BEFORE. HORSE 1 SHOULD BE AHEAD HERE BUT GIVEN CURRENT LOGIC THIS WILL NOT BE THE CASE
             if (placed == 2 || (placed == 0 && won == 1))
             {
                 result += 0.75M;
@@ -231,6 +232,7 @@ namespace Core.Algorithms
         /// <summary>
         /// Distance Preference
         /// Surface Preference
+        /// Jumps/Not Jumps
         /// Condition of surface preference
         /// Specific track preference
         /// </summary>
