@@ -6,6 +6,7 @@ using Core.Interfaces.Data;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models.Algorithm;
+using Core.Models.Algorithm.Bentners;
 using Core.Models.GetRace;
 using Infrastructure.PunterAdmin.ViewModels;
 using System;
@@ -103,6 +104,7 @@ namespace Core.Algorithms
 
             foreach (var horse in horses)
             {
+                var tracker = new RaceHorseStatisticsTracker();
                 var toAdd = new HorsePredictionModel();
                 toAdd.points = 0;
                 toAdd.horse_id = horse.horse_id;
@@ -116,8 +118,10 @@ namespace Core.Algorithms
                 }
 
                 //Current Condition
-                toAdd.points += await GetCurrentCondition(race, horse.Horse, settings);
-                //TODO, COULD DO WITH STORING THESE IN THE DESCRIPTION
+                var currentCondition = await GetCurrentCondition(race, horse.Horse, settings, tracker);
+                toAdd.points += currentCondition.TotalPointsForGetCurrentCondition;
+                //TODO, COULD DO WITH STORING TRACKER IN DB
+                //REMEMBER TO SET TOTAL POINTS ON TRACKER
 
                 result.Add(toAdd);
             }
@@ -133,21 +137,17 @@ namespace Core.Algorithms
         /// SHOULD WE BE LOOKING AT TB_EVENT RACE TYPE VARIABLE HERE???? JUMPS/NOT JUMPS
         /// </summary>
         /// <returns></returns>
-        public async Task<decimal> GetCurrentCondition(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings) 
+        public async Task<RaceHorseStatisticsTracker> GetCurrentCondition(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker) 
         {
             decimal result = 0M;
             var reliabilityCurrentCondition = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).FirstOrDefault().setting_value.ToString());
             
 
             //Performance in last 2 races. 0.5 for a single place 0.75 for 2 places, 1 for a place and a win, 1.5 for two wins
-            var lastTwo = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created).OrderByDescending(x => x.Race.Event.created).Take(2);
+            var lastTwo = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id).OrderByDescending(x => x.Race.Event.created).Take(2);
             int placed = 0;
             int won = 0;
 
-            if (horse.horse_id == 17650) 
-            {
-            
-            }
             foreach (var lastRace in lastTwo)
             {
                 var placePosition = SharedCalculations.GetTake(lastRace.Race.no_of_horses ?? 0);
@@ -165,30 +165,89 @@ namespace Core.Algorithms
             if (placed == 2 || (placed == 0 && won == 1))
             {
                 result += 0.75M;
+                tracker.GetCurrentConditionDescription += "--Plus 0.75 for 2 placed or 1 won--";
             }
             else if (placed == 1 && won == 0)
             {
                 result += 0.5M;
+                tracker.GetCurrentConditionDescription += "--Plus 0.5 for 1 placed--";
             }
             else if (placed == 1 && won == 1) 
             {
-                result += 1M;
+                result += 1.25M;
+                tracker.GetCurrentConditionDescription += "--Plus 1.25 for 1 placed and 1 won--";
             }
             else if (won == 2)
             {
-                result += 1.5M;
+                result += 1.75M;
+                tracker.GetCurrentConditionDescription += "--Plus 1.75 for 2 won--";
             }
 
-            //Get the most similar time since last ran race. if won: +0.5, if placed +0.25, if did not place -0.5
-            //would be a query like,
-            //get the time since last race for this current race
-            //get a dictionary of raceIds and time since last race for all of the horses races. 
-            //Find the closest period of time to this race and do the position check, keep in mind that 0 position will be included and should not be given points
+            tracker.TotalPointsForLastTwoRaces = result;
 
+            //Get the most similar time since last ran race. if won: +0.5, if placed +0.25, if did not place -0.25
+            //would be a query like,
+            //get the time since last race for this current race (within a year)
+            var racesOrdered = horse.Races.Where(x => x.position != 0 
+                && x.race_id != race.race_id 
+                && x.Race.Event.created >= race.Event.created.AddYears(-1))
+                .OrderByDescending(x => x.Race.Event.created).ToList();
+
+            if (racesOrdered != null && racesOrdered.Count() > 0) 
+            {
+                var currentRaceDate = race.Event.created;
+                var previousRaceDate = racesOrdered.FirstOrDefault().Race.Event.created;
+                var daysSinceLastRace = (currentRaceDate - previousRaceDate).TotalDays;
+
+                var historicDaysSinceLastRace = new List<DaysSinceLastRaceModel>();
+                //get a dictionary of raceIds and time since last race for all of the horses races. 
+                for (int i = 0; i < racesOrdered.ToList().Count; i++)
+                {
+                    var r1 = racesOrdered.Skip(i).FirstOrDefault();
+                    var r2 = racesOrdered.Skip(i + 1).FirstOrDefault();
+
+                    if (r1 != null && r2 != null)
+                    {
+                        historicDaysSinceLastRace.Add(new DaysSinceLastRaceModel()
+                        {
+                            RaceId = r1.race_id,
+                            DaysSinceLastRace = Convert.ToInt32((r1.Race.Event.created - r2.Race.Event.created).TotalDays)
+                        });
+                    }
+                }
+
+                if (historicDaysSinceLastRace.Count() > 1)
+                {
+                    //Find the closest period of time to this race and do the position check
+                    var closest = historicDaysSinceLastRace.Aggregate((x, y) => Math.Abs(x.DaysSinceLastRace - Convert.ToInt32(daysSinceLastRace)) < Math.Abs(y.DaysSinceLastRace - Convert.ToInt32(daysSinceLastRace)) ? x : y);
+                    var closestRace = racesOrdered.Where(x => x.race_id == closest.RaceId).FirstOrDefault();
+                    var pPos = SharedCalculations.GetTake(closestRace.Race.no_of_horses ?? 0);
+
+                    if (closestRace.position == 1)
+                    {
+                        result += 0.25M;
+                        tracker.TotalPointsForTimeSinceLastRace = 0.25M;
+                        tracker.GetCurrentConditionDescription += $"--Plus 0.25 for a WIN on time since last race. Current = {daysSinceLastRace}. Previous = {closest.DaysSinceLastRace}--";
+                    }
+                    else if (closestRace.position <= pPos)
+                    {
+                        result += 0.10M;
+                        tracker.TotalPointsForTimeSinceLastRace = 0.10M;
+                        tracker.GetCurrentConditionDescription += $"--Plus 0.10 for a PLACE on time since last race. Current = {daysSinceLastRace}. Previous = {closest.DaysSinceLastRace}--";
+                    }
+                    else
+                    {
+                        result -= 0.10M;
+                        tracker.TotalPointsForTimeSinceLastRace = -0.10M;
+                        tracker.GetCurrentConditionDescription += $"--Minus 0.10 for NO PLACE on time since last race. Current = {daysSinceLastRace}. Previous = {closest.DaysSinceLastRace}--";
+                    }
+                }
+            }
 
             //We find that a typical horse's peak racing age is 4.45 years. The rate of improvement from age 2 to 4 1/2 is greater than the rate of decline after age 4 1/2. 
             //so Past peak age by 1-2? -0.25 by 2+? -0.5 <- WRITE QUERY FOR THIS TO VALIDATE
-            return result;
+            tracker.TotalPointsForGetCurrentCondition = result;
+            return tracker;
         }
 
         /// <summary>

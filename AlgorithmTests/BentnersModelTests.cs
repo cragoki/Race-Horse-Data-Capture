@@ -3,9 +3,11 @@ using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data;
 using Core.Interfaces.Data.Repositories;
 using Core.Models.Algorithm;
+using Core.Models.Algorithm.Bentners;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TestHelpers.GetCurrentCondition;
 using TestHelpers.MappingTables;
 using TestHelpers.Settings;
@@ -22,7 +24,7 @@ namespace AlgorithmTests
         {
 
             var algorithm = InstantiateAlgorithmIndividualMethods();
-            var winningHorseId = 228604;
+            var winningHorseId = 17650;
             var b = new DateTime(2022,10,14);
             //Generate Race
             var race = ShouldGetCurrentConditionLastTwoRacesOnlyGenerator.ShouldGetCurrentConditionLastTwoRacesOnlyEntity();
@@ -32,65 +34,40 @@ namespace AlgorithmTests
 
             foreach (var horse in race.RaceHorses)
             {
+                var tracker = new RaceHorseStatisticsTracker();
                 var toAdd = new HorsePredictionModel();
                 toAdd.horse_id = horse.horse_id;
-                toAdd.points += await algorithm.GetCurrentCondition(race, horse.Horse, settings);
+
+                var currentCondition = await algorithm.GetCurrentCondition(race, horse.Horse, settings, tracker);
+                toAdd.points += currentCondition.TotalPointsForGetCurrentCondition;
                 result.Add(toAdd);
             }
+            var maxPoints = result.Max(x => x.points);
+            var winners = result.Where(x => x.points == maxPoints).ToList().Select(x => x.horse_id);
 
-            var a = result;
+            Assert.Contains(winningHorseId, winners);
         }
 
         [Fact]
-        public async void ShouldGetCurrentConditionComplex()
+        public async void ShouldGetPastPerformance()
         {
 
         }
 
         [Fact]
-        public async void ShouldGetPastPerformanceEasy()
+        public async void ShouldGetAdjustmentsPastPerformance()
         {
 
         }
 
         [Fact]
-        public async void ShouldGetPastPerformanceComplex()
+        public async void ShouldGetPresentRaceFactors()
         {
 
         }
 
         [Fact]
-        public async void ShouldGetAdjustmentsPastPerformanceEasy()
-        {
-
-        }
-
-        [Fact]
-        public async void ShouldGetAdjustmentsPastPerformanceComplex()
-        {
-
-        }
-
-        [Fact]
-        public async void ShouldGetPresentRaceFactorsEasy()
-        {
-
-        }
-
-        [Fact]
-        public async void ShouldGetPresentRaceFactorsComplex()
-        {
-
-        }
-
-        [Fact]
-        public async void ShouldGetHorsePreferencesEasy()
-        {
-
-        }
-
-        [Fact]
-        public async void ShoulGetHorsePreferencesComplex()
+        public async void ShouldGetHorsePreferences()
         {
 
         }
