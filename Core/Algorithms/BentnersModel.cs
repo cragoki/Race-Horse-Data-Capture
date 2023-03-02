@@ -137,13 +137,17 @@ namespace Core.Algorithms
         {
             decimal result = 0M;
             var reliabilityCurrentCondition = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).FirstOrDefault().setting_value.ToString());
-            var distances = _mappingRepository.GetDistanceTypes();
-            var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+            
 
             //Performance in last 2 races. 0.5 for a single place 0.75 for 2 places, 1 for a place and a win, 1.5 for two wins
-            var lastTwo = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.Race.race_class <= race.race_class && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0)).OrderByDescending(x => x.Race.Event.created).Take(2);
+            var lastTwo = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created).OrderByDescending(x => x.Race.Event.created).Take(2);
             int placed = 0;
             int won = 0;
+
+            if (horse.horse_id == 17650) 
+            {
+            
+            }
             foreach (var lastRace in lastTwo)
             {
                 var placePosition = SharedCalculations.GetTake(lastRace.Race.no_of_horses ?? 0);
@@ -190,6 +194,7 @@ namespace Core.Algorithms
         /// <summary>
         /// Finishing Position in Past races
         /// Normalized times of Past races TODO
+        /// Performance at class
         /// </summary>
         /// <returns></returns>
         public async Task<decimal> GetPastPerformance(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings)
@@ -240,6 +245,8 @@ namespace Core.Algorithms
         public async Task<decimal> GetHorsePreferences(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings)
         {
             var result = 0;
+            var distances = _mappingRepository.GetDistanceTypes();
+            var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
             var reliabilityHorsePreferences = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityHorsePreferences.ToString()).FirstOrDefault().setting_value.ToString());
             //For Specific Track, try to check the tb_course all weather boolean and the Meeting type (both from tb_event)
             return result;

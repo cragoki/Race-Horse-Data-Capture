@@ -4,6 +4,7 @@ using Core.Interfaces.Data;
 using Core.Interfaces.Data.Repositories;
 using Core.Models.Algorithm;
 using Moq;
+using System;
 using System.Collections.Generic;
 using TestHelpers.GetCurrentCondition;
 using TestHelpers.MappingTables;
@@ -21,9 +22,8 @@ namespace AlgorithmTests
         {
 
             var algorithm = InstantiateAlgorithmIndividualMethods();
-            var winningHorseId = 1;
-            int numberOfHorses = 5;
-
+            var winningHorseId = 228604;
+            var b = new DateTime(2022,10,14);
             //Generate Race
             var race = ShouldGetCurrentConditionLastTwoRacesOnlyGenerator.ShouldGetCurrentConditionLastTwoRacesOnlyEntity();
             var settings = SettingsGenerator.GenerateAlgorithmSettings();

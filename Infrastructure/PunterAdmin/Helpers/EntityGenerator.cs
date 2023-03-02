@@ -29,7 +29,7 @@ namespace Infrastructure.PunterAdmin.Helpers
             result += $"meeting_type = {race.Event.meeting_type}, {Environment.NewLine}";
             result = GenerateMeetingType(result, race);
             result += $"races = {race.Event.races}, {Environment.NewLine}";
-            result += $"created = new DateTime({DateTime.Parse(race.Event.created.Date.ToString().Replace("00:00:00", ""))}), {Environment.NewLine}";
+            result += $"created = new DateTime({race.Event.created.ToString("yyyy,MM,dd").ToString().Replace("/", ",")}), {Environment.NewLine}";
             //Event End
             result += TestCaseHelper.CloseEntity(",");
             return result;
@@ -106,7 +106,7 @@ namespace Infrastructure.PunterAdmin.Helpers
                 result += $"field_changed = {TestCaseHelper.FormatString(archive.field_changed)},{Environment.NewLine}";
                 result += $"old_value = {TestCaseHelper.FormatString(archive.old_value)},{Environment.NewLine}";
                 result += $"new_value = {TestCaseHelper.FormatString(archive.new_value)},{Environment.NewLine}";
-                result += $"date = new DateTime({DateTime.Parse(archive.date.Date.ToString().Replace("00:00:00", ""))}), {Environment.NewLine}";
+                result += $"date = new DateTime({archive.date.ToString("yyyy,MM,dd").ToString().Replace("/", ",")}), {Environment.NewLine}";
                 result += TestCaseHelper.CloseEntity(",");
             }
             //HORSE END
