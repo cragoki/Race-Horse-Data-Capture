@@ -2,7 +2,9 @@
 using Core.Helpers;
 using Core.Models.GetRace;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using System;
+using System.Linq;
 
 namespace Infrastructure.PunterAdmin.Helpers
 {
@@ -32,25 +34,105 @@ namespace Infrastructure.PunterAdmin.Helpers
             result += TestCaseHelper.CloseEntity(",");
             return result;
         }
-        public static string GenerateRace()
+        public static string GenerateRace(string result, RaceEntity race)
         {
-            return "";
+            result += $"Race = {TestCaseHelper.NewEntity("RaceEntity")}";
+            result += $"race_id = {race.race_id},{Environment.NewLine}";
+            result += $"race_time = {TestCaseHelper.FormatString(race.race_time)},{Environment.NewLine}";
+            result += $"rp_race_id = {race.rp_race_id},{Environment.NewLine}";
+            result += $"weather = {race.weather},{Environment.NewLine}";
+            result += $"no_of_horses = {race.no_of_horses},{Environment.NewLine}";
+            result += $"going = {race.going.ToString() ?? "null"},{Environment.NewLine}";
+            result += $"distance = {race.distance.ToString() ?? "null"},{Environment.NewLine}";
+            result += $"race_class = {race.race_class.ToString() ?? "null"},{Environment.NewLine}";
+            result += $"ages = {race.ages.ToString() ?? "null"},{Environment.NewLine}";
+            result += $"completed = {race.completed.ToString().ToLower()},{Environment.NewLine}";
+            result += $"event_id = {race.event_id},{Environment.NewLine}";
+            //EVENT ENTITY
+            result = GenerateEvent(result, race);
+            //RACE END
+            result += TestCaseHelper.CloseEntity(",");
+
+            return result;
         }
-        public static string GenerateRaceHorse()
+        public static string GenerateRaceHorse(string result, RaceHorseEntity pastRace)
         {
-            return "";
+            //RACE HORSE ENTITY
+            result += $"{TestCaseHelper.NewEntity("RaceHorseEntity")}";
+            result += $"race_horse_id = {pastRace.race_horse_id},{Environment.NewLine}";
+            result += $"horse_id = {pastRace.horse_id},{Environment.NewLine}";
+            result += $"weight = {TestCaseHelper.FormatString(pastRace.weight)},{Environment.NewLine}";
+            result += $"age = {pastRace.age},{Environment.NewLine}";
+            result += $"trainer_id = {pastRace.trainer_id},{Environment.NewLine}";
+            result += $"jockey_id = {pastRace.jockey_id},{Environment.NewLine}";
+            result += $"finished = {pastRace.finished.ToString().ToLower()},{Environment.NewLine}";
+            result += $"position = {pastRace.position},{Environment.NewLine}";
+            result += $"race_id = {pastRace.race_id},{Environment.NewLine}";
+            //GENERATE RACE ENTITY, EVENT ENTITY AND POTENTIALLY RACE HORSES <- {potentially divide the above into submethods? As this work has already been done
+            result = GenerateRace(result, pastRace.Race);
+            //RACE HORSE END
+            result += TestCaseHelper.CloseEntity(",");
+
+            return result;
         }
-        public static string GenerateHorse()
+        public static string GenerateHorse(string result, RaceEntity race, RaceHorseEntity horse)
         {
-            return "";
+            //HORSE ENTITY
+            result += $"Horse = {TestCaseHelper.NewEntity("HorseEntity")}";
+            result += $"horse_id = {horse.horse_id},{Environment.NewLine}";
+            result += $"rp_horse_id = {horse.Horse.rp_horse_id},{Environment.NewLine}";
+            result += $"horse_name = {TestCaseHelper.FormatString(horse.Horse.horse_name)},{Environment.NewLine}";
+            result += $"top_speed = {horse.Horse.top_speed ?? 0},{Environment.NewLine}";
+            result += $"rpr = {horse.Horse.rpr ?? 0},{Environment.NewLine}";
+            //GENERATE RACE HISTORY
+            //Need a list of race horse entities, linked to a race with a set of race horses, then linked to an event
+            result += "Races = new List<RaceHorseEntity>() {";
+            result += $"{Environment.NewLine}";
+            foreach (var pastRace in horse.Horse.Races.Where(x => x.Race.Event.created < race.Event.created))
+            {
+                result = GenerateRaceHorse(result, pastRace);
+            }
+            result += TestCaseHelper.CloseEntity(",");
+
+            //GENERATE ARCHIVE
+            result += "Archive = new List<HorseArchiveEntity>() {";
+            result += $"{Environment.NewLine}";
+            foreach (var archive in horse.Horse.Archive.Where(x => x.date <= race.Event.created))
+            {
+                //Archive entity
+                result += $"{TestCaseHelper.NewEntity("HorseArchiveEntity")}";
+                result += $"archive_id = {archive.archive_id},{Environment.NewLine}";
+                result += $"horse_id = {archive.horse_id},{Environment.NewLine}";
+                result += $"field_changed = {TestCaseHelper.FormatString(archive.field_changed)},{Environment.NewLine}";
+                result += $"old_value = {TestCaseHelper.FormatString(archive.old_value)},{Environment.NewLine}";
+                result += $"new_value = {TestCaseHelper.FormatString(archive.new_value)},{Environment.NewLine}";
+                result += $"date = new DateTime({DateTime.Parse(archive.date.Date.ToString().Replace("00:00:00", ""))}), {Environment.NewLine}";
+                result += TestCaseHelper.CloseEntity(",");
+            }
+            //HORSE END
+            result += TestCaseHelper.CloseEntity("");
+            result += TestCaseHelper.CloseEntity(",");
+            return result;
         }
-        public static string GenerateJockey()
+        public static string GenerateJockey(string result, RaceHorseEntity horse)
         {
-            return "";
+            result += $"Jockey = {TestCaseHelper.NewEntity("JockeyEntity")}";
+            result += $"jockey_id = {horse.jockey_id},{Environment.NewLine}";
+            result += $"jockey_name = {TestCaseHelper.FormatString(horse.Jockey.jockey_name)},{Environment.NewLine}";
+            //Jockey END
+            result += TestCaseHelper.CloseEntity(",");
+
+            return result;
         }
-        public static string GenerateTrainer()
+        public static string GenerateTrainer(string result, RaceHorseEntity horse)
         {
-            return "";
+            result += $"Trainer = {TestCaseHelper.NewEntity("TrainerEntity")}";
+            result += $"trainer_id = {horse.trainer_id},{Environment.NewLine}";
+            result += $"trainer_name = {TestCaseHelper.FormatString(horse.Trainer.trainer_name)},{Environment.NewLine}";
+            //TRAINER END
+            result += TestCaseHelper.CloseEntity(",");
+
+            return result;
         }
         public static string GenerateWeather(string result, RaceEntity race)
         {
