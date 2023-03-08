@@ -13,9 +13,9 @@ namespace Core.Interfaces.Algorithms
         Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races);
         Task<List<HorsePredictionModel>> GetHorsePoints(List<RaceHorseEntity> horses, RaceEntity race, List<AlgorithmSettingsEntity> settings);
         Task<RaceHorseStatisticsTracker> GetCurrentCondition(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
-        Task<decimal> GetPastPerformance(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings);
-        Task<decimal> GetAdjustmentsPastPerformance(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings);
-        Task<decimal> GetPresentRaceFactors(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings);
-        Task<decimal> GetHorsePreferences(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings);
+        Task<RaceHorseStatisticsTracker> GetPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetAdjustmentsPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetHorsePreferences(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
     }
 }

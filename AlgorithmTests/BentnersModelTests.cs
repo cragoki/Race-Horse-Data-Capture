@@ -25,7 +25,6 @@ namespace AlgorithmTests
 
             var algorithm = InstantiateAlgorithmIndividualMethods();
             var winningHorseId = 17650;
-            var b = new DateTime(2022,10,14);
             //Generate Race
             var race = ShouldGetCurrentConditionLastTwoRacesOnlyGenerator.ShouldGetCurrentConditionLastTwoRacesOnlyEntity();
             var settings = SettingsGenerator.GenerateAlgorithmSettings();
@@ -51,7 +50,28 @@ namespace AlgorithmTests
         [Fact]
         public async void ShouldGetPastPerformance()
         {
+            var algorithm = InstantiateAlgorithmIndividualMethods();
+            var winningHorseId = 17650;
+            //Generate Race
+            var race = ShouldGetCurrentConditionLastTwoRacesOnlyGenerator.ShouldGetCurrentConditionLastTwoRacesOnlyEntity();
+            var settings = SettingsGenerator.GenerateAlgorithmSettings();
 
+            var result = new List<HorsePredictionModel>();
+
+            foreach (var horse in race.RaceHorses)
+            {
+                var tracker = new RaceHorseStatisticsTracker();
+                var toAdd = new HorsePredictionModel();
+                toAdd.horse_id = horse.horse_id;
+
+                var currentCondition = await algorithm.GetPastPerformance(race, horse.Horse, settings, tracker);
+                toAdd.points += currentCondition.TotalPointsForGetCurrentCondition;
+                result.Add(toAdd);
+            }
+            var maxPoints = result.Max(x => x.points);
+            var winners = result.Where(x => x.points == maxPoints).ToList().Select(x => x.horse_id);
+
+            Assert.Contains(winningHorseId, winners);
         }
 
         [Fact]

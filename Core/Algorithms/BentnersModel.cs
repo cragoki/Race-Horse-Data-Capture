@@ -8,11 +8,15 @@ using Core.Interfaces.Services;
 using Core.Models.Algorithm;
 using Core.Models.Algorithm.Bentners;
 using Core.Models.GetRace;
+using Core.Variables;
 using Infrastructure.PunterAdmin.ViewModels;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Core.Algorithms
@@ -140,6 +144,7 @@ namespace Core.Algorithms
         public async Task<RaceHorseStatisticsTracker> GetCurrentCondition(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker) 
         {
             decimal result = 0M;
+            //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityCurrentCondition = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).FirstOrDefault().setting_value.ToString());
             
 
@@ -256,14 +261,45 @@ namespace Core.Algorithms
         /// Performance at class
         /// </summary>
         /// <returns></returns>
-        public async Task<decimal> GetPastPerformance(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings)
+        public async Task<RaceHorseStatisticsTracker> GetPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
-            var result = 0;
+            var result = 0M;
+            //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityPastPerformance = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityPastPerformance.ToString()).FirstOrDefault().setting_value.ToString());
+            var distances = _mappingRepository.GetDistanceTypes();
+            var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+            var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class).OrderByDescending(x => x.Race.Event.created);
 
             //Number of races placed vs number of races not placed. 75% + placed = +2, 60%+ = +1, 50%+ = +0.5, 0% = -2
+            foreach (var pastRace in pastRaces)
+            {
+                //Reduce this value slightly for each iteration
+                var pointsForWin = 1M;
+                var pointsForPlace = pointsForWin - 0.25M;
+                var placePosition = SharedCalculations.GetTake(pastRace.Race.no_of_horses ?? 0);
 
-            return result;
+                //Check if class is lower and if it is, multiply points to add
+                var difference = race.race_class - pastRace.Race.race_class;
+                var addition = 0.25M * difference;
+                pointsForWin += addition ?? 0;
+
+                if (pastRace.position == 1)
+                {
+                    tracker.TotalPoints += pointsForWin;
+                    tracker.GetPastPerformanceDescription += $"--Plus {pointsForWin} for win at race class {pastRace.Race.race_class}--";
+                    result += pointsForWin;
+                }
+                else if (pastRace.position <= placePosition)
+                {
+                    tracker.TotalPoints += pointsForPlace;
+                    tracker.GetPastPerformanceDescription += $"--Plus {pointsForPlace} for place at race class {pastRace.Race.race_class}--";
+                    result += pointsForPlace;
+                }
+
+            }
+
+            tracker.TotalPointsForPastPerformance = result;
+            return tracker;
         }
 
         /// <summary>
@@ -272,25 +308,44 @@ namespace Core.Algorithms
         /// Jockeys Contribution to last races (performs well with this jockey? +1, performs well regardless of jockey? +1, has not placed with this jockey? 0)
         /// </summary>
         /// <returns></returns>
-        public async Task<decimal> GetAdjustmentsPastPerformance(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings)
+        public async Task<RaceHorseStatisticsTracker> GetAdjustmentsPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
             var result = 0;
+            //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityAdjustmentsPastPerformance = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityAdjustmentsPastPerformance.ToString()).FirstOrDefault().setting_value.ToString());
 
-            return result;
+            //Strength of competition in past races (can either look at RPR (v1) BUT INVESTIGATE TO SEE WHAT IS A GOOD RPR??
+            //But what RPRs don’t do is tell you what types of weight a horse has carried when posting its best ratings. Many horses win handicaps when given a chance to carry a lightweight for the first time, while others are better at carrying big weights against lower-class opponents.
+            //What Else Don’t RPRs Tell You?
+            //RPRs also won’t tell you when a trainer is in form or when a horse is reunited with a jockey that has won it before.
+
+            //Optimal Weight in past races - Get each past race and get the weight for their top 3 performances
+            //May need some sort of diff value (ie. if weight = -2 compared to previous race, +x if -1 +y etc...)
+
+
+            //Has raced with jockey before? If so how has that gone? (performs well with this jockey? +1, performs well regardless of jockey? +1, has not placed with this jockey? 0)
+            return tracker;
         }
 
         /// <summary>
         /// Weight to be carried
         /// Todays Jockeys ability
+        /// Trainer form
         /// </summary>
         /// <returns></returns>
-        public async Task<decimal> GetPresentRaceFactors(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings)
+        public async Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
             var result = 0;
+            //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityPresentRaceFactors = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString()).FirstOrDefault().setting_value.ToString());
 
-            return result;
+            //Look at jockey race history
+
+            //Research Weight contribution towards a race
+
+            //Look at recent races from horses from same trainer
+
+            return tracker;
         }
 
         /// <summary>
@@ -301,14 +356,24 @@ namespace Core.Algorithms
         /// Specific track preference
         /// </summary>
         /// <returns></returns>
-        public async Task<decimal> GetHorsePreferences(RaceEntity race, int horseId, List<AlgorithmSettingsEntity> settings)
+        public async Task<RaceHorseStatisticsTracker> GetHorsePreferences(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
             var result = 0;
             var distances = _mappingRepository.GetDistanceTypes();
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+            //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityHorsePreferences = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityHorsePreferences.ToString()).FirstOrDefault().setting_value.ToString());
             //For Specific Track, try to check the tb_course all weather boolean and the Meeting type (both from tb_event)
-            return result;
+
+            //Get Horses Distance group they have performed best at... (Ie: 50% places at distance +1, 75% places at distance +2)
+            //Get Horses Surface group they have performed best at... (Ie: 50% places at Surface +1, 75% places at Surface +2)
+            //Get Horses Jumps/Not Jumps they have performed best at
+            //Get Horses Going group they have performed best at... (Ie: 50% places at Going +1, 75% places at Going +2)
+            //Get Horses record at this specific course.
+
+
+
+            return tracker;
         }
     }
 }
