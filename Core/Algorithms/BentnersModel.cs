@@ -310,20 +310,75 @@ namespace Core.Algorithms
         /// <returns></returns>
         public async Task<RaceHorseStatisticsTracker> GetAdjustmentsPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
-            var result = 0;
+            var result = 0M;
             //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityAdjustmentsPastPerformance = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityAdjustmentsPastPerformance.ToString()).FirstOrDefault().setting_value.ToString());
-
+            var distances = _mappingRepository.GetDistanceTypes();
+            var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+            var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0)).OrderByDescending(x => x.Race.Event.created);
+            var raceHorse = race.RaceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
             //Strength of competition in past races (can either look at RPR (v1) BUT INVESTIGATE TO SEE WHAT IS A GOOD RPR??
             //But what RPRs don’t do is tell you what types of weight a horse has carried when posting its best ratings. Many horses win handicaps when given a chance to carry a lightweight for the first time, while others are better at carrying big weights against lower-class opponents.
             //What Else Don’t RPRs Tell You?
             //RPRs also won’t tell you when a trainer is in form or when a horse is reunited with a jockey that has won it before.
+            //So Higher the better, could do it as % of horses in past races where RPR > horses RPR. 
+            //We would even need to look deeper into this. Horse won last race but all horses had a lower RPR, this should not award as many points as when a horse has raced against 50% field of higher rprs. could get tricky.
+            //So to keep this simple for V1, we get the average rpr for each race, and if it is greater than the horses rpr for that race we increment a variable by one. 
+            var pointsForStrength = 0.5M;
+            var racesWithGreaterRprs = 0;
+            foreach (var pastRace in pastRaces) 
+            {
+                var horseForThisRace = pastRace.Race.RaceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
+                var horseForThisRaceRpr = ConfigureRPR(horseForThisRace, pastRace.Race.Event.created) ?? 0;
+
+                var allRprs = new List<int>();
+                var averages = new List<double>();
+                foreach (var pastHorseForRace in pastRace.Race.RaceHorses.Where(x => x.horse_id != horse.horse_id)) 
+                {
+                    var rpr = ConfigureRPR(pastHorseForRace, pastRace.Race.Event.created) ?? 0;
+                    allRprs.Add(rpr);
+                }
+
+                averages.Add(allRprs.Where(x => x != 0).Average());
+
+                if (averages.Average() > horseForThisRaceRpr) 
+                {
+                    racesWithGreaterRprs = racesWithGreaterRprs + 1;
+                }
+            }
+            //we then take that variable and work it out as a % against total races. Divide that by 10 and multiply it by points
+            var percentageOfRacesWithGreaterRpr = (int)Math.Round((double)(100 * racesWithGreaterRprs) / pastRaces.Count());
+            result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength; //TEST THIS WORKS
 
             //Optimal Weight in past races - Get each past race and get the weight for their top 3 performances
             //May need some sort of diff value (ie. if weight = -2 compared to previous race, +x if -1 +y etc...)
+            var pointsForWeight = 0.5M;
+            var topHalf = pastRaces.OrderBy(x => x.position).Take(pastRaces.Count() / 2).ToList();
+            var averageWeight = topHalf.Average(x => Decimal.Parse(x.weight.Replace(" ", "")));
+            //we can do this as a reduction. if weight diff is 0.6, multiply pointsForWeight by that value and remove it from total
+            var diff = Math.Abs(averageWeight - Decimal.Parse(raceHorse.weight.Replace(" ", ""))); // TO TEST THIS DOESNT RETURN NEGATIVE NUMBERS
+            result -= (pointsForWeight * diff);
 
+            //Has raced with jockey before? If so how has that gone? (performs well with this jockey?)
+            //So if the horse has 4 races with this jockey and has placed or won twice. Add pointsForJockey * 0.5
+            var pointsForJockey = 1M;
+            var racesWithJockey = pastRaces.Where(x => x.jockey_id == raceHorse.jockey_id).ToList();
+            int placedWithJockey = 0;
 
-            //Has raced with jockey before? If so how has that gone? (performs well with this jockey? +1, performs well regardless of jockey? +1, has not placed with this jockey? 0)
+            if (racesWithJockey.Count() > 0)
+            {
+                foreach (var raceWithJockey in racesWithJockey)
+                {
+                    var placePosition = SharedCalculations.GetTake(raceWithJockey.Race.no_of_horses ?? 0);
+                    if (raceWithJockey.position == 1 || raceWithJockey.position <= placePosition)
+                    {
+                        placedWithJockey = placedWithJockey + 1;
+                    }
+                }
+                var multiplier = (placedWithJockey / racesWithJockey.Count());
+                result += (pointsForJockey * multiplier);
+            }
+
             return tracker;
         }
 
@@ -374,6 +429,28 @@ namespace Core.Algorithms
 
 
             return tracker;
+        }
+
+        private int? ConfigureRPR(RaceHorseEntity raceHorse, DateTime created)
+        {
+            var result = 0;
+
+            if (raceHorse.Horse.Archive != null && raceHorse.Horse.Archive.Count() != 0)
+            {
+                var archive = raceHorse.Horse.Archive;
+                var rprString = archive.Where(x => x.field_changed == "rpr" && x.date < created)
+                    .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
+
+                if (rprString != "-")
+                {
+                    if (Int32.TryParse(rprString, out var rprInt))
+                    {
+                        result = rprInt;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }
