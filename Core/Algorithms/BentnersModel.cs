@@ -349,7 +349,8 @@ namespace Core.Algorithms
             //we then take that variable and work it out as a % against total races. Divide that by 10 and multiply it by points
             var percentageOfRacesWithGreaterRpr = (int)Math.Round((double)(100 * racesWithGreaterRprs) / pastRaces.Count());
             result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength; //TEST THIS WORKS
-
+            tracker.TotalPointsForStrengthOfCompetition += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength;
+            tracker.GetPastPerformanceAdjustmentsDescription += $"--Plus {tracker.TotalPointsForStrengthOfCompetition} for strength of competition with {percentageOfRacesWithGreaterRpr}% of horses with greater rpr --";
             //Optimal Weight in past races - Get each past race and get the weight for their top 3 performances
             //May need some sort of diff value (ie. if weight = -2 compared to previous race, +x if -1 +y etc...)
             var pointsForWeight = 0.5M;
@@ -358,6 +359,8 @@ namespace Core.Algorithms
             //we can do this as a reduction. if weight diff is 0.6, multiply pointsForWeight by that value and remove it from total
             var diff = Math.Abs(averageWeight - Decimal.Parse(raceHorse.weight.Replace(" ", ""))); // TO TEST THIS DOESNT RETURN NEGATIVE NUMBERS
             result -= (pointsForWeight * diff);
+            tracker.TotalPointsForWeight -= (pointsForWeight * diff);
+            tracker.GetPastPerformanceAdjustmentsDescription += $"--Minus {tracker.TotalPointsForWeight} for weight adjustment, peak weight of {averageWeight}--";
 
             //Has raced with jockey before? If so how has that gone? (performs well with this jockey?)
             //So if the horse has 4 races with this jockey and has placed or won twice. Add pointsForJockey * 0.5
@@ -377,8 +380,11 @@ namespace Core.Algorithms
                 }
                 var multiplier = (placedWithJockey / racesWithJockey.Count());
                 result += (pointsForJockey * multiplier);
+                tracker.TotalPointsForJockeyContribution += (pointsForJockey * multiplier);
+                tracker.GetPastPerformanceAdjustmentsDescription += $"--plus {tracker.TotalPointsForJockeyContribution} for jockey contribution. placed {placedWithJockey} times with jockey --";
             }
 
+            tracker.TotalPoints += result;
             return tracker;
         }
 
@@ -428,18 +434,79 @@ namespace Core.Algorithms
         {
             var result = 0;
             var distances = _mappingRepository.GetDistanceTypes();
+            var goings = _mappingRepository.GetGoingTypes();
+
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+            var goingGroups = VariableGroupings.GetGoingGroupings(goings).Where(x => x.ElementIds.Contains(race.going ?? 0)).FirstOrDefault();
+
             //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityHorsePreferences = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityHorsePreferences.ToString()).FirstOrDefault().setting_value.ToString());
+            var pointsForEachCondition = reliabilityHorsePreferences / 4;
+
             //For Specific Track, try to check the tb_course all weather boolean and the Meeting type (both from tb_event)
+            var racesAtCourse = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && x.Race.Event.course_id == race.Event.course_id && x.position != 0).ToList();
+            foreach (var condition1 in racesAtCourse) 
+            {
+                var placePosition = SharedCalculations.GetTake(condition1.Race.no_of_horses ?? 0);
 
+                if (condition1.position == 1)
+                {
+
+                }
+                else if (condition1.position <= placePosition)
+                {
+
+                }
+            }
             //Get Horses Distance group they have performed best at... (Ie: 50% places at distance +1, 75% places at distance +2)
-            //Get Horses Surface group they have performed best at... (Ie: 50% places at Surface +1, 75% places at Surface +2)
+            var racesAtDistanceGroup = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.position != 0).ToList();
+            foreach (var condition2 in racesAtDistanceGroup)
+            {
+                var placePosition = SharedCalculations.GetTake(condition2.Race.no_of_horses ?? 0);
+
+                if (condition2.position == 1)
+                {
+
+                }
+                else if (condition2.position <= placePosition)
+                {
+
+                }
+            }
             //Get Horses Jumps/Not Jumps they have performed best at
+            if (race.Event.meeting_type != null) 
+            {
+                var racesAtRaceType = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && x.Race.Event.meeting_type != null && x.Race.Event.meeting_type == race.Event.meeting_type && x.position != 0).ToList();
+                foreach (var condition3 in racesAtRaceType)
+                {
+                    var placePosition = SharedCalculations.GetTake(condition3.Race.no_of_horses ?? 0);
+
+                    if (condition3.position == 1)
+                    {
+
+                    }
+                    else if (condition3.position <= placePosition)
+                    {
+
+                    }
+                }
+            }
+
             //Get Horses Going group they have performed best at... (Ie: 50% places at Going +1, 75% places at Going +2)
-            //Get Horses record at this specific course.
+            var racesAtGoingGroup = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && goingGroups.ElementIds.Contains(x.Race.going ?? 0) && x.position != 0).ToList();
+            foreach (var condition4 in racesAtGoingGroup)
+            {
+                var placePosition = SharedCalculations.GetTake(condition4.Race.no_of_horses ?? 0);
 
+                if (condition4.position == 1)
+                {
 
+                }
+                else if (condition4.position <= placePosition)
+                {
+
+                }
+            }
 
             return tracker;
         }

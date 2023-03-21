@@ -16,6 +16,11 @@ namespace Core.Models.Algorithm.Bentners
         public string GetPastPerformanceDescription { get; set; }
 
         //GetAdjustmentsPastPerformance
+        public decimal TotalPointsForStrengthOfCompetition { get; set; }
+        public decimal TotalPointsForWeight { get; set; }
+        public decimal TotalPointsForJockeyContribution { get; set; }
+        public string GetPastPerformanceAdjustmentsDescription { get; set; }
+
 
         //GetPresentRaceFactors
         public decimal pointsForJockey { get; set; }
