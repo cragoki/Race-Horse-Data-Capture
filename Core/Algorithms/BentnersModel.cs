@@ -383,22 +383,35 @@ namespace Core.Algorithms
         }
 
         /// <summary>
-        /// Weight to be carried
+        /// Weight to be carried (Research Weight contribution towards a race)
         /// Todays Jockeys ability
         /// Trainer form
         /// </summary>
         /// <returns></returns>
-        public async Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
+        public async Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
+            //SHOULD ONLY BE CALLED ONCE, THIS WILL ANALYSE ALL JOCKEYS AND TRAINERS INVOLVED IN THIS RACE AND RANK THEM, POINTS ARE TO BE ASSIGNED OUTSIDE OF THIS METHOD
             var result = 0;
             //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityPresentRaceFactors = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString()).FirstOrDefault().setting_value.ToString());
+            tracker.pointsForJockey = reliabilityPresentRaceFactors / 2;
+            tracker.pointsForTrainer = reliabilityPresentRaceFactors / 2;
+            tracker.TrainerRankings = new Dictionary<int, double>();
+            tracker.JockeyRankings = new Dictionary<int, double>();
 
-            //Look at jockey race history
 
-            //Research Weight contribution towards a race
+            foreach (var raceHorse in race.RaceHorses)
+            {
+                var jockey = raceHorse.jockey_id;
+                //Get jockey history for the last 6 months
+                var jockeyHistory = _context.tb_race_horse.Where(x => x.jockey_id == jockey && x.Race.Event.created > x.Race.Event.created.AddMonths(-6) && x.position != 0).OrderByDescending(x => x.Race.Event.created).ToList();
+                tracker.JockeyRankings.Add(jockey, jockeyHistory.Average(x => x.position));
 
-            //Look at recent races from horses from same trainer
+                var trainer = raceHorse.trainer_id;
+                //Get trainer history for the last 6 months
+                var trainerHistory = _context.tb_race_horse.Where(x => x.trainer_id == trainer && x.Race.Event.created > x.Race.Event.created.AddMonths(-6) && x.position != 0).OrderByDescending(x => x.Race.Event.created).ToList();
+                tracker.TrainerRankings.Add(trainer, trainerHistory.Average(x => x.position));
+            }
 
             return tracker;
         }
