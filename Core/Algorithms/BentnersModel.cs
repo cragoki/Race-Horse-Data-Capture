@@ -13,6 +13,7 @@ using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -84,17 +85,6 @@ namespace Core.Algorithms
 
             //Variables
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.BentnersModel);
-            var placedRange = SharedCalculations.GetTake(race.no_of_horses ?? 0);
-            var counter = 0;
-            var horses = race.RaceHorses;
-            var listOfHorses = new List<HorseEntity>();
-            var distances = _mappingRepository.GetDistanceTypes();
-            var goings = _mappingRepository.GetGoingTypes();
-            var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
-            var goingGroups = VariableGroupings.GetGoingGroupings(goings).Where(x => x.ElementIds.Contains(race.going ?? 0)).FirstOrDefault();
-
-            //Settings
-
 
             //BEGIN CALCULATING PREDICTED RESULTS
             var horsepoints = await GetHorsePoints(race.RaceHorses, race, settings);
@@ -105,6 +95,8 @@ namespace Core.Algorithms
         public async Task<List<HorsePredictionModel>> GetHorsePoints(List<RaceHorseEntity> horses, RaceEntity race, List<AlgorithmSettingsEntity> settings) 
         {
             var result = new List<HorsePredictionModel>();
+            var raceTracker = new RaceHorseStatisticsTracker();
+            var presentRaceFactors = await GetPresentRaceFactors(race, settings, raceTracker); 
 
             foreach (var horse in horses)
             {
@@ -120,12 +112,30 @@ namespace Core.Algorithms
                     result.Add(toAdd);
                     continue;
                 }
+                var topJockeys = raceTracker.JockeyRankings.Take(2);
+                var topTrainers = raceTracker.JockeyRankings.Take(2);
 
+                if (topJockeys.Select(x => x.Key).Contains(horse.jockey_id)) 
+                {
+                    tracker.PointsGivenForJockey = tracker.pointsForJockey;
+                    tracker.GetPresentRaceFactorsDescription += $"--Given {tracker.pointsForJockey} points for favoured Jockey--";
+                    tracker.TotalPoints += tracker.PointsGivenForJockey;
+                }
+                if (topTrainers.Select(x => x.Key).Contains(horse.trainer_id))
+                {
+                    tracker.PointsGivenForTrainer = tracker.pointsForTrainer;
+                    tracker.GetPresentRaceFactorsDescription += $"--Given {tracker.pointsForTrainer} points for favoured Trainer--";
+                    tracker.TotalPoints += tracker.PointsGivenForTrainer;
+                }
                 //Current Condition
                 var currentCondition = await GetCurrentCondition(race, horse.Horse, settings, tracker);
-                toAdd.points += currentCondition.TotalPointsForGetCurrentCondition;
+                var pastPerformance = await GetPastPerformance(race, horse.Horse, settings, tracker);
+                var adjustmentsPastPerformance = await GetAdjustmentsPastPerformance(race, horse.Horse, settings, tracker);
+                var horsePreferences = GetHorsePreferences(race, horse.Horse, settings, tracker);
+
+                toAdd.points = tracker.TotalPoints;
                 //TODO, COULD DO WITH STORING TRACKER IN DB
-                //REMEMBER TO SET TOTAL POINTS ON TRACKER
+                //FIRST CHECK THAT ANY TRACKERS FOR THIS RACE_HORSE_ID HAS NOT ALREADY BEEN STORED, IF IT HAS IGNORE IT...
 
                 result.Add(toAdd);
             }
@@ -252,6 +262,7 @@ namespace Core.Algorithms
             //We find that a typical horse's peak racing age is 4.45 years. The rate of improvement from age 2 to 4 1/2 is greater than the rate of decline after age 4 1/2. 
             //so Past peak age by 1-2? -0.25 by 2+? -0.5 <- WRITE QUERY FOR THIS TO VALIDATE
             tracker.TotalPointsForGetCurrentCondition = result;
+            tracker.TotalPoints += result;
             return tracker;
         }
 
@@ -285,13 +296,11 @@ namespace Core.Algorithms
 
                 if (pastRace.position == 1)
                 {
-                    tracker.TotalPoints += pointsForWin;
                     tracker.GetPastPerformanceDescription += $"--Plus {pointsForWin} for win at race class {pastRace.Race.race_class}--";
                     result += pointsForWin;
                 }
                 else if (pastRace.position <= placePosition)
                 {
-                    tracker.TotalPoints += pointsForPlace;
                     tracker.GetPastPerformanceDescription += $"--Plus {pointsForPlace} for place at race class {pastRace.Race.race_class}--";
                     result += pointsForPlace;
                 }
@@ -299,6 +308,7 @@ namespace Core.Algorithms
             }
 
             tracker.TotalPointsForPastPerformance = result;
+            tracker.TotalPoints += result;
             return tracker;
         }
 
@@ -384,6 +394,7 @@ namespace Core.Algorithms
                 tracker.GetPastPerformanceAdjustmentsDescription += $"--plus {tracker.TotalPointsForJockeyContribution} for jockey contribution. placed {placedWithJockey} times with jockey --";
             }
 
+            tracker.TotalPointsForAdjustmentsPastPerformance = result;
             tracker.TotalPoints += result;
             return tracker;
         }
@@ -397,7 +408,6 @@ namespace Core.Algorithms
         public async Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
             //SHOULD ONLY BE CALLED ONCE, THIS WILL ANALYSE ALL JOCKEYS AND TRAINERS INVOLVED IN THIS RACE AND RANK THEM, POINTS ARE TO BE ASSIGNED OUTSIDE OF THIS METHOD
-            var result = 0;
             //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityPresentRaceFactors = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString()).FirstOrDefault().setting_value.ToString());
             tracker.pointsForJockey = reliabilityPresentRaceFactors / 2;
@@ -432,7 +442,7 @@ namespace Core.Algorithms
         /// <returns></returns>
         public async Task<RaceHorseStatisticsTracker> GetHorsePreferences(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker)
         {
-            var result = 0;
+            var result = 0M;
             var distances = _mappingRepository.GetDistanceTypes();
             var goings = _mappingRepository.GetGoingTypes();
 
@@ -445,69 +455,92 @@ namespace Core.Algorithms
 
             //For Specific Track, try to check the tb_course all weather boolean and the Meeting type (both from tb_event)
             var racesAtCourse = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && x.Race.Event.course_id == race.Event.course_id && x.position != 0).ToList();
+            var pointsForEachC1 = (pointsForEachCondition / racesAtCourse.Count());
             foreach (var condition1 in racesAtCourse) 
             {
                 var placePosition = SharedCalculations.GetTake(condition1.Race.no_of_horses ?? 0);
 
                 if (condition1.position == 1)
                 {
-
+                    tracker.TotalPointsForSpecificTrack += pointsForEachC1;
+                    tracker.GetHorsePreferencesDescription += $"--plus {pointsForEachC1} for winning race at Track--";
+                    result += pointsForEachC1;
                 }
                 else if (condition1.position <= placePosition)
                 {
-
+                    tracker.TotalPointsForSpecificTrack += (pointsForEachC1/2);
+                    tracker.GetHorsePreferencesDescription += $"--plus {(pointsForEachC1 / 2)} for placing race at Track--";
+                    result += (pointsForEachC1 / 2);
                 }
             }
             //Get Horses Distance group they have performed best at... (Ie: 50% places at distance +1, 75% places at distance +2)
             var racesAtDistanceGroup = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.position != 0).ToList();
+            var pointsForEachC2 = (pointsForEachCondition / racesAtDistanceGroup.Count());
+
             foreach (var condition2 in racesAtDistanceGroup)
             {
                 var placePosition = SharedCalculations.GetTake(condition2.Race.no_of_horses ?? 0);
 
                 if (condition2.position == 1)
                 {
-
+                    tracker.TotalPointsForDistance += pointsForEachC2;
+                    tracker.GetHorsePreferencesDescription += $"--plus {pointsForEachC2} for winning race at Distance--";
+                    result += pointsForEachC2;
                 }
                 else if (condition2.position <= placePosition)
                 {
-
+                    tracker.TotalPointsForDistance += (pointsForEachC2 / 2);
+                    tracker.GetHorsePreferencesDescription += $"--plus {(pointsForEachC2 / 2)} for placing race at Distance--";
+                    result += (pointsForEachC2 / 2);
                 }
             }
             //Get Horses Jumps/Not Jumps they have performed best at
             if (race.Event.meeting_type != null) 
             {
                 var racesAtRaceType = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && x.Race.Event.meeting_type != null && x.Race.Event.meeting_type == race.Event.meeting_type && x.position != 0).ToList();
+                var pointsForEachC3 = (pointsForEachCondition / racesAtRaceType.Count());
+
                 foreach (var condition3 in racesAtRaceType)
                 {
                     var placePosition = SharedCalculations.GetTake(condition3.Race.no_of_horses ?? 0);
 
                     if (condition3.position == 1)
                     {
-
+                        tracker.TotalPointsForRaceType += pointsForEachC3;
+                        tracker.GetHorsePreferencesDescription += $"--plus {pointsForEachC3} for winning race at Race Type--";
+                        result += pointsForEachC3;
                     }
                     else if (condition3.position <= placePosition)
                     {
-
+                        tracker.TotalPointsForRaceType += (pointsForEachC3 / 2);
+                        tracker.GetHorsePreferencesDescription += $"--plus {(pointsForEachC3 / 2)} for placing race at Race Type--";
+                        result += (pointsForEachC3 / 2);
                     }
                 }
             }
 
             //Get Horses Going group they have performed best at... (Ie: 50% places at Going +1, 75% places at Going +2)
             var racesAtGoingGroup = _context.tb_race_horse.Where(x => x.horse_id == horse.horse_id && goingGroups.ElementIds.Contains(x.Race.going ?? 0) && x.position != 0).ToList();
+            var pointsForEachC4 = (pointsForEachCondition / racesAtGoingGroup.Count());
             foreach (var condition4 in racesAtGoingGroup)
             {
                 var placePosition = SharedCalculations.GetTake(condition4.Race.no_of_horses ?? 0);
 
                 if (condition4.position == 1)
                 {
-
+                    tracker.TotalPointsForGoing += pointsForEachC4;
+                    tracker.GetHorsePreferencesDescription += $"--plus {pointsForEachC4} for winning race at Going--";
+                    result += pointsForEachC4;
                 }
                 else if (condition4.position <= placePosition)
                 {
-
+                    tracker.TotalPointsForGoing += (pointsForEachC4 / 2);
+                    tracker.GetHorsePreferencesDescription += $"--plus {(pointsForEachC4 / 2)} for placing race at Going--";
+                    result += (pointsForEachC4 / 2);
                 }
             }
 
+            tracker.TotalPoints += result;
             return tracker;
         }
 
