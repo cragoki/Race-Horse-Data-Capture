@@ -180,7 +180,7 @@ namespace Infrastructure.PunterAdmin.Services
                                 {
                                     var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
                                     thisRace.AlgorithmRan = true;
-                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
                                     horse.PredictedPosition = prediction.i + 1;
                                     horse.HorseReliability = prediction.value.Predictability;
                                     horse.Points = prediction.value.Points;
@@ -216,7 +216,7 @@ namespace Infrastructure.PunterAdmin.Services
                                 {
                                     var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
                                     thisRace.AlgorithmRan = true;
-                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
                                     horse.PredictedPosition = prediction.i + 1;
                                     horse.HorseReliability = prediction.value.Predictability;
                                     horse.Points = prediction.value.Points;
@@ -430,6 +430,9 @@ namespace Infrastructure.PunterAdmin.Services
                     case ((int)AlgorithmEnum.FormRevamp):
                             predictions = await _formRevamp.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
                         break;
+                    case ((int)AlgorithmEnum.BentnersModel):
+                        predictions = await _bentnersModel.RunModel(race);
+                        break;
                     default:
                         throw new Exception("Selected Algorithm is not set up for URL Predictions");
                 }
@@ -444,7 +447,7 @@ namespace Infrastructure.PunterAdmin.Services
                 {  
                     result = BuildTodaysRaceViewModel(race, race.Event.created);
                     result.AlgorithmRan = true;
-                    var horse = result.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
+                    var horse = result.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
                     horse.PredictedPosition = prediction.i + 1;
                     horse.HorseReliability = prediction.value.Predictability;
                     horse.Points = prediction.value.Points;

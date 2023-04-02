@@ -290,7 +290,7 @@ namespace Core.Algorithms
 
                     //Get Actual results and compare vs horsePoints
                     var placedHorses = race.RaceHorses.Where(x => x.position != 0 && x.position <= total).Select(x => x.horse_id).ToList();
-                    var predictedPlacedhorses = predictions.OrderByDescending(x => x.Points).Take(total).Select(x => x.Horse.horse_id).ToList();
+                    var predictedPlacedhorses = predictions.OrderByDescending(x => x.Points).Take(total).Select(x => x.horse_id).ToList();
 
                     if (predictions.All(x => x.Points == 0)) 
                     {
@@ -344,7 +344,7 @@ namespace Core.Algorithms
                 var toAdd = new FormResultModel();
                 toAdd.RaceHorseId = horse.race_horse_id;
                 toAdd.Points = 0;
-                toAdd.Horse = horse.Horse;
+                toAdd.horse_id = horse.horse_id;
                 //Get races within the last 6 months
                 var races = horse.Horse.Races.Where(x => x.Race.Event.created > race.Event.created.AddMonths(-6) && x.Race.Event.created < race.Event.created).ToList();
 

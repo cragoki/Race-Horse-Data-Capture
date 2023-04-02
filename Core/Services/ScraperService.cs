@@ -55,8 +55,8 @@ namespace Core.Services
                 var getTableRows = await ExtractJson(page, "byDate\":", "\"dates\":[", 0, 1);
 
                 //For new Structure, cheers racing post for ruining my day and changing stuff on your UI :(
-                var startString = DateTime.Now.Date.ToUniversalTime().ToString("yyyy-MM-dd");
-                var endString = DateTime.Now.Date.AddDays(1).ToUniversalTime().ToString("yyyy-MM-dd");
+                var startString = DateTime.Now.Date.ToString("yyyy-MM-dd");
+                var endString = DateTime.Now.Date.AddDays(1).ToString("yyyy-MM-dd");
                 getTableRows = await ExtractJson(getTableRows, startString, endString, 2, 2);
 
                 //New Objects for RP restructure

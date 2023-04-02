@@ -49,6 +49,6 @@ namespace Infrastructure.Data
         public DbSet<WeatherType> tb_weather_type { get; set; }
         public DbSet<AlgorithmSettingsEntity> tb_algorithm_settings { get; set; }
         public DbSet<AlgorithmPredictionEntity> tb_algorithm_prediction { get; set; }
-
+        public DbSet<AlgorithmTrackerEntity> tb_algorithm_tracker { get; set; }
     }
 }

@@ -263,7 +263,7 @@ namespace Core.Algorithms
 
                 foreach (var horse in result)
                 {
-                    var horsePredictability = await CalculateHorsePredictability(horse.Horse.horse_id, race.Event.created, race, goingGroup, distanceGroup);
+                    var horsePredictability = await CalculateHorsePredictability(horse.horse_id, race.Event.created, race, goingGroup, distanceGroup);
                     horse.Predictability = horsePredictability;
                 }
             }
@@ -341,7 +341,7 @@ namespace Core.Algorithms
                 toAdd.RaceHorseId = horse.race_horse_id;
                 toAdd.Points = 0;
                 toAdd.PointsDescription = $"";
-                toAdd.Horse = horse.Horse;
+                toAdd.horse_id = horse.horse_id;
                 //Get races within the last 9 months
                 var races = horse.Horse.Races.Where(x => x.Race.Event.created > race.Event.created.AddMonths(-9) && x.Race.Event.created < race.Event.created).ToList();
 

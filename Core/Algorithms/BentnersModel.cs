@@ -26,16 +26,14 @@ namespace Core.Algorithms
     {
         private readonly IConfigurationRepository _configRepository;
         private readonly IMappingTableRepository _mappingRepository;
-        private readonly IAlgorithmRepository _algorithmRepository;
         private readonly IDbContextData _context;
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public BentnersModel(IConfigurationRepository configRepository, IMappingTableRepository mappingRepository, IAlgorithmRepository algorithmRepository, IDbContextData context)
+        public BentnersModel(IConfigurationRepository configRepository, IMappingTableRepository mappingRepository, IDbContextData context)
         {
             _configRepository = configRepository;
             _mappingRepository = mappingRepository;
-            _algorithmRepository = algorithmRepository;
             _context = context;
         }
 
@@ -78,17 +76,24 @@ namespace Core.Algorithms
         {
             var result = new List<FormResultModel>();
 
-            if (race.RaceHorses.All(x => x.position == 0))
-            {
-                return result;
-            }
-
             //Variables
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.BentnersModel);
 
             //BEGIN CALCULATING PREDICTED RESULTS
-            var horsepoints = await GetHorsePoints(race.RaceHorses, race, settings);
+            var horsePoints = await GetHorsePoints(race.RaceHorses, race, settings);
             //TURN THIS INTO List<FormResultModel>
+            foreach (var horsePoint in horsePoints) 
+            {
+                result.Add(new FormResultModel()
+                {
+                    horse_id = horsePoint.horse_id,
+                    RaceHorseId = horsePoint.race_horse_id,
+                    Predictability = "",
+                    Points = horsePoint.points,
+                    PointsDescription = ""
+                });
+            }
+
             return result;
         }
 
@@ -104,6 +109,7 @@ namespace Core.Algorithms
                 var toAdd = new HorsePredictionModel();
                 toAdd.points = 0;
                 toAdd.horse_id = horse.horse_id;
+                toAdd.race_horse_id = horse.race_horse_id;
                 //Get past races for horse
                 var races = horse.Horse.Races.Where(x => x.Race.Event.created < race.Event.created).ToList();
 
@@ -136,6 +142,12 @@ namespace Core.Algorithms
                 toAdd.points = tracker.TotalPoints;
                 //TODO, COULD DO WITH STORING TRACKER IN DB
                 //FIRST CHECK THAT ANY TRACKERS FOR THIS RACE_HORSE_ID HAS NOT ALREADY BEEN STORED, IF IT HAS IGNORE IT...
+                var existingAlgorithmTracker = _context.tb_algorithm_tracker.Where(x => x.race_horse_id == horse.race_horse_id && x.total_points == tracker.TotalPoints).FirstOrDefault();
+
+                if (existingAlgorithmTracker == null) 
+                {
+                    _context.tb_algorithm_tracker.Add(new AlgorithmTrackerEntity() { });
+                }
 
                 result.Add(toAdd);
             }

@@ -31,9 +31,10 @@ namespace RHDCAutomation
         private IMappingTableRepository _mappingRepository;
         private IFormAlgorithm _form;
         private IFormRevamped _formRevampedAlgorithm;
+        private IBentnersModel _bentnersModel;
 
         private static Guid _batch;
-        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService, IFormRevamped formRevampedAlgorithm)
+        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService, IFormRevamped formRevampedAlgorithm, IBentnersModel bentnersModel)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
@@ -45,6 +46,7 @@ namespace RHDCAutomation
             _form = form;
             _formRevampedAlgorithm = formRevampedAlgorithm;
             _algorithmService = algorithmService;
+            _bentnersModel = bentnersModel;
         }
         private void OnStopping()
         {
@@ -124,7 +126,7 @@ namespace RHDCAutomation
                         //    {
                         //        var predictions = new List<FormResultModel>();
 
-                        //        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly) 
+                        //        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly)
                         //        {
                         //            predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
                         //        }
@@ -132,7 +134,10 @@ namespace RHDCAutomation
                         //        {
                         //            predictions = await _formRevampedAlgorithm.FormCalculationPredictions(race, settings, distances, goings);
                         //        }
-
+                        //        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
+                        //        {
+                        //            predictions = await _bentnersModel.RunModel(race);
+                        //        }
                         //        if (predictions == null || predictions.Count() == 0)
                         //        {
                         //            continue;
@@ -144,7 +149,7 @@ namespace RHDCAutomation
                         //            {
                         //                //store in db
                         //                //Create new table for predictions
-                        //                var algorithmPrediction = new AlgorithmPredictionEntity() 
+                        //                var algorithmPrediction = new AlgorithmPredictionEntity()
                         //                {
                         //                    race_horse_id = prediction.value.RaceHorseId,
                         //                    algorithm_id = activeAlgorithm.algorithm_id,
@@ -155,7 +160,7 @@ namespace RHDCAutomation
                         //                };
                         //                _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
                         //            }
-                        //            catch (Exception ex) 
+                        //            catch (Exception ex)
                         //            {
                         //                Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
                         //            }

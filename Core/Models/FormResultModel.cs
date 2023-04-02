@@ -5,7 +5,7 @@ namespace Infrastructure.PunterAdmin.ViewModels
 {
     public class FormResultModel
     {
-        public HorseEntity Horse { get; set; }
+        public int horse_id { get; set; }
         public int RaceHorseId { get; set; }
         public string Predictability { get; set; }
         public decimal? Points { get; set; }
