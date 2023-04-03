@@ -112,7 +112,6 @@ namespace RHDCAutomation
                         if (activeAlgorithm == null)
                         {
                             Console.WriteLine($"No Active Algorithm Detected");
-                            continue;
                         }
                         Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
 
