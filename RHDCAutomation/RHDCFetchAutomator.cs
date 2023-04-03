@@ -113,7 +113,7 @@ namespace RHDCAutomation
                         {
                             Console.WriteLine($"No Active Algorithm Detected");
                         }
-                        Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
+                        //Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
 
                         //var settings = await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
 
