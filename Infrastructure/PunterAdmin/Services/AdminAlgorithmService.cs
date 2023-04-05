@@ -242,23 +242,23 @@ namespace Infrastructure.PunterAdmin.Services
 
                                 var settings = await BuildAlgorithmSettings(algorithm);
 
-                                //var predictions = await _bentnersModel.FormCalculationPredictions(race, settings, distances, goings);
+                                var predictions = await _bentnersModel.RunModel(race);
 
-                                //if (predictions == null || predictions.Count() == 0)
-                                //{
-                                //    continue;
-                                //}
+                                if (predictions == null || predictions.Count() == 0)
+                                {
+                                    continue;
+                                }
 
-                                //foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
-                                //{
-                                //    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
-                                //    thisRace.AlgorithmRan = true;
-                                //    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.Horse.horse_id).FirstOrDefault();
-                                //    horse.PredictedPosition = prediction.i + 1;
-                                //    horse.HorseReliability = prediction.value.Predictability;
-                                //    horse.Points = prediction.value.Points;
-                                //    horse.PointsDescription = prediction.value.PointsDescription;
-                                //}
+                                foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                {
+                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                    thisRace.AlgorithmRan = true;
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
+                                    horse.PredictedPosition = prediction.i + 1;
+                                    horse.HorseReliability = prediction.value.Predictability;
+                                    horse.Points = prediction.value.Points;
+                                    horse.PointsDescription = prediction.value.PointsDescription;
+                                }
                             }
                         }
                         break;

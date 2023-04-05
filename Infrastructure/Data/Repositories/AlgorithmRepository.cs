@@ -73,6 +73,13 @@ namespace Infrastructure.Data.Repositories
             _context.tb_algorithm_prediction.Add(algorithmPrediction);
             SaveChanges();
         }
+
+        public void AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker)
+        {
+            _context.tb_algorithm_tracker.Add(algorithmTracker);
+            SaveChanges();
+        }
+
         public List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
         {
             return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).Include(x => x.Algorithm).ToList();
