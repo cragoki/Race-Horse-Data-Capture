@@ -109,63 +109,76 @@ namespace RHDCAutomation
                         var goings = _mappingRepository.GetGoingTypes();
                         var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
 
-                        if (activeAlgorithm == null)
+
+                        try
                         {
-                            Console.WriteLine($"No Active Algorithm Detected");
+                            if (activeAlgorithm == null)
+                            {
+                                Console.WriteLine($"No Active Algorithm Detected");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
+
+                                var settings = await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
+
+                                foreach (var even in events)
+                                {
+                                    var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.EventId);
+
+                                    foreach (var race in races)
+                                    {
+                                        var predictions = new List<FormResultModel>();
+
+                                        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly)
+                                        {
+                                            predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
+                                        }
+                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormRevamp)
+                                        {
+                                            predictions = await _formRevampedAlgorithm.FormCalculationPredictions(race, settings, distances, goings);
+                                        }
+                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
+                                        {
+                                            predictions = await _bentnersModel.RunModel(race);
+                                        }
+                                        if (predictions == null || predictions.Count() == 0)
+                                        {
+                                            continue;
+                                        }
+
+                                        foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                        {
+                                            try
+                                            {
+                                                //store in db
+                                                //Create new table for predictions
+                                                var algorithmPrediction = new AlgorithmPredictionEntity()
+                                                {
+                                                    race_horse_id = prediction.value.RaceHorseId,
+                                                    algorithm_id = activeAlgorithm.algorithm_id,
+                                                    predicted_position = prediction.i + 1,
+                                                    points = prediction.value.Points ?? 0,
+                                                    points_description = prediction.value.PointsDescription,
+                                                    horse_predictability = prediction.value.Predictability
+                                                };
+                                                _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        //Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error Occured while running predictions. All Races have still been saved. Error: {ex.Message} ---- Inner Exception: {ex.InnerException}");
+                        }
+                        
 
-                        //var settings = await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
-
-                        //foreach (var even in events)
-                        //{
-                        //    var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.EventId);
-
-                        //    foreach (var race in races)
-                        //    {
-                        //        var predictions = new List<FormResultModel>();
-
-                        //        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly)
-                        //        {
-                        //            predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
-                        //        }
-                        //        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormRevamp)
-                        //        {
-                        //            predictions = await _formRevampedAlgorithm.FormCalculationPredictions(race, settings, distances, goings);
-                        //        }
-                        //        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
-                        //        {
-                        //            predictions = await _bentnersModel.RunModel(race);
-                        //        }
-                        //        if (predictions == null || predictions.Count() == 0)
-                        //        {
-                        //            continue;
-                        //        }
-
-                        //        foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
-                        //        {
-                        //            try
-                        //            {
-                        //                //store in db
-                        //                //Create new table for predictions
-                        //                var algorithmPrediction = new AlgorithmPredictionEntity()
-                        //                {
-                        //                    race_horse_id = prediction.value.RaceHorseId,
-                        //                    algorithm_id = activeAlgorithm.algorithm_id,
-                        //                    predicted_position = prediction.i + 1,
-                        //                    points = prediction.value.Points ?? 0,
-                        //                    points_description = prediction.value.PointsDescription,
-                        //                    horse_predictability = prediction.value.Predictability
-                        //                };
-                        //                _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
-                        //            }
-                        //            catch (Exception ex)
-                        //            {
-                        //                Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
-                        //            }
-                        //        }
-                        //    }
-                        //}
                         Console.WriteLine($"Completed Algorithm Checks");
 
                         //Complete Diagnostics

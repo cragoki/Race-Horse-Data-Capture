@@ -147,32 +147,32 @@ namespace Core.Algorithms
                 var algorithm = _context.tb_algorithm.Where(x => x.algorithm_name == "BentersModel").FirstOrDefault();
                 if (existingAlgorithmTracker == null)
                 {
-                    _algorithmRepository.AddAlgorithmTracker(new AlgorithmTrackerEntity()
-                    {
-                        total_points = tracker.TotalPoints,
-                        total_points_for_adjustments_past_performance = tracker.TotalPointsForAdjustmentsPastPerformance,
-                        total_points_for_distance = tracker.TotalPointsForDistance,
-                        total_points_for_get_current_condition = tracker.TotalPointsForGetCurrentCondition,
-                        total_points_for_going = tracker.TotalPointsForGoing,
-                        total_points_for_jockey_contribution = tracker.TotalPointsForJockeyContribution,
-                        total_points_for_last_two_races = tracker.TotalPointsForLastTwoRaces,
-                        total_points_for_past_performance = tracker.TotalPointsForPastPerformance,
-                        total_points_for_race_type = tracker.TotalPointsForRaceType,
-                        total_points_for_specific_track = tracker.TotalPointsForSpecificTrack,
-                        total_points_for_strength_of_competition = tracker.TotalPointsForStrengthOfCompetition,
-                        total_points_for_time_since_last_race = tracker.TotalPointsForTimeSinceLastRace,
-                        total_points_for_weight = tracker.TotalPointsForWeight,
-                        algorithm_id = algorithm.algorithm_id,
-                        get_present_race_factors_description = tracker.GetPresentRaceFactorsDescription,
-                        created = DateTime.Now,
-                        get_current_condition_description = tracker.GetCurrentConditionDescription,
-                        get_horse_preferences_description = tracker.GetHorsePreferencesDescription,
-                        get_past_performance_adjustments_description = tracker.GetPastPerformanceAdjustmentsDescription,
-                        get_past_performance_description = tracker.GetPastPerformanceDescription,
-                        points_given_for_jockey = tracker.PointsGivenForJockey,
-                        points_given_for_trainer = tracker.PointsGivenForTrainer,
-                        race_horse_id = horse.race_horse_id
-                    });
+                    //_algorithmRepository.AddAlgorithmTracker(new AlgorithmTrackerEntity()
+                    //{
+                    //    total_points = tracker.TotalPoints,
+                    //    total_points_for_adjustments_past_performance = tracker.TotalPointsForAdjustmentsPastPerformance,
+                    //    total_points_for_distance = tracker.TotalPointsForDistance,
+                    //    total_points_for_get_current_condition = tracker.TotalPointsForGetCurrentCondition,
+                    //    total_points_for_going = tracker.TotalPointsForGoing,
+                    //    total_points_for_jockey_contribution = tracker.TotalPointsForJockeyContribution,
+                    //    total_points_for_last_two_races = tracker.TotalPointsForLastTwoRaces,
+                    //    total_points_for_past_performance = tracker.TotalPointsForPastPerformance,
+                    //    total_points_for_race_type = tracker.TotalPointsForRaceType,
+                    //    total_points_for_specific_track = tracker.TotalPointsForSpecificTrack,
+                    //    total_points_for_strength_of_competition = tracker.TotalPointsForStrengthOfCompetition,
+                    //    total_points_for_time_since_last_race = tracker.TotalPointsForTimeSinceLastRace,
+                    //    total_points_for_weight = tracker.TotalPointsForWeight,
+                    //    algorithm_id = algorithm.algorithm_id,
+                    //    get_present_race_factors_description = tracker.GetPresentRaceFactorsDescription,
+                    //    created = DateTime.Now,
+                    //    get_current_condition_description = tracker.GetCurrentConditionDescription,
+                    //    get_horse_preferences_description = tracker.GetHorsePreferencesDescription,
+                    //    get_past_performance_adjustments_description = tracker.GetPastPerformanceAdjustmentsDescription,
+                    //    get_past_performance_description = tracker.GetPastPerformanceDescription,
+                    //    points_given_for_jockey = tracker.PointsGivenForJockey,
+                    //    points_given_for_trainer = tracker.PointsGivenForTrainer,
+                    //    race_horse_id = horse.race_horse_id
+                    //});
                 }
 
                 result.Add(toAdd);
@@ -320,6 +320,11 @@ namespace Core.Algorithms
             var reliabilityPastPerformance = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityPastPerformance.ToString()).FirstOrDefault().setting_value.ToString());
             var distances = _mappingRepository.GetDistanceTypes();
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+
+            if (distanceGroups == null) 
+            {
+                return tracker;
+            }
             var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class).OrderByDescending(x => x.Race.Event.created);
 
             //Number of races placed vs number of races not placed. 75% + placed = +2, 60%+ = +1, 50%+ = +0.5, 0% = -2
@@ -366,6 +371,10 @@ namespace Core.Algorithms
             var reliabilityAdjustmentsPastPerformance = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityAdjustmentsPastPerformance.ToString()).FirstOrDefault().setting_value.ToString());
             var distances = _mappingRepository.GetDistanceTypes();
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
+            if (distanceGroups == null) 
+            {
+                return tracker;
+            }
             var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0)).OrderByDescending(x => x.Race.Event.created);
             var raceHorse = race.RaceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
             //Strength of competition in past races (can either look at RPR (v1) BUT INVESTIGATE TO SEE WHAT IS A GOOD RPR??
@@ -516,6 +525,10 @@ namespace Core.Algorithms
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
             var goingGroups = VariableGroupings.GetGoingGroupings(goings).Where(x => x.ElementIds.Contains(race.going ?? 0)).FirstOrDefault();
 
+            if (distanceGroups == null || goingGroups == null) 
+            {
+                return tracker;
+            }
             //PLAN FOR V2 IMPLEMENTATION - TO SPLIT THIS UP INTO MULTIPLE VARIABLES SO WE CAN ADJUST THEM
             var reliabilityHorsePreferences = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityHorsePreferences.ToString()).FirstOrDefault().setting_value.ToString());
             var pointsForEachCondition = reliabilityHorsePreferences / 4;

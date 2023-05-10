@@ -127,14 +127,7 @@ namespace Core.Services
                         var eventEntity = _eventRepository.GetEventById(race.event_id);
 
                         //Ensure that this is not a race which occurred today
-                        if (eventEntity.created.Date != DateTime.Now.Date)
-                        {
-                            result.Add(race);
-                        }
-                        else 
-                        {
-                        
-                        }
+                        result.Add(race);
                     }
                 }
             }

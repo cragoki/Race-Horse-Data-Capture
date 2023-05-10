@@ -98,20 +98,9 @@ namespace Core.Services
             return result;
         }
 
-        public async Task<List<RaceEntity>> GetRacesForTodayToTest()
+        public async Task<IEnumerable<RaceEntity>> GetRacesForTodayToTest()
         {
-            var result = new List<RaceEntity>();
-
-            try
-            {
-                result = _eventRepository.GetTodaysRacesTest().ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to get entities from the database. Error: {ex.InnerException}");
-            }
-
-            return result;
+            return _eventRepository.GetTodaysRacesTest();
         }
 
         private void AddDbInfoForEventAndRaces(Course even, Guid batchId)

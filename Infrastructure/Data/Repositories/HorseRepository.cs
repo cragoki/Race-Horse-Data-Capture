@@ -2,6 +2,7 @@
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace Infrastructure.Data.Repositories
@@ -146,7 +147,17 @@ namespace Infrastructure.Data.Repositories
 
         public IEnumerable<RaceEntity> GetNoResultRaces()
         {
-           return _context.tb_race.Where(x => x.completed == false).ToList();
+           var result = new List<RaceEntity>();
+           var races = _context.tb_race_horse.Where(x => x.position == 0).Select(x => x.Race);
+           foreach(var race in races) 
+           {
+                if (race.RaceHorses.All(x => x.position == 0) && race.Event.created.Date < DateTime.Now.Date) 
+                {
+                    result.Add(race);
+                }
+           }
+
+            return result;
         }
         public IEnumerable<RaceHorseEntity> GetAllRacesForHorse(int horse_id)
         {
