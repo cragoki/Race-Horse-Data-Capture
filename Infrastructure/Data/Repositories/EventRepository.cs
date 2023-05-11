@@ -188,7 +188,7 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_race.Where(x => x.Event.created.Date == DateTime.Now.Date).AsNoTracking();
         }
 
-        public List<RaceEntity> GetRacesForEvent(int eventId)
+        public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
         {
             return _context.tb_race.Where(x => x.event_id == eventId)
                 .Include(x => x.RaceHorses)
@@ -208,7 +208,7 @@ namespace Infrastructure.Data.Repositories
                                         .ThenInclude(x => x.Races)
                                             .ThenInclude(x => x.Race)
                                                 .ThenInclude(x => x.Event)
-                .Include(x => x.Event).ToList();
+                .Include(x => x.Event);
         }
 
         public IEnumerable<RaceEntity> GetRacesForBatch(Guid batchId)

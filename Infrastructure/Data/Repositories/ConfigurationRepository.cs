@@ -62,9 +62,9 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_job.Where(x => x.job_id == (int)job).ToList().FirstOrDefault();
         }
 
-        public List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId)
+        public IEnumerable<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId)
         {
-            return _context.tb_algorithm_settings.Where(x => x.algorithm_id == algorithmId).ToList();
+            return _context.tb_algorithm_settings.Where(x => x.algorithm_id == algorithmId);
         }
 
         public void UpdateNextExecution(JobEnum job)

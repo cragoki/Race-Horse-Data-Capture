@@ -22,7 +22,7 @@ namespace Core.Interfaces.Data.Repositories
         int AddEvent(EventEntity eventToAdd);
         List<CourseEntity> GetCourses();
         List<RaceEntity> GetAllRaces();
-        List<RaceEntity> GetRacesForEvent(int eventId);
+        IEnumerable<RaceEntity> GetRacesForEvent(int eventId);
         void AddRace(RaceEntity raceToUpdate);
         void UpdateRace(RaceEntity raceToUpdate);
         RaceEntity GetRaceById(int raceId);

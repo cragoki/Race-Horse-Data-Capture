@@ -5,6 +5,7 @@ using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.Mail;
+using Infrastructure.Data.Repositories;
 using Infrastructure.PunterAdmin.Services;
 using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.Extensions.Hosting;
@@ -105,10 +106,8 @@ namespace RHDCAutomation
 
                         //Trigger Algorithm for todays results.
                         Console.WriteLine($"Running Predictions");
-                        var distances = _mappingRepository.GetDistanceTypes();
-                        var goings = _mappingRepository.GetGoingTypes();
-                        var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
 
+                        var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
 
                         try
                         {
@@ -119,55 +118,62 @@ namespace RHDCAutomation
                             else
                             {
                                 Console.WriteLine($"Running Active Algorithm {activeAlgorithm.algorithm_name}...");
-
-                                var settings = await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
+                                var predictions = new List<List<FormResultModel>>();
 
                                 foreach (var even in events)
                                 {
                                     var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.EventId);
 
-                                    foreach (var race in races)
+                                    foreach (var race in races.ToList())
                                     {
-                                        var predictions = new List<FormResultModel>();
-
-                                        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly)
+                                        var prediction = new List<FormResultModel>();
+                                        //if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly)
+                                        //{
+                                        //    predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
+                                        //}
+                                        //else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormRevamp)
+                                        //{
+                                        //    predictions = await _formRevampedAlgorithm.FormCalculationPredictions(race, settings, distances, goings);
+                                        //}
+                                        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
                                         {
-                                            predictions = await _form.FormCalculationPredictions(race, settings, distances, goings);
+                                            prediction = await _bentnersModel.RunModel(race);
                                         }
-                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormRevamp)
-                                        {
-                                            predictions = await _formRevampedAlgorithm.FormCalculationPredictions(race, settings, distances, goings);
-                                        }
-                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
-                                        {
-                                            predictions = await _bentnersModel.RunModel(race);
-                                        }
-                                        if (predictions == null || predictions.Count() == 0)
+                                        if (prediction == null || prediction.Count() == 0)
                                         {
                                             continue;
                                         }
+                                        predictions.Add(prediction);
+                                    }
+                                }
 
-                                        foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                for (int i = 0; i < predictions.Count(); i ++ ) 
+                                {
+                                    foreach (var prediction in predictions[i].OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                    {
+                                        try
                                         {
-                                            try
+                                            //store in db
+                                            //Create new table for predictions
+                                            var algorithmPrediction = new AlgorithmPredictionEntity()
                                             {
-                                                //store in db
-                                                //Create new table for predictions
-                                                var algorithmPrediction = new AlgorithmPredictionEntity()
-                                                {
-                                                    race_horse_id = prediction.value.RaceHorseId,
-                                                    algorithm_id = activeAlgorithm.algorithm_id,
-                                                    predicted_position = prediction.i + 1,
-                                                    points = prediction.value.Points ?? 0,
-                                                    points_description = prediction.value.PointsDescription,
-                                                    horse_predictability = prediction.value.Predictability
-                                                };
-                                                _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
-                                            }
-                                            catch (Exception ex)
+                                                race_horse_id = prediction.value.RaceHorseId,
+                                                algorithm_id = activeAlgorithm.algorithm_id,
+                                                predicted_position = prediction.i + 1,
+                                                points = prediction.value.Points ?? 0,
+                                                points_description = prediction.value.PointsDescription,
+                                                horse_predictability = prediction.value.Predictability
+                                            };
+                                            _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
+
+                                            if (prediction.value.Tracker != null)
                                             {
-                                                Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
+                                                _algorithmService.AddAlgorithmTracker(prediction.value.Tracker);
                                             }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
                                         }
                                     }
                                 }

@@ -344,6 +344,7 @@ namespace Core.Services
                 var horseWeightL = htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerWgt__carried_lb')]").InnerText.Replace(" ", "") ?? "";
                 var horseWeight = $"{horseWeightS}.{horseWeightL}";
                 var age = Int32.Parse(htmlDoc.SelectSingleNode(".//span[contains(@class, 'RC-runnerAge')]").InnerText ?? "");
+
                 var identity = await AddOrUpdateHorseData(horse, jockey, trainer);
 
                 raceHorse.jockey_id = identity.JockeyId;

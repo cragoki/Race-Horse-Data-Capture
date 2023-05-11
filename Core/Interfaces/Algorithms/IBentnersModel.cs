@@ -11,11 +11,11 @@ namespace Core.Interfaces.Algorithms
     {
         Task<List<FormResultModel>> RunModel(RaceEntity race);
         Task<AlgorithmResult> GenerateAlgorithmResult(List<RaceEntity> races);
-        Task<List<HorsePredictionModel>> GetHorsePoints(List<RaceHorseEntity> horses, RaceEntity race, List<AlgorithmSettingsEntity> settings);
-        Task<RaceHorseStatisticsTracker> GetCurrentCondition(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
-        Task<RaceHorseStatisticsTracker> GetPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
-        Task<RaceHorseStatisticsTracker> GetAdjustmentsPastPerformance(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
-        Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
-        Task<RaceHorseStatisticsTracker> GetHorsePreferences(RaceEntity race, HorseEntity horse, List<AlgorithmSettingsEntity> settings, RaceHorseStatisticsTracker tracker);
+        Task<List<HorsePredictionModel>> GetHorsePoints(List<RaceHorseEntity> horses, RaceEntity race);
+        Task<RaceHorseStatisticsTracker> GetCurrentCondition(RaceEntity race, HorseEntity horse, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetPastPerformance(RaceEntity race, HorseEntity horse, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetAdjustmentsPastPerformance(RaceEntity race, HorseEntity horse, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetPresentRaceFactors(RaceEntity race, RaceHorseStatisticsTracker tracker);
+        Task<RaceHorseStatisticsTracker> GetHorsePreferences(RaceEntity race, HorseEntity horse, RaceHorseStatisticsTracker tracker);
     }
 }

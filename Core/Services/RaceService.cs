@@ -38,7 +38,7 @@ namespace Core.Services
                     Logger.Info($"Fetching Races for event {even.name}.");
 
                     //Get all of the raceUrls/Weather/course Url for this event
-                    var races = _eventRepository.GetRacesForEvent(EventId);
+                    var races = _eventRepository.GetRacesForEvent(EventId).ToList(); // PULL INTO MEM TO PREVENT TRACKING ERROR
 
                     //Add Each race
                     foreach (var race in races) 

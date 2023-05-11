@@ -10,5 +10,7 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public string Predictability { get; set; }
         public decimal? Points { get; set; }
         public string PointsDescription { get; set; }
+
+        public AlgorithmTrackerEntity Tracker { get; set; }
     }
 }

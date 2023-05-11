@@ -14,7 +14,7 @@ namespace Core.Interfaces.Data.Repositories
         BacklogDateEntity GetBacklogDate();
         void UpdateBacklogDate(DateTime date);
         JobEntity GetJobInfo(JobEnum job);
-        List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
+        IEnumerable<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
         void UpdateNextExecution(JobEnum job);
     }
 }

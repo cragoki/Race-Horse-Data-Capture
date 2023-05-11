@@ -9,7 +9,7 @@ namespace Core.Helpers
 {
     public class VariableGroupings
     {
-        public static List<DistanceGroupModel> GetDistanceGroupings(List<DistanceType> distances) 
+        public static List<DistanceGroupModel> GetDistanceGroupings(IEnumerable<DistanceType> distances) 
         {
             var result = new List<DistanceGroupModel>();
             var sprints = new DistanceGroupModel() {GroupType = DistanceGroupType.Sprint, DistanceIds = new List<int>() };
@@ -77,7 +77,7 @@ namespace Core.Helpers
             return result;
         }
 
-        public static List<FavourGroupModel> GetWeatherGroupings(List<WeatherType> weathers) 
+        public static List<FavourGroupModel> GetWeatherGroupings(IEnumerable<WeatherType> weathers) 
         {
             var result = new List<FavourGroupModel>();
             var noGo = new FavourGroupModel() { FavourType = FavorGroupType.NoGo, ElementIds = new List<int>() };
@@ -119,7 +119,7 @@ namespace Core.Helpers
 
             return result;
         }
-        public static List<GoingGroupModel> GetGoingGroupings(List<GoingType> goings) 
+        public static List<GoingGroupModel> GetGoingGroupings(IEnumerable<GoingType> goings) 
         {
             var result = new List<GoingGroupModel>();
             var heavy = new GoingGroupModel() { GoingType = GoingGroupType.Heavy, ElementIds = new List<int>() };

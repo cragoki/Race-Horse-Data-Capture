@@ -176,5 +176,10 @@ namespace Core.Services
             _algorithmRepository.AddAlgorithmPrediction(prediction);
         }
 
+        public void AddAlgorithmTracker(AlgorithmTrackerEntity tracker)
+        {
+            _algorithmRepository.AddAlgorithmTracker(tracker);
+        }
+
     }
 }

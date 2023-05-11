@@ -82,20 +82,9 @@ namespace Core.Services
             return result;
         }
 
-        public async Task<List<RaceEntity>> GetRacesFromDatabaseForAlgorithm(int event_id)
+        public async Task<IEnumerable<RaceEntity>> GetRacesFromDatabaseForAlgorithm(int event_id)
         {
-            var result = new List<RaceEntity>();
-
-            try
-            {
-                result = _eventRepository.GetRacesForEvent(event_id).ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Failed to get entities from the database. Error: {ex.InnerException}");
-            }
-
-            return result;
+            return _eventRepository.GetRacesForEvent(event_id);
         }
 
         public async Task<IEnumerable<RaceEntity>> GetRacesForTodayToTest()
