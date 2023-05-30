@@ -251,7 +251,7 @@ namespace Infrastructure.PunterAdmin.Services
                 var rpr = ConfigureRPR(raceHorse, even.created);
                 var ts = ConfigureTS(raceHorse, even.created);
                 //FIXFIXFIX
-                var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id).ToList();
+                var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id);
                 var predictedPosition = predictedPositions.Where(x => x.Algorithm.active).FirstOrDefault();
 
                 if (predictedPosition != null) 

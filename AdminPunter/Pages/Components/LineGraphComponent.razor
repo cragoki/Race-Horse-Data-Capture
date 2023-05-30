@@ -3,7 +3,10 @@
 @using Plotly.Blazor.Traces.ScatterLib
 <div class="container">
     <div class="row">
-        <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />
+        @if (Tracker != null)
+        {
+            <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />
+        }
     </div>
 </div>
 
@@ -19,7 +22,11 @@
     Layout layout = new Layout();
 
     protected override async Task OnInitializedAsync()
-    {     
+    {
+        if (Tracker != null)
+        {
+            data = GenerateAxis();
+        }
     }
     // Using of the interface IList is important for the event callback!
     IList<ITrace> data = new List<ITrace>
@@ -29,7 +36,49 @@
             Name = "ScatterTrace",
             Mode = ModeFlag.Lines | ModeFlag.Markers,
             X = new List<object>{1,2,3},
-            Y = new List<object>{1,2,3}
+            Y = new List<object>{1,2,3},
         }
     };
+
+    private IList<ITrace> GenerateAxis()
+    {
+        var xAxis = new List<object>();
+
+        for (int i = 1; i <= Tracker.TotalPoints; i ++)
+        {
+            xAxis.Add(i);
+        }
+
+
+
+        return new List<ITrace>()
+        {
+            new Scatter
+            {
+                Name = "Test",
+                Mode = ModeFlag.Lines | ModeFlag.Markers,
+                X = xAxis,
+                Y = new List<object>
+                {
+                    Tracker.TotalPointsForGetCurrentCondition,
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance,
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance,
+                    //Going
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing,
+                    //RaceType
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType,
+                    //Distance
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance,
+                    //TotalPointsForSpecificTrack
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance + Tracker.TotalPointsForSpecificTrack,
+                    //Jockey
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance + Tracker.TotalPointsForSpecificTrack + Tracker.PointsGivenForTrainer,
+                    //Trainer
+                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance + Tracker.TotalPointsForSpecificTrack + Tracker.PointsGivenForTrainer + Tracker.PointsGivenForJockey,
+                },
+                HoverTextArray = new List<string>{"TotalPointsForGetCurrentCondition","TotalPointsForPastPerformance", "TotalPointsForGetCurrentCondition", "TotalPointsForAdjustmentsPastPerformance",
+                                    "Going", "RaceType", "Distance", "TotalPointsForSpecificTrack", "Jockey", "Trainer"}
+            }
+        };
+    }
 }
