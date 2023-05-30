@@ -135,7 +135,7 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_event.Where(x => x.course_id == courseId && x.batch_id == batch).ToList().FirstOrDefault();
         }
-        public List<EventEntity> GetEventsByBatch(Guid batch)
+        public IQueryable<EventEntity> GetEventsByBatch(Guid batch)
         {
             return _context.tb_event.Where(x => x.batch_id == batch)
                 .Include(x => x.Course)
@@ -144,7 +144,7 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Races)
                     .ThenInclude(y => y.RaceHorses)
                         .ThenInclude(z => z.Horse)
-                            .ThenInclude(a =>a.Archive)
+                            .ThenInclude(a => a.Archive)
                 .Include(x => x.Races)
                     .ThenInclude(y => y.RaceHorses)
                         .ThenInclude(z => z.Jockey)
@@ -160,8 +160,7 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Races)
                     .ThenInclude(y => y.Ages)
                 .Include(x => x.Races)
-                    .ThenInclude(y => y.Going)
-                .ToList();
+                    .ThenInclude(y => y.Going);           
         }
         public IEnumerable<EventEntity> GetEventByCourse(int courseId)
         {

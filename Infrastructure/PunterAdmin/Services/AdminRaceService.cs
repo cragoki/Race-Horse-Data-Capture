@@ -5,6 +5,7 @@ using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Infrastructure.Data;
 using Infrastructure.PunterAdmin.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +19,15 @@ namespace Infrastructure.PunterAdmin.Services
         private static IEventRepository _eventRepository;
         private static IHorseRepository _horseRepository;
         private static IAlgorithmRepository _algorithmRepository;
+        private readonly DbContextData _context;
 
-        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository, IAlgorithmRepository algorithmRepository)
+        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository, IAlgorithmRepository algorithmRepository, DbContextData context)
         {
             _configRepo = configRepo;
             _eventRepository = eventRepository;
             _horseRepository = horseRepository;
             _algorithmRepository = algorithmRepository;
+            _context = context;
         }
 
         public async Task<List<TodaysRacesViewModel>> GetTodaysRaces(RaceRetrievalType retrievalType, Guid? batchId)
@@ -97,6 +100,7 @@ namespace Infrastructure.PunterAdmin.Services
                 result.CurrentRace = race;
                 result.Horse = raceHorse;
                 result.HorseRaces = GetRacesForHorse(raceHorse.HorseId);
+                result.Tracker = GetTrackerData(raceHorse.RaceHorseId);
             }
             catch (Exception ex) 
             {
@@ -143,6 +147,52 @@ namespace Infrastructure.PunterAdmin.Services
                 }
             }
             catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        public RaceHorseTrackerViewModel GetTrackerData(int race_horse_id) 
+        {
+            var result = new RaceHorseTrackerViewModel();
+
+            try
+            {
+                var algoTracker = _algorithmRepository.GetAlgorithmTracker(race_horse_id);
+
+                if (algoTracker != null) 
+                {
+                    result = new RaceHorseTrackerViewModel()
+                    {
+                        Id = algoTracker.algorithm_tracker_id,
+                        RaceHorseId = algoTracker.race_horse_id,
+                        TotalPoints = algoTracker.total_points,
+                        TotalPointsForGetCurrentCondition = algoTracker.total_points_for_get_current_condition,
+                        TotalPointsForLastTwoRaces = algoTracker.total_points_for_last_two_races,
+                        TotalPointsForTimeSinceLastRace = algoTracker.total_points_for_time_since_last_race,
+                        GetCurrentConditionDescription = algoTracker.get_current_condition_description,
+                        TotalPointsForPastPerformance = algoTracker.total_points_for_past_performance,
+                        GetPastPerformanceDescription = algoTracker.get_past_performance_description,
+                        TotalPointsForAdjustmentsPastPerformance = algoTracker.total_points_for_adjustments_past_performance,
+                        TotalPointsForStrengthOfCompetition = algoTracker.total_points_for_strength_of_competition,
+                        TotalPointsForWeight = algoTracker.total_points_for_weight,
+                        TotalPointsForJockeyContribution = algoTracker.total_points_for_jockey_contribution,
+                        GetPastPerformanceAdjustmentsDescription = algoTracker.get_past_performance_adjustments_description,
+                        PointsGivenForJockey = algoTracker.points_given_for_jockey,
+                        PointsGivenForTrainer = algoTracker.points_given_for_trainer,
+                        GetPresentRaceFactorsDescription = algoTracker.get_present_race_factors_description,
+                        TotalPointsForSpecificTrack = algoTracker.total_points_for_specific_track,
+                        TotalPointsForDistance = algoTracker.total_points_for_distance,
+                        TotalPointsForRaceType = algoTracker.total_points_for_race_type,
+                        TotalPointsForGoing = algoTracker.total_points_for_going,
+                        GetHorsePreferencesDescription = algoTracker.get_horse_preferences_description,
+                        Created = algoTracker.created
+                    };
+                }
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -200,7 +250,8 @@ namespace Infrastructure.PunterAdmin.Services
                 decimal racePoints = 0;
                 var rpr = ConfigureRPR(raceHorse, even.created);
                 var ts = ConfigureTS(raceHorse, even.created);
-                var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id);
+                //FIXFIXFIX
+                var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id).ToList();
                 var predictedPosition = predictedPositions.Where(x => x.Algorithm.active).FirstOrDefault();
 
                 if (predictedPosition != null) 

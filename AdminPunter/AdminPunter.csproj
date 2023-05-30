@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Blazored.Modal" Version="6.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.3" />
+    <PackageReference Include="Plotly.Blazor" Version="2.18.2" />
     <PackageReference Include="Stashbox.Extensions.Hosting" Version="4.1.1" />
   </ItemGroup>
 

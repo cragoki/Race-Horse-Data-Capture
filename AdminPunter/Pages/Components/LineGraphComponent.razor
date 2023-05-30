@@ -1,0 +1,35 @@
+﻿@using AdminPunter.Pages.Races
+@using System.Globalization
+@using Plotly.Blazor.Traces.ScatterLib
+<div class="container">
+    <div class="row">
+        <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />
+    </div>
+</div>
+
+
+@code
+{
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [Parameter]
+    public RaceHorseTrackerViewModel Tracker { get; set; }
+
+    PlotlyChart chart;
+    Config config = new Config();
+    Layout layout = new Layout();
+
+    protected override async Task OnInitializedAsync()
+    {     
+    }
+    // Using of the interface IList is important for the event callback!
+    IList<ITrace> data = new List<ITrace>
+    {
+        new Scatter
+        {
+            Name = "ScatterTrace",
+            Mode = ModeFlag.Lines | ModeFlag.Markers,
+            X = new List<object>{1,2,3},
+            Y = new List<object>{1,2,3}
+        }
+    };
+}

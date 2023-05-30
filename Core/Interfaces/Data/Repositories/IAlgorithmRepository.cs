@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Core.Interfaces.Data.Repositories
@@ -7,6 +8,7 @@ namespace Core.Interfaces.Data.Repositories
     public interface IAlgorithmRepository
     {
         AlgorithmEntity GetActiveAlgorithm();
+        AlgorithmTrackerEntity GetAlgorithmTracker(int raceHorse);
         List<AlgorithmEntity> GetAlgorithms();
         AlgorithmEntity GetAlgorithmById(int algorithmId);
         List<AlgorithmVariableEntity> GetAlgorithmVariableByAlgorithmId(int algorithmId);
@@ -17,7 +19,7 @@ namespace Core.Interfaces.Data.Repositories
         void UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings);
         void UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables);
         void AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction);
-        List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id);
+        IQueryable<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id);
         List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id);
         void AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker);
     }

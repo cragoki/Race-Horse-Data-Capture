@@ -364,3 +364,15 @@ span {
 .search-btn {
     margin-bottom:20px;
 }
+
+.mboth {
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom:10%;
+}
+
+    .mboth a {
+        padding-left:50% !important;
+        margin-right: 0px !important;
+        line-height:15px !important;
+    }

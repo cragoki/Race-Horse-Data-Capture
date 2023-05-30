@@ -50,6 +50,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm.Where(x => x.active == true).ToList().FirstOrDefault();
         }
 
+        public AlgorithmTrackerEntity GetAlgorithmTracker(int raceHorse)
+        {
+            return _context.tb_algorithm_tracker.Where(x => x.race_horse_id == raceHorse).OrderByDescending(x => x.created).FirstOrDefault();
+        }
+
         public void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity)
         {
             _context.tb_algorithm.Update(algorithmEntity);
@@ -80,9 +85,9 @@ namespace Infrastructure.Data.Repositories
             SaveChanges();
         }
 
-        public List<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
+        public IQueryable<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
         {
-            return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).Include(x => x.Algorithm).ToList();
+            return _context.tb_algorithm_prediction.Where(x => x.race_horse_id == race_horse_id).AsQueryable();
         }
         public List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id)
         {

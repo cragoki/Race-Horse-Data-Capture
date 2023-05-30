@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.Interfaces.Data.Repositories
 {
@@ -14,7 +15,7 @@ namespace Core.Interfaces.Data.Repositories
         MeetingType GetMeetingTypeById(int meetingTypeId);
         SurfaceType GetSurfaceTypeById(int surfaceTypeId);
         EventEntity GetEventByBatch(int courseId, Guid batch);
-        List<EventEntity> GetEventsByBatch(Guid batch);
+        IQueryable<EventEntity> GetEventsByBatch(Guid batch);
         IEnumerable<RaceEntity> GetRacesForBatch(Guid batchId);
         IEnumerable<EventEntity> GetEventByCourse(int courseId);
         void AddCourse(CourseEntity courseToAdd);

@@ -14,5 +14,6 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public RaceViewModel CurrentRace { get; set; }
         public List<RaceViewModel> HorseRaces { get; set; }
         public List<TsRprAuditViewModel> TsRprAudit { get; set; }
+        public RaceHorseTrackerViewModel Tracker { get; set; }
     }
 }
