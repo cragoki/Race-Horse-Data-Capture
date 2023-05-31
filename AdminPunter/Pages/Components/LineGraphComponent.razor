@@ -2,12 +2,21 @@
 @using System.Globalization
 @using Plotly.Blazor.Traces.ScatterLib
 <div class="container">
+@if (Tracker != null)
+{
     <div class="row">
-        @if (Tracker != null)
-        {
-            <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />
-        }
+            <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />      
     </div>
+    <div class="row">
+        <ul>
+            <li>@Tracker.GetPresentRaceFactorsDescription</li>
+            <li>@Tracker.GetCurrentConditionDescription</li>
+            <li>@Tracker.GetPastPerformanceDescription</li>
+            <li>@Tracker.GetPastPerformanceAdjustmentsDescription</li>
+            <li>@Tracker.GetHorsePreferencesDescription</li>
+        </ul>
+    </div>
+}
 </div>
 
 
@@ -20,7 +29,7 @@
     PlotlyChart chart;
     Config config = new Config();
     Layout layout = new Layout();
-
+    decimal totalPoints = 0M;
     protected override async Task OnInitializedAsync()
     {
         if (Tracker != null)
@@ -44,41 +53,63 @@
     {
         var xAxis = new List<object>();
 
-        for (int i = 1; i <= Tracker.TotalPoints; i ++)
+        for (int i = 0; i <= 12; i ++)
         {
             xAxis.Add(i);
         }
-
-
 
         return new List<ITrace>()
         {
             new Scatter
             {
-                Name = "Test",
+                Name = "Bentners Algorithm",
                 Mode = ModeFlag.Lines | ModeFlag.Markers,
                 X = xAxis,
                 Y = new List<object>
                 {
-                    Tracker.TotalPointsForGetCurrentCondition,
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance,
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance,
-                    //Going
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing,
-                    //RaceType
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType,
-                    //Distance
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance,
-                    //TotalPointsForSpecificTrack
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance + Tracker.TotalPointsForSpecificTrack,
-                    //Jockey
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance + Tracker.TotalPointsForSpecificTrack + Tracker.PointsGivenForTrainer,
-                    //Trainer
-                    Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForPastPerformance + Tracker.TotalPointsForGetCurrentCondition + Tracker.TotalPointsForAdjustmentsPastPerformance + Tracker.TotalPointsForGoing + Tracker.TotalPointsForRaceType + Tracker.TotalPointsForDistance + Tracker.TotalPointsForSpecificTrack + Tracker.PointsGivenForTrainer + Tracker.PointsGivenForJockey,
+                    //Tracker.GetPresentRaceFactors
+                   GetRunningTotal(Tracker.PointsGivenForJockey),
+                   GetRunningTotal(Tracker.PointsGivenForTrainer),
+                    //TotalPointsForGetCurrentCondition
+                   GetRunningTotal(Tracker.TotalPointsForLastTwoRaces),
+                   GetRunningTotal(Tracker.TotalPointsForTimeSinceLastRace),
+
+                    //TotalPointsForPastPerformance
+                   GetRunningTotal(Tracker.TotalPointsForPastPerformance),
+                    
+                    //Tracker.TotalPointsForAdjustmentsPastPerformance,
+                   GetRunningTotal(Tracker.TotalPointsForWeight),
+                   GetRunningTotal(Tracker.TotalPointsForJockeyContribution),
+                   GetRunningTotal(Tracker.TotalPointsForStrengthOfCompetition),
+
+                   //GetHorsePreferences
+                   GetRunningTotal(Tracker.TotalPointsForSpecificTrack),
+                   GetRunningTotal(Tracker.TotalPointsForDistance),
+                   GetRunningTotal(Tracker.TotalPointsForRaceType),
+                   GetRunningTotal(Tracker.TotalPointsForGoing),
                 },
-                HoverTextArray = new List<string>{"TotalPointsForGetCurrentCondition","TotalPointsForPastPerformance", "TotalPointsForGetCurrentCondition", "TotalPointsForAdjustmentsPastPerformance",
-                                    "Going", "RaceType", "Distance", "TotalPointsForSpecificTrack", "Jockey", "Trainer"}
+                HoverTextArray = new List<string>
+                {
+                    "PointsGivenForJockey (1)",
+                    "PointsGivenForTrainer (2)",
+                    "TotalPointsForLastTwoRaces (2)",
+                    "TotalPointsForTimeSinceLastRace (2)",
+                    "TotalPointsForPastPerformance (3)",
+                    "TotalPointsForWeight (4)",
+                    "TotalPointsForJockeyContribution (4)",
+                    "TotalPointsForStrengthOfCompetition (4)",
+                    "TotalPointsForSpecificTrack (5)",
+                    "TotalPointsForDistance (5)",
+                    "TotalPointsForRaceType (5)",
+                    "TotalPointsForGoing (5)"
+                }
             }
         };
+    }
+
+    private decimal GetRunningTotal(decimal points)
+    {
+        totalPoints = totalPoints + points;
+        return totalPoints;
     }
 }

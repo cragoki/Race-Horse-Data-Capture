@@ -410,7 +410,7 @@ namespace Core.Algorithms
                 {
                     //we then take that variable and work it out as a % against total races. Divide that by 10 and multiply it by points
                     var percentageOfRacesWithGreaterRpr = (int)Math.Round((double)(100 * racesWithGreaterRprs) / pastRaces.Count());
-                    result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength; //TEST THIS WORKS
+                    result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength; 
                     tracker.TotalPointsForStrengthOfCompetition += FormatHelper.ToTwoPlaces((percentageOfRacesWithGreaterRpr / 10) * pointsForStrength);
                     tracker.GetPastPerformanceAdjustmentsDescription += $"--Plus {tracker.TotalPointsForStrengthOfCompetition} for strength of competition with {percentageOfRacesWithGreaterRpr}% of horses with greater rpr --";
                     //Optimal Weight in past races - Get each past race and get the weight for their top 3 performances
