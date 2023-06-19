@@ -88,5 +88,22 @@ namespace Infrastructure.Data.Repositories
             _context.SaveChanges();
         }
 
+        public void DeleteFailedResult(FailedResultEntity entity)
+        {
+            _context.tb_failed_result.Remove(entity);
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<FailedResultEntity> GetFailedResults()
+        {
+            return _context.tb_failed_result;
+        }
+
+        public void AddFailedResult(FailedResultEntity entity) 
+        {
+            _context.tb_failed_result.Add(entity);
+            _context.SaveChanges();
+        }
+
     }
 }

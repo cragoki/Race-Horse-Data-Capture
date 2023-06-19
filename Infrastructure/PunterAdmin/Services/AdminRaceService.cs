@@ -19,15 +19,15 @@ namespace Infrastructure.PunterAdmin.Services
         private static IEventRepository _eventRepository;
         private static IHorseRepository _horseRepository;
         private static IAlgorithmRepository _algorithmRepository;
-        private readonly DbContextData _context;
+        private static IScraperService _scraperService;
 
-        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository, IAlgorithmRepository algorithmRepository, DbContextData context)
+        public AdminRaceService(IConfigurationRepository configRepo, IEventRepository eventRepository, IHorseRepository horseRepository, IAlgorithmRepository algorithmRepository, IScraperService scraperService)
         {
             _configRepo = configRepo;
             _eventRepository = eventRepository;
             _horseRepository = horseRepository;
             _algorithmRepository = algorithmRepository;
-            _context = context;
+            _scraperService = scraperService;
         }
 
         public async Task<List<TodaysRacesViewModel>> GetTodaysRaces(RaceRetrievalType retrievalType, Guid? batchId)
@@ -198,6 +198,54 @@ namespace Infrastructure.PunterAdmin.Services
             }
 
             return result;
+        }
+
+        public async Task RunResultRetrieval() 
+        {
+            var results = new List<RaceHorseEntity>();
+            try
+            {
+                var horses = _horseRepository.GetRaceHorseWithNoPosition();
+
+                foreach (var horse in horses) 
+                {
+                    try
+                    {
+                        var horseResult = await _scraperService.GetResultsForRaceHorse(horse);
+                        results.Add(horseResult);
+                    }
+                    catch (Exception ex) 
+                    {
+
+                        //Ignore for now
+                    }
+                }
+
+                foreach (var raceHorse in results) 
+                {
+                    //Check the Failed results table to remove this race_horse if result is retrieved successfully
+
+                    if (raceHorse.position == -1)
+                    {
+                        var failedResult = new FailedResultEntity()
+                        {
+                            race_horse_id = raceHorse.race_horse_id,
+                            error_message = raceHorse.description
+                        };
+                        
+                        raceHorse.description = "ERROR";
+                        raceHorse.position = 0;
+
+                        _configRepo.AddFailedResult(failedResult);
+                    }
+
+                    _horseRepository.UpdateRaceHorse(raceHorse);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         private List<RaceViewModel> BuildTodaysRaceViewModel(List<RaceEntity> races, DateTime date) 

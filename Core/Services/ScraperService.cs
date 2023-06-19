@@ -208,19 +208,36 @@ namespace Core.Services
                     var comment = commentDivs[i].SelectSingleNode("td").InnerText;
 
                     var horse = _horseRepository.GetHorseByRpId(horseId);
-
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
 
-                    if (toUpdate != null)
+                    try
                     {
-                        toUpdate.position = Int32.Parse(formattedPos);
-                        toUpdate.description = comment.Replace("  ", "");
-                        toUpdate.finished = true;
 
-                        _horseRepository.UpdateRaceHorse(toUpdate);
+                        if (toUpdate != null)
+                        {
+                            toUpdate.position = Int32.Parse(formattedPos);
 
-                        result.Add(toUpdate);
+                            if (toUpdate.position == 0)
+                            {
+                                toUpdate.description = "NR";
+                            }
+                            else 
+                            {
+                                toUpdate.description = "";
+                            }
+
+                            toUpdate.finished = true;
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        toUpdate.position = -1;
+                        toUpdate.description = "ERROR";
+                        toUpdate.finished = false;
+                    }
+
+                    result.Add(toUpdate);
+                    _horseRepository.UpdateRaceHorse(toUpdate);
 
                 }
 
@@ -231,6 +248,92 @@ namespace Core.Services
             }
 
             return result;
+        }
+
+        public async Task<RaceHorseEntity> GetResultsForRaceHorse(RaceHorseEntity raceHorse)
+        {
+            try
+            {
+                //Build the URL
+                var resultUrl = raceHorse.Race.race_url.Replace("racecards", "results");
+                var url = $"{_racingPostConfig.BaseUrl + resultUrl}";
+                Thread.Sleep(5000);
+                //Get the raw HTML
+                var page = await CallUrl(url);
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(page);
+
+                var resultDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__mainRow')]");
+                var commentDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__commentRow')]");
+                
+                for (int i = 0; i < resultDivs.Count; i++)
+                {
+                    //Horse
+                    //div class rp-horseTable__horse
+                    var horseDiv = resultDivs[i].SelectSingleNode(".//div[contains(@class, 'rp-horseTable__horse')]");
+                    //a class rp-horseTable__horse__name => href get url and parse into ID
+                    var rpHorseurl = horseDiv.SelectSingleNode(".//a[contains(@class,'rp-horseTable__horse__name')]")?.Attributes["href"].Value ?? "";
+                    var horseId = await ExtractHorseIdFromUrl(rpHorseurl);
+
+
+                    //Position
+                    //div class rp-horseTable__pos__numWrapper
+                    var positionDiv = resultDivs[i].SelectSingleNode(".//div[contains(@class, 'rp-horseTable__pos__numWrapper')]");
+                    //span class rp-horseTable__pos__number inner text
+                    var position = positionDiv.SelectSingleNode(".//span[contains(@class, 'rp-horseTable__pos__number')]")?.InnerText.Replace(" ", "");
+                    string formattedPos = "";
+                    var index = position.IndexOf("(");
+                    if (index == -1)
+                    {
+                        formattedPos = Regex.Match(position, @"\d+").Value;
+                    }
+                    else
+                    {
+                        formattedPos = Regex.Match(position, @"\d+").Value;
+                    }
+                    //Comment
+                    //tr class rp-horseTable__commentRow
+                    var comment = commentDivs[i].SelectSingleNode("td").InnerText;
+
+                    var horse = _horseRepository.GetHorseByRpId(horseId);
+
+                    if (horse != null && horse.horse_id == raceHorse.horse_id) 
+                    {
+                        try
+                        {
+                            raceHorse.position = Int32.Parse(formattedPos);
+                            if (raceHorse.position == 0)
+                            {
+                                raceHorse.description = "NR";
+                            }
+                            raceHorse.finished = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            raceHorse.position = -1;
+                            raceHorse.description = ex.Message;
+                            raceHorse.finished = false;
+                            //Could log errors to a seperate table to review and maybe manually input?
+                        }
+
+                        return raceHorse;
+                    }
+
+                }
+
+                raceHorse.position = 0;
+                raceHorse.description = "NR";
+                raceHorse.finished = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to retrieve results for race horse {raceHorse.race_horse_id} ... {ex.Message}");
+                raceHorse.position = -1;
+                raceHorse.description = ex.Message;
+                raceHorse.finished = false;
+            }
+
+            return raceHorse;
         }
 
         private async Task<string> ExtractCourseUrl(HtmlDocument htmlDoc)

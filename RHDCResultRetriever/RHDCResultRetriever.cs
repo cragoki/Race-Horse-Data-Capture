@@ -74,7 +74,7 @@ namespace RHDCResultRetriever
                         foreach (var even in events)
                         {
                             var races = await _raceService.GetEventRacesFromDB(even.event_id);
-                            races.AddRange(await _raceService.GetIncompleteRaces());
+                            //races.AddRange(await _raceService.GetIncompleteRaces());
                             Logger.Info($"Retrieved {races.Count()} races for event {even.name}");
 
                             //foreach race convert the race url into a result URL and scrape the results into tb_race_horse

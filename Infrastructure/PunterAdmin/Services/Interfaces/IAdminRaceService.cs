@@ -10,5 +10,6 @@ namespace Infrastructure.PunterAdmin.Services
     {
         Task<List<TodaysRacesViewModel>> GetTodaysRaces(RaceRetrievalType retrievalType, Guid? batchId);
         Task<RaceHorseStatisticsViewModel> GetHorseStatistics(RaceHorseViewModel raceHorse, RaceViewModel race);
+        Task RunResultRetrieval();
     }
 }

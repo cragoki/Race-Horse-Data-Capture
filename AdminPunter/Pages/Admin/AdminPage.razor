@@ -1,0 +1,40 @@
+﻿@page "/Races/AdminPage"
+@using AdminPunter.Pages.Components
+@using Core.Enums
+
+<PageTitle>Admin</PageTitle>
+
+@inject IAdminRaceService adminRaceService;
+
+
+@if (isLoading)
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <p>Loading...</p>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-lg-12">
+       <input value="Get Missing Data" type="button" class="btn btn-primary" @onclick="@(e => @GetMissingData())" />
+    </div>
+</div>
+
+
+@code {
+    bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private async Task GetMissingData()
+    {
+        isLoading = true;
+        await adminRaceService.RunResultRetrieval();
+        isLoading = false;
+    }
+}

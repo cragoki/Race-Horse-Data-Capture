@@ -13,5 +13,6 @@ namespace Core.Interfaces.Services
         Task<DailyRaces> RetrieveBacklogEvents(DateTime date);
         Task<List<RaceHorseModel>> RetrieveHorseDetailsForRace(RaceEntity race);
         Task<List<RaceHorseEntity>> GetResultsForRace(RaceEntity race, List<RaceHorseEntity> raceHorses);
+        Task<RaceHorseEntity> GetResultsForRaceHorse(RaceHorseEntity raceHorse);
     }
 }

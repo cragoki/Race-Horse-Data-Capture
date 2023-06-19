@@ -16,5 +16,9 @@ namespace Core.Interfaces.Data.Repositories
         JobEntity GetJobInfo(JobEnum job);
         IEnumerable<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
         void UpdateNextExecution(JobEnum job);
+        void DeleteFailedResult(FailedResultEntity entity);
+        IEnumerable<FailedResultEntity> GetFailedResults();
+        void AddFailedResult(FailedResultEntity entity);
+
     }
 }

@@ -30,6 +30,7 @@ namespace Core.Interfaces.Data
         DbSet<AlgorithmSettingsEntity> tb_algorithm_settings { get; set; }
         DbSet<AlgorithmPredictionEntity> tb_algorithm_prediction { get; set; }
         DbSet<AlgorithmTrackerEntity> tb_algorithm_tracker { get; set; }
+        DbSet<FailedResultEntity> tb_failed_result { get; set; }
         void DetachAllEntities();
     }
 }
