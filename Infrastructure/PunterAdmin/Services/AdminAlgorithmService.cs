@@ -28,9 +28,11 @@ namespace Infrastructure.PunterAdmin.Services
         private IFormAlgorithm _form;
         private IFormRevamped _formRevamp;
         private IBentnersModel _bentnersModel;
+        private IConfigurationRepository _configurationRepository;
+        private IHorseRepository _horseRepository;
 
 
-        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository, IFormRevamped formRevamp, IBentnersModel bentnersModel)
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository, IFormRevamped formRevamp, IBentnersModel bentnersModel, IConfigurationRepository configurationRepository, IHorseRepository horseRepository)
         {
             _algorithmRepository = algorithmRepository;
             _eventRepository = eventRepository;
@@ -41,6 +43,8 @@ namespace Infrastructure.PunterAdmin.Services
             _mappingRepository = mappingRepository;
             _formRevamp = formRevamp;
             _bentnersModel = bentnersModel;
+            _configurationRepository = configurationRepository;
+            _horseRepository = horseRepository;
         }
 
         public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
@@ -587,6 +591,36 @@ namespace Infrastructure.PunterAdmin.Services
                     setting_value = setting.SettingValue,
                     algorithm_setting_id = setting.AlgorithmSettingId
                 });
+            }
+
+            return result;
+        }
+
+        public List<FailedResultsViewModel> GetFailedResultsTable() 
+        {
+            var result = new List<FailedResultsViewModel>();
+
+            try
+            {
+                var failedResults = _configurationRepository.GetFailedResults();
+
+                foreach (var failedResult in failedResults) 
+                {
+                    var raceHorse = _horseRepository.GetRaceHorseById(failedResult.race_horse_id);
+
+                    result.Add(new FailedResultsViewModel() 
+                    {
+                        RaceHorseId = failedResult.race_horse_id,
+                        Position = raceHorse.position,
+                        Description = failedResult.error_message,
+                        RaceUrl = $"https://www.racingpost.com/{raceHorse.Race.race_url.Replace("racecards", "results")}",
+                        HorseName = raceHorse.Horse.horse_name
+                    });
+                }
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
             }
 
             return result;

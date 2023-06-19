@@ -169,6 +169,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event).Include(x => x.Race).ThenInclude(x => x.RaceHorses).Where(x => x.Race.Event.created >= DateTime.Now.AddMonths(-4) && x.position == 0 && x.description != "NR" && x.description != "ERROR" && !x.Race.RaceHorses.All(x => x.position == 0)).Take(1000);
         }
 
+        public RaceHorseEntity GetRaceHorseById(int id)
+        {
+            return _context.tb_race_horse.Include(x => x.Race).Include(x => x.Horse).Where(x => x.race_horse_id == id).FirstOrDefault();
+        }
+
         public void SaveChanges()
         {
             if (_configService.SavePermitted())

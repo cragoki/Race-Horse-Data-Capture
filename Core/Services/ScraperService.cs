@@ -232,7 +232,7 @@ namespace Core.Services
                     catch (Exception ex)
                     {
                         toUpdate.position = -1;
-                        toUpdate.description = "ERROR";
+                        toUpdate.description = ex.Message;
                         toUpdate.finished = false;
                     }
 

@@ -17,13 +17,15 @@ namespace Core.Services
         private readonly IEventRepository _eventRepository;
         private readonly IHorseRepository _horseRepository;
         private readonly IMappingTableRepository _mappingRepository;
+        private readonly IConfigurationRepository _configRepo;
 
-        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository, IMappingTableRepository mappingRepository)
+        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository, IMappingTableRepository mappingRepository, IConfigurationRepository configRepo)
         {
             _scraperService = scraperService;
             _eventRepository = evenRepository;
             _horseRepository = horseRepository;
             _mappingRepository = mappingRepository;
+            _configRepo = configRepo;
         }
 
         public async Task GetEventRaces(int EventId)
@@ -97,6 +99,27 @@ namespace Core.Services
                 if (raceHorses != null || raceHorses.Count() != 0 && raceHorses.All(x => x.position != 0))
                 {
                     raceDb.completed = true;
+                }
+
+                foreach (var raceHorse in raceHorses.Where(x => x.description == "ERROR"))
+                {
+                    //Check the Failed results table to remove this race_horse if result is retrieved successfully
+
+                    if (raceHorse.position == -1)
+                    {
+                        var failedResult = new FailedResultEntity()
+                        {
+                            race_horse_id = raceHorse.race_horse_id,
+                            error_message = raceHorse.description
+                        };
+
+                        raceHorse.description = "ERROR";
+                        raceHorse.position = 0;
+
+                        _configRepo.AddFailedResult(failedResult);
+                    }
+
+                    _horseRepository.UpdateRaceHorse(raceHorse);
                 }
 
                 _eventRepository.UpdateRace(raceDb);
