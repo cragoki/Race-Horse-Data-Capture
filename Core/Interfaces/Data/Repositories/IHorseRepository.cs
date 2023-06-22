@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.Interfaces.Data.Repositories
 {

@@ -2,6 +2,7 @@
 using Core.Helpers;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,15 +17,13 @@ namespace Core.Services
         private readonly IScraperService _scraperService;
         private readonly IEventRepository _eventRepository;
         private readonly IHorseRepository _horseRepository;
-        private readonly IMappingTableRepository _mappingRepository;
         private readonly IConfigurationRepository _configRepo;
 
-        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository, IMappingTableRepository mappingRepository, IConfigurationRepository configRepo)
+        public RaceService(IScraperService scraperService, IEventRepository evenRepository, IHorseRepository horseRepository, IConfigurationRepository configRepo)
         {
             _scraperService = scraperService;
             _eventRepository = evenRepository;
             _horseRepository = horseRepository;
-            _mappingRepository = mappingRepository;
             _configRepo = configRepo;
         }
 
@@ -45,14 +44,21 @@ namespace Core.Services
                     //Add Each race
                     foreach (var race in races) 
                     {
-                        //Now use the race URL to fetch the Horses/Trainers/Owners
-                        var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
-
-                        //if they dont then add them into tb_horse
-                        foreach (var raceHorse in horses) 
+                        try 
                         {
-                            var rh = raceHorse.RaceHorse;
-                            _horseRepository.AddRaceHorse(rh);
+                            //Now use the race URL to fetch the Horses/Trainers/Owners
+                            var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
+
+                            //if they dont then add them into tb_horse
+                            foreach (var raceHorse in horses)
+                            {
+                                var rh = raceHorse.RaceHorse;
+                                _horseRepository.AddRaceHorse(rh);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            FailedRace(race, ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message);
                         }
                     }
 
@@ -99,9 +105,68 @@ namespace Core.Services
                 if (raceHorses != null || raceHorses.Count() != 0 && raceHorses.All(x => x.position != 0))
                 {
                     raceDb.completed = true;
+                    if (raceHorses.Any(x => x.position == -1)) 
+                    {
+                        foreach (var raceHorse in raceHorses.Where(x => x.position == -1))
+                        {
+                            //Check the Failed results table to remove this race_horse if result is retrieved successfully
+                            var failedResult = new FailedResultEntity()
+                            {
+                                race_horse_id = raceHorse.race_horse_id,
+                                error_message = raceHorse.description
+                            };
+
+                            raceHorse.description = "ERROR";
+                            raceHorse.position = 0;
+
+                            _configRepo.AddFailedResult(failedResult);
+
+
+                            _horseRepository.UpdateRaceHorse(raceHorse);
+                        }
+                    }
                 }
 
-                foreach (var raceHorse in raceHorses.Where(x => x.description == "ERROR"))
+                _eventRepository.UpdateRace(raceDb);
+                Logger.Info($"Update Complete!");
+                Logger.Info($"Finding next race...");
+
+            }
+            catch (Exception ex) 
+            {
+                var failedResult = new FailedResultEntity()
+                {
+                    race_horse_id = race.RaceHorses.FirstOrDefault().race_horse_id,
+                    error_message = "Something went wrong collecting the results for this race"
+                };
+
+                _configRepo.AddFailedResult(failedResult);
+                Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
+            }
+        }
+
+        public async Task<List<RaceHorseEntity>> GetIncompleteRaces() 
+        {
+            var results = new List<RaceHorseEntity>();
+            try
+            {
+                var horses = _horseRepository.GetRaceHorseWithNoPosition();
+
+                foreach (var horse in horses)
+                {
+                    try
+                    {
+                        var horseResult = await _scraperService.GetResultsForRaceHorse(horse);
+                        results.Add(horseResult);
+                    }
+                    catch (Exception ex)
+                    {
+
+                        //Ignore for now
+                    }
+                }
+
+                foreach (var raceHorse in results)
                 {
                     //Check the Failed results table to remove this race_horse if result is retrieved successfully
 
@@ -121,45 +186,13 @@ namespace Core.Services
 
                     _horseRepository.UpdateRaceHorse(raceHorse);
                 }
-
-                _eventRepository.UpdateRace(raceDb);
-                Logger.Info($"Update Complete!");
-                Logger.Info($"Finding next race...");
-
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
-            }
-        }
-
-        public async Task<List<RaceEntity>> GetIncompleteRaces() 
-        {
-            var result = new List<RaceEntity>();
-
-            try
-            {
-                //Get a list of races from the database where tb_race_horse.result = null AND where date is not today
-                var nonCompleteRaces = _horseRepository.GetNoResultRaces();
-
-                if (nonCompleteRaces != null && nonCompleteRaces.Count() > 0) 
-                {
-                    //Get race URL/Date
-                    foreach (var race in nonCompleteRaces) 
-                    {
-                        var eventEntity = _eventRepository.GetEventById(race.event_id);
-
-                        //Ensure that this is not a race which occurred today
-                        result.Add(race);
-                    }
-                }
-            }
-            catch (Exception ex) 
-            {
-                Logger.Error($"Error attempting to retrieve incomplete races.  {ex.Message}");
+                throw new Exception(ex.Message);
             }
 
-            return result;
+            return results;
         }
 
         public async Task<int> GetRprForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate) 
@@ -199,6 +232,65 @@ namespace Core.Services
             }
 
             return -1;
+        }
+
+        public async Task<int> GetMissingRaceData() 
+        {
+            var result = 0;
+
+            try
+            {
+                var racesToRetry = _eventRepository.GetRacesWithMissingRaceHorses();
+
+                foreach (var race in racesToRetry) 
+                {
+                    try
+                    {
+                        //Now use the race URL to fetch the Horses/Trainers/Owners
+                        var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
+
+                        //if they dont then add them into tb_horse
+                        foreach (var raceHorse in horses)
+                        {
+                            var rh = raceHorse.RaceHorse;
+                            _horseRepository.AddRaceHorse(rh);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        FailedRace(race, ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message);
+                    }
+
+                    result++;
+                }
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        private void FailedRace(RaceEntity race, string exception) 
+        {
+            var existing = _configRepo.GetFailedRace(race.race_id);
+            if (existing == null)
+            {
+                var failedResult = new FailedRaceEntity()
+                {
+                    race_id = race.race_id,
+                    error_message = exception
+                };
+
+                _configRepo.AddFailedRace(failedResult);
+            }
+            else
+            {
+                existing.attempts++;
+                existing.error_message = exception;
+                _configRepo.UpdateFailedRace(existing);
+            }
         }
     }
 }

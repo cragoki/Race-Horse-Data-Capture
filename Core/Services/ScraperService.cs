@@ -154,6 +154,7 @@ namespace Core.Services
             catch (Exception ex)
             {
                 Logger.Error($"Failed to retrieve races for race {race.race_id} ... {ex.Message}");
+                throw new Exception(ex.Message);
             }
 
 
@@ -215,15 +216,35 @@ namespace Core.Services
 
                         if (toUpdate != null)
                         {
-                            toUpdate.position = Int32.Parse(formattedPos);
+                            if (String.IsNullOrEmpty(formattedPos)) 
+                            {
+                                toUpdate.position = 0;
 
-                            if (toUpdate.position == 0)
-                            {
-                                toUpdate.description = "NR";
+                                if (position.Contains("PU")) 
+                                {
+                                    toUpdate.description = "Pulled-Up";
+                                }
+                                else if (position.Contains("UR"))
+                                {
+                                    toUpdate.description = "Unseated Rider";
+                                }
+                                else if (position.Contains("F"))
+                                {
+                                    toUpdate.description = "Fell";
+                                }
                             }
-                            else 
+                            else
                             {
-                                toUpdate.description = "";
+                                toUpdate.position = Int32.Parse(formattedPos);
+
+                                if (toUpdate.position == 0)
+                                {
+                                    toUpdate.description = "NR";
+                                }
+                                else
+                                {
+                                    toUpdate.description = "";
+                                }
                             }
 
                             toUpdate.finished = true;
@@ -232,7 +253,7 @@ namespace Core.Services
                     catch (Exception ex)
                     {
                         toUpdate.position = -1;
-                        toUpdate.description = ex.Message;
+                        toUpdate.description = ex.Message + " --- " + formattedPos + "---" + position;
                         toUpdate.finished = false;
                     }
 

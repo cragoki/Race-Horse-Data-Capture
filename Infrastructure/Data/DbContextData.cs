@@ -51,5 +51,6 @@ namespace Infrastructure.Data
         public DbSet<AlgorithmPredictionEntity> tb_algorithm_prediction { get; set; }
         public DbSet<AlgorithmTrackerEntity> tb_algorithm_tracker { get; set; }
         public DbSet<FailedResultEntity> tb_failed_result { get; set; }
+        public DbSet<FailedRaceEntity> tb_failed_race { get; set; }
     }
 }

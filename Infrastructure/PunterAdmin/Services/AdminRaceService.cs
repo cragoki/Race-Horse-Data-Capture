@@ -99,7 +99,7 @@ namespace Infrastructure.PunterAdmin.Services
                 result.Weight = raceHorse.Weight;
                 result.CurrentRace = race;
                 result.Horse = raceHorse;
-                result.HorseRaces = GetRacesForHorse(raceHorse.HorseId);
+                result.HorseRaces = new List<RaceViewModel>();//GetRacesForHorse(raceHorse.HorseId); //Would be better to just return the Race URL, position etc....
                 result.Tracker = GetTrackerData(raceHorse.RaceHorseId);
             }
             catch (Exception ex) 

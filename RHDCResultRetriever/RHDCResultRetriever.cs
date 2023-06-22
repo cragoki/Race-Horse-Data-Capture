@@ -81,7 +81,14 @@ namespace RHDCResultRetriever
                             foreach (var race in races)
                             {
                                 Logger.Info($"Getting race results for {race.description}");
-                                await _raceService.GetRaceResults(race);
+                                try
+                                {
+                                    await _raceService.GetRaceResults(race);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logger.Info($"Error Getting race results for Race {race.race_id}");
+                                }
                             }
                         }
 

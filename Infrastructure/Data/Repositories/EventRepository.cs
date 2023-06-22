@@ -326,6 +326,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_race_horse.Where(x => x.race_id == raceId).Include(x => x.Horse).ThenInclude(x => x.Archive).Include(x => x.Race).ThenInclude(x => x.Event).ToList();
         }
 
+        public List<RaceEntity> GetRacesWithMissingRaceHorses() 
+        {
+            return _context.tb_race.Include(x => x.RaceHorses).Include(x => x.Event).Where(x => x.RaceHorses.Count() == 0 && x.Event.created > DateTime.Now.Date.AddMonths(-4)).OrderBy(x => x.Event.created).Take(10).ToList();
+        }
+
         public void SaveChanges()
         {
             if (_configService.SavePermitted())

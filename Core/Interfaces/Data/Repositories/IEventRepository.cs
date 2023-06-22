@@ -32,5 +32,6 @@ namespace Core.Interfaces.Data.Repositories
         void SaveChanges();
         List<EventEntity> TestAlgorithmWithOneHundredEvents();
         RaceEntity GetAllRaceDataById(int raceId);
+        List<RaceEntity> GetRacesWithMissingRaceHorses();
     }
 }

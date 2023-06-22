@@ -5,6 +5,7 @@
 <PageTitle>Admin</PageTitle>
 
 @inject IAdminAlgorithmService algorithmService;
+@inject IAdminRaceService adminRaceService;
 
 
 @if (isLoading)
@@ -60,7 +61,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        FailedResults = algorithmService.GetFailedResults();
+        FailedResults = algorithmService.GetFailedResultsTable();
     }
 
     private async Task GetMissingData()

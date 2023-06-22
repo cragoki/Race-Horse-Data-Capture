@@ -3,6 +3,7 @@
     public enum AutomatorEnum
     {
             RHDCFetch,
-            RHDCResultRetriever
+            RHDCResultRetriever,
+            RHDCCleaner
     }
 }

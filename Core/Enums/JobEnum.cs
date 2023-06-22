@@ -3,7 +3,7 @@
     public enum JobEnum
     {
         rhdcautomation = 2,
-        rhdcbacklog = 3,
+        rhdccleaner = 3,
         rhdcresultretriever = 4
     }
 }

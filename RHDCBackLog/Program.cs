@@ -47,7 +47,7 @@ namespace RHDCBackLog
             {
                 services.Configure<HostOptions>(opts
                     => opts.ShutdownTimeout = TimeSpan.FromMinutes(2));
-                services.AddHostedService<RHDCBackLogAutomator>();
+                services.AddHostedService<RHDCCleanerAutomator>();
 
                 services.AddDbContextPool<DbContextData>(option =>
                     option.UseSqlServer(hostContext.Configuration.GetConnectionString("DefaultConnection"),

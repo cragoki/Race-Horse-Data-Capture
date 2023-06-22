@@ -124,7 +124,7 @@ namespace RHDCAutomation
                                 {
                                     var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.EventId);
 
-                                    foreach (var race in races.ToList())
+                                    foreach (var race in races)
                                     {
                                         var prediction = new List<FormResultModel>();
                                         //if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.FormOnly)
@@ -147,7 +147,7 @@ namespace RHDCAutomation
                                     }
                                 }
 
-                                for (int i = 0; i < predictions.Count(); i ++ ) 
+                                for (int i = 0; i < predictions.Count(); i++)
                                 {
                                     foreach (var prediction in predictions[i].OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
                                     {

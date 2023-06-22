@@ -2,6 +2,7 @@
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.Mail;
+using Core.Models.RP.GetRaceNew;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace RHDCBackLog
 {
-    public class RHDCBackLogAutomator : BackgroundService
+    public class RHDCCleanerAutomator : BackgroundService
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private IRaceService _raceService;
@@ -21,7 +22,7 @@ namespace RHDCBackLog
         private static Guid _batch;
 
 
-        public RHDCBackLogAutomator(IRaceService raceService, IConfigurationService configService, IMailService mailService, IEventService eventService)
+        public RHDCCleanerAutomator(IRaceService raceService, IConfigurationService configService, IMailService mailService, IEventService eventService)
         {
             _raceService = raceService;
             _configService = configService;
@@ -40,7 +41,7 @@ namespace RHDCBackLog
             { 
                 try
                 {
-                    var job = await _configService.GetJobInfo(JobEnum.rhdcbacklog);
+                    var job = await _configService.GetJobInfo(JobEnum.rhdccleaner);
 
                     Console.WriteLine("No errors, DB connection successful.");
 
@@ -48,11 +49,10 @@ namespace RHDCBackLog
                     {
                         Console.WriteLine($"Beginning Batch at {DateTime.Now}");
                         _batch = Guid.NewGuid();
-                        int eventsFiltered = 0;
                         Logger.Info("-------------------------------------------------------------------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
-                        Logger.Info("-----------------------------------Backlog Automator Inilializing--------------------------------");
+                        Logger.Info("----------------------------------------Cleaner Inilializing-------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
                         Logger.Info("-------------------------------------------------------------------------------------------------");
@@ -64,11 +64,29 @@ namespace RHDCBackLog
                             TimeInitialized = DateTime.Now
                         };
 
-                        //Complete races from the database
-                        await BackFill();
+                        //Get Race Data for races which have no Race Horses within Last 4 months
+                        try
+                        {
+                            var races = _raceService.GetMissingRaceData();
+                            Logger.Info($"Processed {races} Races With Missing Race Horse Data");
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Info($"Error Trying to Process Missing Race Data {ex.Message}");
+                        }
 
-                        //Get next 'dates' results:
-                        //await BackLog();
+                        //Get Missing Results Data
+                        try
+                        {
+                            var raceHorses = await _raceService.GetIncompleteRaces();
+                            Logger.Info($"Processed {raceHorses.Count} Race Horses With Missing Race Result Data");
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Info($"Error Trying to Process Missing Result Data {ex.Message}");
+                        }
+
+                        //Purge old records
 
                         var diagnosticsString = JsonSerializer.Serialize(diagnostics);
                         Logger.Info(diagnosticsString);
@@ -82,7 +100,7 @@ namespace RHDCBackLog
                         Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
-                        if (!await _configService.UpdateJob(JobEnum.rhdcbacklog))
+                        if (!await _configService.UpdateJob(JobEnum.rhdccleaner))
                         {
                             //Send Error Email and stop service as the service will be broken
                             var email = new MailModel()
@@ -114,51 +132,6 @@ namespace RHDCBackLog
 
                     _mailService.SendEmailAsync(email);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Backfill fills any current null race data we have in the database
-        /// </summary>
-        /// <returns></returns>
-        public async Task BackFill() 
-        {
-            Logger.Info($"Retrieving existing data with missing results...");
-            try
-            {
-                var incompleteRaces = await _raceService.GetIncompleteRaces();
-
-                foreach (var race in incompleteRaces)
-                {
-                    await _raceService.GetRaceResults(race);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Unable to process BackFill. Error: {ex.Message}, {ex.InnerException}");
-            }
-            Logger.Info($"Back fill complete!");
-        }
-
-        /// <summary>
-        /// Backlog works its way back through results via Racing Post incrementally.
-        /// </summary>
-        /// <returns></returns>
-        public async Task BackLog()
-        {
-            try
-            {
-                var previousDate = _configService.GetLastBackfillDate();
-                var nextDate = previousDate.AddDays(-1);
-
-                if (await _eventService.GetBacklogEvents(_batch, nextDate)) 
-                {
-                    await _configService.UpdateBackfillDate(nextDate);
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Unable to process BackLog. Error: {ex.Message}");
             }
         }
     }

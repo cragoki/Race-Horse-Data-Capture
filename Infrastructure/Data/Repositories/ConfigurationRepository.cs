@@ -76,7 +76,8 @@ namespace Infrastructure.Data.Repositories
                 case JobEnum.rhdcautomation:
                     jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 06, 00, 00);
                     break;
-                case JobEnum.rhdcbacklog:
+                case JobEnum.rhdccleaner:
+                    jobDb.next_execution = DateTime.Now.AddMinutes(30);
                     break;
                 case JobEnum.rhdcresultretriever:
                     jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 22, 00, 00);
@@ -99,9 +100,30 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_failed_result;
         }
 
+        public IEnumerable<FailedResultEntity> GetFailedRaces()
+        {
+            return _context.tb_failed_result;
+        }
+
+        public FailedRaceEntity GetFailedRace(int race_id)
+        {
+            return _context.tb_failed_race.Where(x => x.race_id == race_id).FirstOrDefault();
+        }
+
         public void AddFailedResult(FailedResultEntity entity) 
         {
             _context.tb_failed_result.Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void AddFailedRace(FailedRaceEntity entity)
+        {
+            _context.tb_failed_race.Add(entity);
+            _context.SaveChanges();
+        }
+        public void UpdateFailedRace(FailedRaceEntity entity)
+        {
+            _context.tb_failed_race.Update(entity);
             _context.SaveChanges();
         }
 

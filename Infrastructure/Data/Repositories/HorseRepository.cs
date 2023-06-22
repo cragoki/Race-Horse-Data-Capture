@@ -51,8 +51,7 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Races)
                     .ThenInclude(x => x.Race)
                         .ThenInclude(x => x.RaceHorses)
-                            .ThenInclude(x => x.Horse)
-                .ToList().FirstOrDefault();
+                            .ThenInclude(x => x.Horse).FirstOrDefault();
         }
         public HorseEntity GetHorseByRpId(int rp_id)
         {
