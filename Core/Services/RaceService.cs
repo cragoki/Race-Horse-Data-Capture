@@ -102,27 +102,30 @@ namespace Core.Services
 
                 var raceDb = _eventRepository.GetRaceById(race.race_id);
 
-                if (raceHorses != null || raceHorses.Count() != 0 && raceHorses.All(x => x.position != 0))
+                if (raceHorses != null && raceHorses.Count() != 0)
                 {
-                    raceDb.completed = true;
-                    if (raceHorses.Any(x => x.position == -1)) 
+                    if (raceHorses.All(x => x.position != 0))
                     {
-                        foreach (var raceHorse in raceHorses.Where(x => x.position == -1))
+                        raceDb.completed = true;
+                        if (raceHorses.Any(x => x.position == -1))
                         {
-                            //Check the Failed results table to remove this race_horse if result is retrieved successfully
-                            var failedResult = new FailedResultEntity()
+                            foreach (var raceHorse in raceHorses.Where(x => x.position == -1))
                             {
-                                race_horse_id = raceHorse.race_horse_id,
-                                error_message = raceHorse.description
-                            };
+                                //Check the Failed results table to remove this race_horse if result is retrieved successfully
+                                var failedResult = new FailedResultEntity()
+                                {
+                                    race_horse_id = raceHorse.race_horse_id,
+                                    error_message = raceHorse.description
+                                };
 
-                            raceHorse.description = "ERROR";
-                            raceHorse.position = 0;
+                                raceHorse.description = "ERROR";
+                                raceHorse.position = 0;
 
-                            _configRepo.AddFailedResult(failedResult);
+                                _configRepo.AddFailedResult(failedResult);
 
 
-                            _horseRepository.UpdateRaceHorse(raceHorse);
+                                _horseRepository.UpdateRaceHorse(raceHorse);
+                            }
                         }
                     }
                 }
@@ -134,14 +137,29 @@ namespace Core.Services
             }
             catch (Exception ex) 
             {
-                var failedResult = new FailedResultEntity()
+                if (race.RaceHorses.Count() > 0)
                 {
-                    race_horse_id = race.RaceHorses.FirstOrDefault().race_horse_id,
-                    error_message = "Something went wrong collecting the results for this race"
-                };
+                    var failedResult = new FailedResultEntity()
+                    {
+                        race_horse_id = race.RaceHorses.FirstOrDefault().race_horse_id,
+                        error_message = "Something went wrong collecting the results for this race"
+                    };
 
-                _configRepo.AddFailedResult(failedResult);
-                Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
+                    _configRepo.AddFailedResult(failedResult);
+                    Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
+                }
+                else 
+                {
+                    var failedResult = new FailedRaceEntity()
+                    {
+                        race_id = race.race_id,
+                        error_message = "Something went wrong collecting the results for this race"
+                    };
+
+                    _configRepo.AddFailedRace(failedResult);
+                    Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
+                }
+
             }
         }
 

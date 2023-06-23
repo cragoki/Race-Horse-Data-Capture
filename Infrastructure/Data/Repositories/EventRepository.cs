@@ -107,7 +107,7 @@ namespace Infrastructure.Data.Repositories
 
         public IEnumerable<EventEntity> GetTodaysEvents() 
         {
-            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date).AsNoTracking();
+            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date.AddDays(-1)).AsNoTracking();
         }
         public List<CourseEntity> GetCourses()
         {

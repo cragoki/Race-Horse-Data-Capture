@@ -73,6 +73,7 @@ namespace RHDCResultRetriever
                         // foreach event, get all races
                         foreach (var even in events)
                         {
+                            //THIS IS SO INNEFICIENT
                             var races = await _raceService.GetEventRacesFromDB(even.event_id);
                             //races.AddRange(await _raceService.GetIncompleteRaces());
                             Logger.Info($"Retrieved {races.Count()} races for event {even.name}");
@@ -80,10 +81,13 @@ namespace RHDCResultRetriever
                             //foreach race convert the race url into a result URL and scrape the results into tb_race_horse
                             foreach (var race in races)
                             {
-                                Logger.Info($"Getting race results for {race.description}");
+                                Logger.Info($"Getting race results for {race.race_id}");
                                 try
                                 {
-                                    await _raceService.GetRaceResults(race);
+                                    if (race.RaceHorses != null && race.RaceHorses.Count() > 0) 
+                                    {
+                                        await _raceService.GetRaceResults(race);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
