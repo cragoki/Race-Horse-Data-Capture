@@ -20,9 +20,8 @@ namespace Core.Interfaces.Data.Repositories
         IEnumerable<FailedResultEntity> GetFailedResults();
         void AddFailedResult(FailedResultEntity entity);
         void AddFailedRace(FailedRaceEntity entity);
-        IEnumerable<FailedResultEntity> GetFailedRaces();
         FailedRaceEntity GetFailedRace(int race_id);
         void UpdateFailedRace(FailedRaceEntity entity);
-
+        IEnumerable<FailedRaceEntity> GetFailedRaces();
     }
 }

@@ -110,6 +110,35 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
+        public async Task<List<RaceStatisticViewModel>> GetHorseRaces(int horseId, int raceId)
+        {
+            var result = new List<RaceStatisticViewModel>();
+
+            try
+            {
+                var races = _horseRepository.GetHorseRaces(horseId).Where(x => x.race_id != raceId).OrderByDescending(x => x.Race.Event.created);
+
+                foreach (var race in races) 
+                {
+                    result.Add(new RaceStatisticViewModel() 
+                    {
+                        Position = race.position,
+                        Weather = race.Race.Weather.weather_type,
+                        Going = race.Race.Going.going_type,
+                        Distance = race.Race.Distance.distance_type,
+                        RaceUrl = race.Race.race_url,
+                        Class = race.Race.race_class ?? 0
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
         private List<RaceViewModel> GetRacesForHorse(int horseId)
         {
             var result = new List<RaceViewModel>();

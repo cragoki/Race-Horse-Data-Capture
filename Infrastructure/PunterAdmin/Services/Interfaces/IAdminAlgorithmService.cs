@@ -16,5 +16,6 @@ namespace Infrastructure.PunterAdmin.Services
         Task<RaceViewModel> GetRacePredictionsForURL(int algorithmId, string raceUrl);
         Task<string> GenerateUnitTestEntities(int raceId, string unitTestTitle);
         List<FailedResultsViewModel> GetFailedResultsTable();
+        List<FailedRacesViewModel> GetFailedRacesTable();
     }
 }

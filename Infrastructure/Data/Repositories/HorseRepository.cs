@@ -162,6 +162,14 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_race_horse.Where(x => x.horse_id == horse_id && x.position > 0).ToList();
         }
+        public IEnumerable<RaceHorseEntity> GetHorseRaces(int horse_id)
+        {
+            return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event)
+                .Include(x => x.Race).ThenInclude(x => x.Weather)
+                .Include(x => x.Race).ThenInclude(x => x.Going)
+                .Include(x => x.Race).ThenInclude(x => x.Distance)
+                .Where(x => x.horse_id == horse_id).ToList();
+        }
 
         public IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition()
         {

@@ -45,16 +45,22 @@ else
     <div id="horse-statistics-races" class="col-md-12">
         <div class="col-md-1"></div>
         <div class="col-md-10">
-            @foreach(var race in @HorseStatistics.HorseRaces.Where(x => x.RaceId != HorseStatistics.CurrentRace.RaceId))
-            {
-                <table class="table">
+        <table class="table">
                 <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Race Url</th>
+                        <th>Class</th>
+                        <th>Distance</th>
+                        <th>Going</th>
+                        <th>Weather</th>
+                    </tr>
                 </thead>
-                <tbody>
-                    <RaceComponent Race=race ActiveHorse=HorseStatistics.Horse />
-                </tbody>
-                </table>
-            }
+        <tbody>
+            <RaceStatisticComponent RaceId=HorseStatistics.CurrentRace.RaceId HorseId=HorseStatistics.Horse.HorseId />
+        </tbody>
+        </table>
+            
         </div>
         <div class="col-md-1"></div>
     </div>

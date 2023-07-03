@@ -28,5 +28,6 @@ namespace Core.Interfaces.Data.Repositories
         IEnumerable<RaceHorseEntity> GetAllRacesForHorse(int horse_id);
         IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition();
         RaceHorseEntity GetRaceHorseById(int id);
+        IEnumerable<RaceHorseEntity> GetHorseRaces(int horse_id);
     }
 }

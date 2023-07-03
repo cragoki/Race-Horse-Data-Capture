@@ -1,0 +1,38 @@
+﻿@inject IAdminRaceService adminRaceService;
+@inject IModalService modal  
+
+@if (Races == null)
+{
+            <tr>
+                <td>Test</td>
+            </tr>
+}
+else
+{
+    @foreach (var item in Races)
+    {
+        <tr>
+            <td>@item.Position</td>
+            <td>@item.RaceUrl</td>
+            <td>@item.Class</td>
+            <td>@item.Distance</td>
+            <td>@item.Going</td>
+            <td>@item.Weather</td>
+        </tr>
+    }   
+}
+
+
+@code{
+    [Parameter]
+    public int HorseId { get; set; }
+    [Parameter]
+    public int RaceId { get; set; }
+
+    private List<RaceStatisticViewModel> Races;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Races = await adminRaceService.GetHorseRaces(HorseId, RaceId);
+    }
+}

@@ -100,9 +100,9 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_failed_result;
         }
 
-        public IEnumerable<FailedResultEntity> GetFailedRaces()
+        public IEnumerable<FailedRaceEntity> GetFailedRaces()
         {
-            return _context.tb_failed_result;
+            return _context.tb_failed_race.Include(x => x.Race);
         }
 
         public FailedRaceEntity GetFailedRace(int race_id)

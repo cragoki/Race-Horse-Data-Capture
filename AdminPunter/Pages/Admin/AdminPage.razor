@@ -22,46 +22,75 @@
        <input value="Get Missing Data" type="button" class="btn btn-primary" @onclick="@(e => @GetMissingData())" />
     </div>
 </div>
-
-@if (FailedResults == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Race Horse ID</th>
-                <th>Position</th>
-                <th>Description</th>
-                <th>Horse Name</th>
-                <th>Race URL</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in FailedResults)
-            {
+<div class="row">
+    @if (FailedResults == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@item.RaceHorseId</td>
-                    <td>@item.Position</td>
-                    <td>@item.Description</td>
-                    <td>@item.HorseName</td>
-                    <td>@item.RaceUrl</td>
+                    <th>Race Horse ID</th>
+                    <th>Position</th>
+                    <th>Description</th>
+                    <th>Horse Name</th>
+                    <th>Race URL</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
-
-
+            </thead>
+            <tbody>
+                @foreach (var item in FailedResults)
+                {
+                    <tr>
+                        <td>@item.RaceHorseId</td>
+                        <td>@item.Position</td>
+                        <td>@item.Description</td>
+                        <td>@item.HorseName</td>
+                        <td>@item.RaceUrl</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+<div class="row">
+    @if (FailedRaces == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Race URL</th>
+                    <th>Description</th>
+                    <th>Attempts</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in FailedRaces)
+                {
+                    <tr>
+                        <td>@item.RaceUrl</td>
+                        <td>@item.Description</td>
+                        <td>@item.Attempts</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
 @code {
     bool isLoading = false;
     private List<FailedResultsViewModel> FailedResults;
+    private List<FailedRacesViewModel> FailedRaces;
 
     protected override async Task OnInitializedAsync()
     {
         FailedResults = algorithmService.GetFailedResultsTable();
+        FailedRaces = algorithmService.GetFailedRacesTable();
     }
 
     private async Task GetMissingData()

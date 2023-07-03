@@ -1,19 +1,16 @@
-﻿using Infrastructure.PunterAdmin.ViewModels;
-using Core.Interfaces.Data.Repositories;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System;
+﻿using Core.Entities;
 using Core.Enums;
-using Core.Interfaces.Algorithms;
-using System.Linq;
-using Core.Entities;
-using Core.Models.Algorithm;
-using Core.Interfaces.Services;
 using Core.Helpers;
-using Core.Models;
-using Org.BouncyCastle.Utilities;
-using Core.Models.GetRace;
+using Core.Interfaces.Algorithms;
+using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
+using Core.Models.Algorithm;
 using Infrastructure.PunterAdmin.Helpers;
+using Infrastructure.PunterAdmin.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.PunterAdmin.Services
 {
@@ -86,16 +83,16 @@ namespace Infrastructure.PunterAdmin.Services
 
         public async Task<List<TodaysRacesViewModel>> RunAlgorithm(AlgorithmTableViewModel algorithm, List<TodaysRacesViewModel> events)
         {
-            try 
+            try
             {
-                switch (algorithm.AlgorithmId) 
+                switch (algorithm.AlgorithmId)
                 {
                     case (int)AlgorithmEnum.TopSpeedOnly:
-                        foreach (var even in events) 
+                        foreach (var even in events)
                         {
                             var races = _eventRepository.GetRacesForEvent(even.EventId);
 
-                            foreach (var race in even.EventRaces) 
+                            foreach (var race in even.EventRaces)
                             {
                                 race.Horses.Select(x => { x.PredictedPosition = null; return x; }).ToList();
                             }
@@ -106,12 +103,12 @@ namespace Infrastructure.PunterAdmin.Services
 
                                 var predictions = await _topSpeed.TopSpeedVariablePredictions(race, settings);
 
-                                if (predictions == null || predictions.Count() == 0) 
+                                if (predictions == null || predictions.Count() == 0)
                                 {
                                     continue;
                                 }
 
-                                foreach (var prediction in predictions.Select((value, i) => new { i, value })) 
+                                foreach (var prediction in predictions.Select((value, i) => new { i, value }))
                                 {
                                     var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
                                     thisRace.AlgorithmRan = true;
@@ -268,7 +265,7 @@ namespace Infrastructure.PunterAdmin.Services
                         break;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -312,7 +309,7 @@ namespace Infrastructure.PunterAdmin.Services
                         {
                             algorithmResult = await _form.GenerateAlgorithmResult(even.Races, variables);
                             //If race counter > 0
-                            if (algorithmResult.RacesFiltered > 0) 
+                            if (algorithmResult.RacesFiltered > 0)
                             {
                                 results.Add(algorithmResult);
                             }
@@ -342,7 +339,7 @@ namespace Infrastructure.PunterAdmin.Services
                         break;
                 }
 
-                if (results == null || results.Count() == 0 || results.Sum(x => x.RacesFiltered) == 0) 
+                if (results == null || results.Count() == 0 || results.Sum(x => x.RacesFiltered) == 0)
                 {
                     algorithm.Notes = "Failed to run";
                     return algorithm;
@@ -402,7 +399,7 @@ namespace Infrastructure.PunterAdmin.Services
             return algorithm;
         }
 
-        public async Task<RaceViewModel> GetRacePredictionsForURL(int algorithmId, string raceUrl) 
+        public async Task<RaceViewModel> GetRacePredictionsForURL(int algorithmId, string raceUrl)
         {
             var result = new RaceViewModel();
 
@@ -413,26 +410,26 @@ namespace Infrastructure.PunterAdmin.Services
 
                 var race = _eventRepository.GetRaceByURL(raceUrl);
                 var algorithm = new AlgorithmTableViewModel();
-                if (race == null) 
+                if (race == null)
                 {
                     throw new Exception("No race found with selected URL");
                 }
 
                 //Switch for algorithm
-                var algorithmEntity =  _algorithmRepository.GetAlgorithmById(algorithmId);
+                var algorithmEntity = _algorithmRepository.GetAlgorithmById(algorithmId);
                 var settings = await GetAlgorithmSettings(algorithmEntity.Settings);
                 var variables = await GetAlgorithmVariables(algorithmEntity.Variables);
                 var distances = _mappingRepository.GetDistanceTypes();
                 var goings = _mappingRepository.GetGoingTypes();
                 var predictions = new List<FormResultModel>();
 
-                switch (algorithmEntity.algorithm_id) 
+                switch (algorithmEntity.algorithm_id)
                 {
-                    case((int)AlgorithmEnum.FormOnly):
-                            predictions = await _form.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
+                    case ((int)AlgorithmEnum.FormOnly):
+                        predictions = await _form.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
                         break;
                     case ((int)AlgorithmEnum.FormRevamp):
-                            predictions = await _formRevamp.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
+                        predictions = await _formRevamp.FormCalculationPredictions(race, algorithmEntity.Settings, distances, goings);
                         break;
                     case ((int)AlgorithmEnum.BentnersModel):
                         predictions = await _bentnersModel.RunModel(race);
@@ -448,7 +445,7 @@ namespace Infrastructure.PunterAdmin.Services
 
                 var updatedHorses = new List<RaceHorseViewModel>();
                 foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
-                {  
+                {
                     result = BuildTodaysRaceViewModel(race, race.Event.created);
                     result.AlgorithmRan = true;
                     var horse = result.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
@@ -478,12 +475,12 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var race = _eventRepository.GetAllRaceDataById(raceId);
 
-                if (race == null) 
+                if (race == null)
                 {
                     throw new Exception($"Could not find race with ID {raceId}");
                 }
 
-                result += "public static RaceEntity " + unitTestTitle + "() {" +  Environment.NewLine;
+                result += "public static RaceEntity " + unitTestTitle + "() {" + Environment.NewLine;
                 result += "return " + TestCaseHelper.NewEntity("RaceEntity");
                 result += $"race_id = {raceId},{Environment.NewLine}";
                 result += $"event_id = {race.event_id}, {Environment.NewLine}";
@@ -507,32 +504,32 @@ namespace Infrastructure.PunterAdmin.Services
                 result += $"description = {TestCaseHelper.FormatString(race.description).Replace("\n", "").Replace("\r", "").Replace(" ", "")}, {Environment.NewLine}";
                 result += $"race_url = {TestCaseHelper.FormatString(race.race_url)}, {Environment.NewLine}";
                 result += $"completed = {race.completed.ToString().ToLower()}, {Environment.NewLine}";
-                    //RACE HORSES
-                    result += $"RaceHorses = new List<RaceHorseEntity>(){Environment.NewLine}";
-                    result += "{";
-                    result += $"{Environment.NewLine}";
-                    foreach (var horse in race.RaceHorses) 
-                    {
-                            result += TestCaseHelper.NewEntity("RaceHorseEntity");
-                            result += $"race_horse_id = {horse.race_horse_id},{Environment.NewLine}";
-                            result += $"race_id = {horse.race_id},{Environment.NewLine}";
-                            result += $"horse_id = {horse.horse_id},{Environment.NewLine}";
-                            result = EntityGenerator.GenerateHorse(result, race, horse);
-                            result += $"weight = {TestCaseHelper.FormatString(horse.weight)},{Environment.NewLine}";
-                            result += $"age = {horse.age},{Environment.NewLine}";
-                            result += $"trainer_id = {horse.trainer_id},{Environment.NewLine}";
-                            //TRAINER ENTITY
-                            result = EntityGenerator.GenerateTrainer(result, horse);
-                            result += $"jockey_id = {horse.jockey_id},{Environment.NewLine}";
-                            //Jockey ENTITY
-                            result = EntityGenerator.GenerateJockey(result, horse);
-                            result += $"finished = {horse.finished.ToString().ToLower()},{Environment.NewLine}";
-                            result += $"position = {horse.position},{Environment.NewLine}";
-                            result += TestCaseHelper.CloseEntity(",");
-                    }
-                    result += "}";
+                //RACE HORSES
+                result += $"RaceHorses = new List<RaceHorseEntity>(){Environment.NewLine}";
+                result += "{";
+                result += $"{Environment.NewLine}";
+                foreach (var horse in race.RaceHorses)
+                {
+                    result += TestCaseHelper.NewEntity("RaceHorseEntity");
+                    result += $"race_horse_id = {horse.race_horse_id},{Environment.NewLine}";
+                    result += $"race_id = {horse.race_id},{Environment.NewLine}";
+                    result += $"horse_id = {horse.horse_id},{Environment.NewLine}";
+                    result = EntityGenerator.GenerateHorse(result, race, horse);
+                    result += $"weight = {TestCaseHelper.FormatString(horse.weight)},{Environment.NewLine}";
+                    result += $"age = {horse.age},{Environment.NewLine}";
+                    result += $"trainer_id = {horse.trainer_id},{Environment.NewLine}";
+                    //TRAINER ENTITY
+                    result = EntityGenerator.GenerateTrainer(result, horse);
+                    result += $"jockey_id = {horse.jockey_id},{Environment.NewLine}";
+                    //Jockey ENTITY
+                    result = EntityGenerator.GenerateJockey(result, horse);
+                    result += $"finished = {horse.finished.ToString().ToLower()},{Environment.NewLine}";
+                    result += $"position = {horse.position},{Environment.NewLine}";
+                    result += TestCaseHelper.CloseEntity(",");
+                }
+                result += "}";
                 //Race End
-                result += TestCaseHelper.CloseEntity(";") +"}";
+                result += TestCaseHelper.CloseEntity(";") + "}";
             }
             catch (Exception ex)
             {
@@ -541,7 +538,7 @@ namespace Infrastructure.PunterAdmin.Services
 
             return result;
         }
-            #region private
+        #region private
         private async Task<List<AlgorithSettingsTableViewModel>> GetAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
         {
             var result = new List<AlgorithSettingsTableViewModel>();
@@ -578,7 +575,7 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        public async Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm) 
+        public async Task<List<AlgorithmSettingsEntity>> BuildAlgorithmSettings(AlgorithmTableViewModel algorithm)
         {
             var result = new List<AlgorithmSettingsEntity>();
 
@@ -596,7 +593,7 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        public List<FailedResultsViewModel> GetFailedResultsTable() 
+        public List<FailedResultsViewModel> GetFailedResultsTable()
         {
             var result = new List<FailedResultsViewModel>();
 
@@ -604,12 +601,13 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var failedResults = _configurationRepository.GetFailedResults();
 
-                foreach (var failedResult in failedResults) 
+                foreach (var failedResult in failedResults)
                 {
                     var raceHorse = _horseRepository.GetRaceHorseById(failedResult.race_horse_id);
 
-                    result.Add(new FailedResultsViewModel() 
+                    result.Add(new FailedResultsViewModel()
                     {
+                        Id = failedResult.failed_result_id,
                         RaceHorseId = failedResult.race_horse_id,
                         Position = raceHorse.position,
                         Description = failedResult.error_message,
@@ -618,7 +616,35 @@ namespace Infrastructure.PunterAdmin.Services
                     });
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        public List<FailedRacesViewModel> GetFailedRacesTable()
+        {
+            var result = new List<FailedRacesViewModel>();
+
+            try
+            {
+                var failedRaces = _configurationRepository.GetFailedRaces();
+
+                foreach (var failedRace in failedRaces)
+                {
+
+                    result.Add(new FailedRacesViewModel()
+                    {
+                        Id = failedRace.failed_race_id,
+                        Description = failedRace.error_message,
+                        RaceUrl = $"https://www.racingpost.com/{failedRace.Race.race_url.Replace("racecards", "results")}",
+                        Attempts = failedRace.attempts
+                    });
+                }
+            }
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -650,24 +676,24 @@ namespace Infrastructure.PunterAdmin.Services
 
             try
             {
-                    result = new RaceViewModel()
-                    {
-                        RaceId = race.race_id,
-                        Date = date,
-                        Ages = race.Ages?.age_type,
-                        Completed = race.completed,
-                        Description = race.description,
-                        Distance = race.Distance?.distance_type,
-                        EventId = race.event_id,
-                        Going = $"Going: {race.Going?.going_type}",
-                        NumberOfHorses = $"{race.no_of_horses} Horses",
-                        RaceClass = $"Class: {race.race_class ?? 0}",
-                        RaceTime = race.race_time,
-                        RaceUrl = $"https://www.racingpost.com/{race.race_url}",
-                        Stalls = $"Stalls: {race.Stalls?.stalls_type}",
-                        Weather = $"Weather: {race.Weather?.weather_type}",
-                        Horses = BuildRaceHorseViewModel(race.RaceHorses, race.Event)
-                    };
+                result = new RaceViewModel()
+                {
+                    RaceId = race.race_id,
+                    Date = date,
+                    Ages = race.Ages?.age_type,
+                    Completed = race.completed,
+                    Description = race.description,
+                    Distance = race.Distance?.distance_type,
+                    EventId = race.event_id,
+                    Going = $"Going: {race.Going?.going_type}",
+                    NumberOfHorses = $"{race.no_of_horses} Horses",
+                    RaceClass = $"Class: {race.race_class ?? 0}",
+                    RaceTime = race.race_time,
+                    RaceUrl = $"https://www.racingpost.com/{race.race_url}",
+                    Stalls = $"Stalls: {race.Stalls?.stalls_type}",
+                    Weather = $"Weather: {race.Weather?.weather_type}",
+                    Horses = BuildRaceHorseViewModel(race.RaceHorses, race.Event)
+                };
             }
             catch (Exception ex)
             {
