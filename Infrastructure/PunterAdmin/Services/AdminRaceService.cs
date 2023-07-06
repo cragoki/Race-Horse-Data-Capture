@@ -3,11 +3,13 @@ using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Core.Models.GetRace;
 using Infrastructure.Data;
 using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -229,28 +231,107 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        public async Task RunResultRetrieval() 
+        public async Task<bool> RetryRaceRetrieval(FailedRacesViewModel failedRace) 
         {
+            //After Adding Event Id to Failed Race entity
+            try
+            {
+                var race = _eventRepository.GetRaceById(failedRace.RaceId);
+                race.race_url = failedRace.RaceUrl;
+                //Now use the race URL to fetch the Horses/Trainers/Owners
+                var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
+
+                //if they dont then add them into tb_horse
+                foreach (var raceHorse in horses)
+                {
+                    var rh = raceHorse.RaceHorse;
+                    _horseRepository.AddRaceHorse(rh);
+                }
+
+                //Add to missing results table
+                foreach (var raceHorse in horses)
+                {
+                    var failedResult = new FailedResultEntity()
+                    {
+                        race_horse_id = raceHorse.RaceHorse.race_horse_id,
+                        error_message = "BACKLOG"
+                    };
+
+                    _configRepo.AddFailedResult(failedResult);
+                }
+
+                //Delete from missing Race Table
+                var existing = _configRepo.GetFailedRace(failedRace.RaceId);
+                _configRepo.DeleteFailedRace(existing);
+            }
+            catch (Exception ex)
+            {
+                //Increment Attempts
+                var existing = _configRepo.GetFailedRace(failedRace.RaceId);
+                existing.attempts++;
+                existing.error_message = ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message;
+                _configRepo.UpdateFailedRace(existing);
+                throw new Exception(ex.Message);
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ProcessResult(FailedResultsViewModel failedResult)
+        {
+            var result = false;
+            try 
+            {
+                var raceHorse = _horseRepository.GetRaceHorseById(failedResult.RaceHorseId);
+                raceHorse.position = failedResult.Position;
+                raceHorse.description = failedResult.Description;
+                _horseRepository.UpdateRaceHorse(raceHorse);
+                result = true;
+
+                //Delete from missing Result Table
+                var existing = _configRepo.GetFailedResult(failedResult.Id);
+                _configRepo.DeleteFailedResult(existing);
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        public async Task<int> RunResultRetrieval()
+        {
+            var processed = 0;
             var results = new List<RaceHorseEntity>();
             try
             {
                 var horses = _horseRepository.GetRaceHorseWithNoPosition();
 
-                foreach (var horse in horses) 
+                foreach (var horse in horses)
                 {
                     try
                     {
                         var horseResult = await _scraperService.GetResultsForRaceHorse(horse);
                         results.Add(horseResult);
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
 
-                        //Ignore for now
+                        var failedResult = new FailedResultEntity()
+                        {
+                            race_horse_id = horse.race_horse_id,
+                            error_message = horse.description
+                        };
+
+                        horse.description = "ERROR";
+                        horse.position = 0;
+
+                        _configRepo.AddFailedResult(failedResult);
                     }
                 }
 
-                foreach (var raceHorse in results) 
+                foreach (var raceHorse in results)
                 {
                     //Check the Failed results table to remove this race_horse if result is retrieved successfully
 
@@ -261,7 +342,7 @@ namespace Infrastructure.PunterAdmin.Services
                             race_horse_id = raceHorse.race_horse_id,
                             error_message = raceHorse.description
                         };
-                        
+
                         raceHorse.description = "ERROR";
                         raceHorse.position = 0;
 
@@ -269,12 +350,15 @@ namespace Infrastructure.PunterAdmin.Services
                     }
 
                     _horseRepository.UpdateRaceHorse(raceHorse);
+                    processed++;
                 }
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+
+            return processed;
         }
 
         private List<RaceViewModel> BuildTodaysRaceViewModel(List<RaceEntity> races, DateTime date) 

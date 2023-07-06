@@ -33,5 +33,6 @@ namespace Core.Interfaces.Data.Repositories
         List<EventEntity> TestAlgorithmWithOneHundredEvents();
         RaceEntity GetAllRaceDataById(int raceId);
         List<RaceEntity> GetRacesWithMissingRaceHorses();
+        IEnumerable<RaceEntity> GetRacesForEventSimple(int eventId);
     }
 }

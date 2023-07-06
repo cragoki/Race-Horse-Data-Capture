@@ -222,15 +222,15 @@ namespace Core.Services
 
                                 if (position.Contains("PU")) 
                                 {
-                                    toUpdate.description = "Pulled-Up";
+                                    toUpdate.description = "PU";
                                 }
                                 else if (position.Contains("UR"))
                                 {
-                                    toUpdate.description = "Unseated Rider";
+                                    toUpdate.description = "UR";
                                 }
                                 else if (position.Contains("F"))
                                 {
-                                    toUpdate.description = "Fell";
+                                    toUpdate.description = "F";
                                 }
                             }
                             else
@@ -322,12 +322,32 @@ namespace Core.Services
                     {
                         try
                         {
-                            raceHorse.position = Int32.Parse(formattedPos);
-                            if (raceHorse.position == 0)
+                            if (String.IsNullOrEmpty(formattedPos))
                             {
-                                raceHorse.description = "NR";
+                                raceHorse.position = 0;
+
+                                if (position.Contains("PU"))
+                                {
+                                    raceHorse.description = "PU";
+                                }
+                                else if (position.Contains("UR"))
+                                {
+                                    raceHorse.description = "UR";
+                                }
+                                else if (position.Contains("F"))
+                                {
+                                    raceHorse.description = "F";
+                                }
                             }
-                            raceHorse.finished = true;
+                            else 
+                            {
+                                raceHorse.position = Int32.Parse(formattedPos);
+                                if (raceHorse.position == 0)
+                                {
+                                    raceHorse.description = "NR";
+                                }
+                                raceHorse.finished = true;
+                            }
                         }
                         catch (Exception ex)
                         {

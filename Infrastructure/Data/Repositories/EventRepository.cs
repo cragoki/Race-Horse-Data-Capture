@@ -107,7 +107,7 @@ namespace Infrastructure.Data.Repositories
 
         public IEnumerable<EventEntity> GetTodaysEvents() 
         {
-            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date.AddDays(-1)).AsNoTracking();
+            return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date).AsNoTracking();
         }
         public List<CourseEntity> GetCourses()
         {
@@ -208,6 +208,12 @@ namespace Infrastructure.Data.Repositories
                                             .ThenInclude(x => x.Race)
                                                 .ThenInclude(x => x.Event)
                 .Include(x => x.Event);
+        }
+
+        public IEnumerable<RaceEntity> GetRacesForEventSimple(int eventId)
+        {
+            return _context.tb_race.Where(x => x.event_id == eventId)
+                .Include(x => x.RaceHorses);
         }
 
         public IEnumerable<RaceEntity> GetRacesForBatch(Guid batchId)

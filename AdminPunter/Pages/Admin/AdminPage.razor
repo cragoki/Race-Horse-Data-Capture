@@ -16,6 +16,14 @@
         </div>
     </div>
 }
+@if (!String.IsNullOrEmpty(error))
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <p>@error</p>
+        </div>
+    </div>
+}
 
 <div class="row">
     <div class="col-lg-12">
@@ -44,10 +52,12 @@
                 {
                     <tr>
                         <td>@item.RaceHorseId</td>
-                        <td>@item.Position</td>
-                        <td>@item.Description</td>
+                        <td><input @bind-value="@item.Position" /></td>
+                        <td><input @bind-value="@item.Description" /></td>
                         <td>@item.HorseName</td>
                         <td>@item.RaceUrl</td>
+                        <input value="Process" type="button" class="btn btn-primary" @onclick="@(e => @ProcessResult(@item))" />
+
                     </tr>
                 }
             </tbody>
@@ -73,9 +83,12 @@
                 @foreach (var item in FailedRaces)
                 {
                     <tr>
-                        <td>@item.RaceUrl</td>
+                        <td><input @bind-value="@item.RaceUrl" /></td>
                         <td>@item.Description</td>
                         <td>@item.Attempts</td>
+                        <td>
+                            <input value="Retry" type="button" class="btn btn-primary" @onclick="@(e => @RetryGetRace(@item))" />
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -84,6 +97,7 @@
 </div>
 @code {
     bool isLoading = false;
+    string error = "";
     private List<FailedResultsViewModel> FailedResults;
     private List<FailedRacesViewModel> FailedRaces;
 
@@ -96,7 +110,55 @@
     private async Task GetMissingData()
     {
         isLoading = true;
-        await adminRaceService.RunResultRetrieval();
+        var processed = await adminRaceService.RunResultRetrieval();
+        FailedResults = algorithmService.GetFailedResultsTable();
+        error = $"Processed {processed} Race Horse Results";
         isLoading = false;
+    }
+
+    private async Task<bool> RetryGetRace(FailedRacesViewModel failedRace)
+    {
+        var result = false;
+        try
+        {
+            isLoading = true;
+            result = await adminRaceService.RetryRaceRetrieval(failedRace);
+            isLoading = false;
+            if (result == false)
+            {
+                error = "FAILED";
+            }
+
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;    
+        }
+        FailedRaces = algorithmService.GetFailedRacesTable();
+
+        return result;
+    }
+
+    private async Task<bool> ProcessResult(FailedResultsViewModel failedResult)
+    {
+        var result = false;
+        try
+        {
+            isLoading = true;
+            result = await adminRaceService.ProcessResult(failedResult);
+            isLoading = false;
+            if (result == false)
+            {
+                error = "FAILED";
+            }
+
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        FailedResults = algorithmService.GetFailedResultsTable();
+
+        return result;
     }
 }

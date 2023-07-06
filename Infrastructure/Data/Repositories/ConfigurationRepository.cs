@@ -95,6 +95,12 @@ namespace Infrastructure.Data.Repositories
             _context.SaveChanges();
         }
 
+        public void DeleteFailedRace(FailedRaceEntity entity)
+        {
+            _context.tb_failed_race.Remove(entity);
+            _context.SaveChanges();
+        }
+
         public IEnumerable<FailedResultEntity> GetFailedResults()
         {
             return _context.tb_failed_result;
@@ -109,6 +115,11 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_failed_race.Where(x => x.race_id == race_id).FirstOrDefault();
         }
+        public FailedResultEntity GetFailedResult(int id)
+        {
+            return _context.tb_failed_result.Where(x => x.failed_result_id == id).FirstOrDefault();
+        }
+
 
         public void AddFailedResult(FailedResultEntity entity) 
         {

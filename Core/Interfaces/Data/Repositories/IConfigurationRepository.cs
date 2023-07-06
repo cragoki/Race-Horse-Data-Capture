@@ -21,7 +21,10 @@ namespace Core.Interfaces.Data.Repositories
         void AddFailedResult(FailedResultEntity entity);
         void AddFailedRace(FailedRaceEntity entity);
         FailedRaceEntity GetFailedRace(int race_id);
+        FailedResultEntity GetFailedResult(int id);
+
         void UpdateFailedRace(FailedRaceEntity entity);
         IEnumerable<FailedRaceEntity> GetFailedRaces();
+        void DeleteFailedRace(FailedRaceEntity entity);
     }
 }

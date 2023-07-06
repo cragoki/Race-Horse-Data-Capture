@@ -638,8 +638,9 @@ namespace Infrastructure.PunterAdmin.Services
                     result.Add(new FailedRacesViewModel()
                     {
                         Id = failedRace.failed_race_id,
+                        RaceId = failedRace.race_id,
                         Description = failedRace.error_message,
-                        RaceUrl = $"https://www.racingpost.com/{failedRace.Race.race_url.Replace("racecards", "results")}",
+                        RaceUrl = $"https://www.racingpost.com/{failedRace.Race.race_url}",
                         Attempts = failedRace.attempts
                     });
                 }

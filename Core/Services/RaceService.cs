@@ -78,7 +78,7 @@ namespace Core.Services
 
             try
             {
-                result = _eventRepository.GetRacesForEvent(EventId).ToList();
+                result = _eventRepository.GetRacesForEventSimple(EventId).ToList();
             }
             catch (Exception ex) 
             {
@@ -104,7 +104,7 @@ namespace Core.Services
 
                 if (raceHorses != null && raceHorses.Count() != 0)
                 {
-                    if (raceHorses.All(x => x.position != 0))
+                    if (!raceHorses.All(x => x.position == 0))
                     {
                         raceDb.completed = true;
                         if (raceHorses.Any(x => x.position == -1))
@@ -297,7 +297,7 @@ namespace Core.Services
             {
                 var failedResult = new FailedRaceEntity()
                 {
-                    race_id = race.race_id,
+                    race_id = race.race_id,   
                     error_message = exception
                 };
 
