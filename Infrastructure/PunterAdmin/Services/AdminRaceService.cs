@@ -300,13 +300,24 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        public async Task<int> RunResultRetrieval()
+        public async Task<int> RunResultRetrieval(string raceHorseIds)
         {
             var processed = 0;
             var results = new List<RaceHorseEntity>();
             try
             {
-                var horses = _horseRepository.GetRaceHorseWithNoPosition();
+                IEnumerable<RaceHorseEntity> horses = Enumerable.Empty<RaceHorseEntity>();
+
+                if (String.IsNullOrEmpty(raceHorseIds))
+                {
+                    horses = _horseRepository.GetRaceHorseWithNoPosition();
+                }
+                else 
+                {
+                    var removeSpaces = raceHorseIds.Replace(" ", "");
+                    var raceHorseIdsParsed = removeSpaces.Split(',').Select(int.Parse).ToList();
+                    horses = _horseRepository.GetRaceHorseWithNoPosition(raceHorseIdsParsed);
+                }
 
                 foreach (var horse in horses)
                 {

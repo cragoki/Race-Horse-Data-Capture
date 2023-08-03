@@ -1,9 +1,12 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
+using Core.Variables;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 namespace Infrastructure.Data.Repositories
 {
@@ -174,6 +177,18 @@ namespace Infrastructure.Data.Repositories
         public IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition()
         {
             return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event).Include(x => x.Race).ThenInclude(x => x.RaceHorses).Where(x => x.Race.Event.created >= DateTime.Now.AddMonths(-4) && x.Race.Event.created.Date < DateTime.Now.Date && x.position == 0 && String.IsNullOrEmpty(x.description)).OrderByDescending(x => x.Race.Event.created).Take(200);
+        }
+
+        public IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition(List<int> raceHorseIds)
+        {
+            //SELECT top(200) e.created, CONCAT(rh.race_horse_id, ',') FROM TB_RACE_HORSE RH
+            //INNER JOIN tb_race r ON rh.race_id = r.race_id
+            //INNER JOIN tb_event e ON r.event_id = e.event_id
+            //where rh.position = 0
+            //AND DATEADD(dd, 0, DATEDIFF(dd, 0, e.created)) < DATEADD(dd, 0, DATEDIFF(dd, 0, GETDATE()))
+            //AND(rh.Description = '' OR rh.Description IS NULL)
+            //ORDER BY e.created desc
+            return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event).Include(x => x.Race).ThenInclude(x => x.RaceHorses).Where(x => raceHorseIds.Contains(x.race_horse_id));
         }
 
         public RaceHorseEntity GetRaceHorseById(int id)

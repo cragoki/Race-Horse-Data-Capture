@@ -30,6 +30,13 @@
        <input value="Get Missing Data" type="button" class="btn btn-primary" @onclick="@(e => @GetMissingData())" />
     </div>
 </div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <input class="form-attr" placeholder="Race Horse Ids" @bind="@raceHorseIds"/>
+    </div>
+</div>
+
 <div class="row">
     @if (FailedResults == null)
     {
@@ -100,6 +107,7 @@
     string error = "";
     private List<FailedResultsViewModel> FailedResults;
     private List<FailedRacesViewModel> FailedRaces;
+    string raceHorseIds = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,9 +118,10 @@
     private async Task GetMissingData()
     {
         isLoading = true;
-        var processed = await adminRaceService.RunResultRetrieval();
+        var processed = await adminRaceService.RunResultRetrieval(raceHorseIds);
         FailedResults = algorithmService.GetFailedResultsTable();
         error = $"Processed {processed} Race Horse Results";
+        raceHorseIds = "";
         isLoading = false;
     }
 

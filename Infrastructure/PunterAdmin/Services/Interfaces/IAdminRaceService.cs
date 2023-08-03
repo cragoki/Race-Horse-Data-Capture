@@ -10,7 +10,7 @@ namespace Infrastructure.PunterAdmin.Services
     {
         Task<List<TodaysRacesViewModel>> GetTodaysRaces(RaceRetrievalType retrievalType, Guid? batchId);
         Task<RaceHorseStatisticsViewModel> GetHorseStatistics(RaceHorseViewModel raceHorse, RaceViewModel race);
-        Task<int> RunResultRetrieval();
+        Task<int> RunResultRetrieval(string raceHorseIds);
         Task<List<RaceStatisticViewModel>> GetHorseRaces(int horseId, int raceId);
         Task<bool> RetryRaceRetrieval(FailedRacesViewModel failedRace);
         Task<bool> ProcessResult(FailedResultsViewModel failedResult);
