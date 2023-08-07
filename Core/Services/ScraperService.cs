@@ -273,11 +273,6 @@ namespace Core.Services
 
         public async Task<RaceHorseEntity> GetResultsForRaceHorse(RaceHorseEntity raceHorse)
         {
-            //DEBUG
-            if (raceHorse.Race.event_id == 298756 || raceHorse.Race.event_id == 10456 || raceHorse.Race.event_id == 10448 || raceHorse.Race.event_id == 10504) 
-            {
-            
-            }
             try
             {
                 //Build the URL
@@ -368,8 +363,8 @@ namespace Core.Services
                 }
 
                 raceHorse.position = 0;
-                raceHorse.description = "";
-                raceHorse.finished = true;
+                raceHorse.description = "NR";
+                raceHorse.finished = false;
             }
             catch (Exception ex)
             {
