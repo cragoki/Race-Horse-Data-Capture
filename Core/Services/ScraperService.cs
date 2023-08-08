@@ -216,11 +216,11 @@ namespace Core.Services
 
                         if (toUpdate != null)
                         {
-                            if (String.IsNullOrEmpty(formattedPos)) 
+                            if (String.IsNullOrEmpty(formattedPos))
                             {
                                 toUpdate.position = 0;
 
-                                if (position.Contains("PU")) 
+                                if (position.Contains("PU"))
                                 {
                                     toUpdate.description = "PU";
                                 }
@@ -232,22 +232,30 @@ namespace Core.Services
                                 {
                                     toUpdate.description = "F";
                                 }
-                            }
-                            else
-                            {
-                                toUpdate.position = Int32.Parse(formattedPos);
-
-                                if (toUpdate.position == 0)
+                                else if (position.Contains("BD"))
                                 {
-                                    toUpdate.description = "NR";
+                                    toUpdate.description = "BD";
+                                }
+                                else if (position.Contains("RO"))
+                                {
+                                    toUpdate.description = "RO";
                                 }
                                 else
                                 {
-                                    toUpdate.description = "";
-                                }
-                            }
+                                    toUpdate.position = Int32.Parse(formattedPos);
 
-                            toUpdate.finished = true;
+                                    if (toUpdate.position == 0)
+                                    {
+                                        toUpdate.description = "NR";
+                                    }
+                                    else
+                                    {
+                                        toUpdate.description = "";
+                                    }
+                                }
+
+                                toUpdate.finished = true;
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -256,7 +264,11 @@ namespace Core.Services
                         toUpdate.description = ex.Message + " --- " + formattedPos + "---" + position;
                         toUpdate.finished = false;
                     }
-
+                    if (toUpdate.position == 0 && String.IsNullOrEmpty(toUpdate.description))
+                    {
+                        toUpdate.position = -1;
+                        toUpdate.description = "Unknown Error";
+                    }
                     result.Add(toUpdate);
                     _horseRepository.UpdateRaceHorse(toUpdate);
 
@@ -338,6 +350,14 @@ namespace Core.Services
                                 {
                                     raceHorse.description = "F";
                                 }
+                                else if (position.Contains("BD"))
+                                {
+                                    raceHorse.description = "BD";
+                                }
+                                else if (position.Contains("RO"))
+                                {
+                                    raceHorse.description = "RO";
+                                }
                             }
                             else 
                             {
@@ -357,6 +377,11 @@ namespace Core.Services
                             //Could log errors to a seperate table to review and maybe manually input?
                         }
 
+                        if (raceHorse.position == 0 && String.IsNullOrEmpty(raceHorse.description)) 
+                        {
+                            raceHorse.position = -1;
+                            raceHorse.description ="Unknown Error";
+                        }
                         return raceHorse;
                     }
 
