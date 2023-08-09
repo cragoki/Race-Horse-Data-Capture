@@ -154,6 +154,10 @@
         try
         {
             isLoading = true;
+            if (failedResult.Position != 0)
+            {
+                failedResult.Description = "";
+            }
             result = await adminRaceService.ProcessResult(failedResult);
             isLoading = false;
             if (result == false)

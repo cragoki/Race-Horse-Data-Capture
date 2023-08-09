@@ -240,23 +240,24 @@ namespace Core.Services
                                 {
                                     toUpdate.description = "RO";
                                 }
+                            }
+                            else
+                            {
+                                toUpdate.position = Int32.Parse(formattedPos);
+
+                                if (toUpdate.position == 0)
+                                {
+                                    toUpdate.description = "NR";
+                                }
                                 else
                                 {
-                                    toUpdate.position = Int32.Parse(formattedPos);
-
-                                    if (toUpdate.position == 0)
-                                    {
-                                        toUpdate.description = "NR";
-                                    }
-                                    else
-                                    {
-                                        toUpdate.description = "";
-                                    }
+                                    toUpdate.description = "";
                                 }
-
-                                toUpdate.finished = true;
                             }
+
+                            toUpdate.finished = true;
                         }
+                        
                     }
                     catch (Exception ex)
                     {
@@ -265,6 +266,11 @@ namespace Core.Services
                         toUpdate.finished = false;
                     }
 
+                    if (toUpdate.position == 0 && String.IsNullOrEmpty(toUpdate.description)) 
+                    {
+                        toUpdate.position = -1;
+                        toUpdate.description = "Unknown Error";
+                    }
                     result.Add(toUpdate);
                     _horseRepository.UpdateRaceHorse(toUpdate);
 
