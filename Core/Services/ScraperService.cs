@@ -264,11 +264,7 @@ namespace Core.Services
                         toUpdate.description = ex.Message + " --- " + formattedPos + "---" + position;
                         toUpdate.finished = false;
                     }
-                    if (toUpdate.position == 0 && String.IsNullOrEmpty(toUpdate.description))
-                    {
-                        toUpdate.position = -1;
-                        toUpdate.description = "Unknown Error";
-                    }
+
                     result.Add(toUpdate);
                     _horseRepository.UpdateRaceHorse(toUpdate);
 
