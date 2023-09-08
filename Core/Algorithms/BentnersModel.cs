@@ -317,7 +317,7 @@ namespace Core.Algorithms
             {
                 return tracker;
             }
-            var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class).OrderByDescending(x => x.Race.Event.created);
+            var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class).OrderByDescending(x => x.Race.Event.created).Take(3);
 
             //Number of races placed vs number of races not placed. 75% + placed = +2, 60%+ = +1, 50%+ = +0.5, 0% = -2
             foreach (var pastRace in pastRaces)
@@ -368,7 +368,7 @@ namespace Core.Algorithms
             {
                 return tracker;
             }
-            var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0)).OrderByDescending(x => x.Race.Event.created);
+            var pastRaces = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0)).OrderByDescending(x => x.Race.Event.created).Take(3);
             var raceHorse = race.RaceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
             //Strength of competition in past races (can either look at RPR (v1) BUT INVESTIGATE TO SEE WHAT IS A GOOD RPR??
             //But what RPRs don’t do is tell you what types of weight a horse has carried when posting its best ratings. Many horses win handicaps when given a chance to carry a lightweight for the first time, while others are better at carrying big weights against lower-class opponents.
@@ -528,7 +528,7 @@ namespace Core.Algorithms
             var pointsForEachCondition = Decimal.Parse(reliabilityHorsePreferences) / 4;
 
             //For Specific Track, try to check the tb_course all weather boolean and the Meeting type (both from tb_event)
-            var racesAtCourse = horse.Races.Where(x => x.Race.Event.course_id == race.Event.course_id && x.position != 0);
+            var racesAtCourse = horse.Races.Where(x => x.Race.Event.course_id == race.Event.course_id && x.position != 0).Take(3);
 
             if (racesAtCourse.Count() > 0)
             {
@@ -555,7 +555,7 @@ namespace Core.Algorithms
             }
 
             //Get Horses Distance group they have performed best at... (Ie: 50% places at distance +1, 75% places at distance +2)
-            var racesAtDistanceGroup = horse.Races.Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.position != 0);
+            var racesAtDistanceGroup = horse.Races.Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.position != 0).Take(3);
 
             if (racesAtDistanceGroup.Count() > 0)
             {
@@ -584,7 +584,7 @@ namespace Core.Algorithms
             //Get Horses Jumps/Not Jumps they have performed best at
             if (race.Event.meeting_type != null)
             {
-                var racesAtRaceType = horse.Races.Where(x => x.Race.Event.meeting_type != null && x.Race.Event.meeting_type == race.Event.meeting_type && x.position != 0);
+                var racesAtRaceType = horse.Races.Where(x => x.Race.Event.meeting_type != null && x.Race.Event.meeting_type == race.Event.meeting_type && x.position != 0).Take(3);
 
                 if (racesAtRaceType.Count() > 0)
                 {
@@ -612,7 +612,7 @@ namespace Core.Algorithms
             }
 
             //Get Horses Going group they have performed best at... (Ie: 50% places at Going +1, 75% places at Going +2)
-            var racesAtGoingGroup = horse.Races.Where(x => goingGroups.ElementIds.Contains(x.Race.going ?? 0) && x.position != 0);
+            var racesAtGoingGroup = horse.Races.Where(x => goingGroups.ElementIds.Contains(x.Race.going ?? 0) && x.position != 0).Take(3);
 
             if (racesAtGoingGroup.Count() > 0) 
             {
