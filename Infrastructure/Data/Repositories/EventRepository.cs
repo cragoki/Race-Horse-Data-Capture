@@ -283,25 +283,8 @@ namespace Infrastructure.Data.Repositories
 
         public RaceEntity GetRaceByURL(string raceURL) 
         {
-            return _context.tb_race.Include(x => x.RaceHorses)
-                    .ThenInclude(x => x.Horse)
-                        .ThenInclude(x => x.Archive)
-                .Include(x => x.RaceHorses)
-                    .ThenInclude(x => x.Horse)
-                        .ThenInclude(x => x.Races)
-                            .ThenInclude(x => x.Race)
-                                .ThenInclude(x => x.Event)
-                .Include(x => x.RaceHorses)
-                    .ThenInclude(x => x.Horse)
-                        .ThenInclude(x => x.Races)
-                            .ThenInclude(x => x.Race)
-                                .ThenInclude(x => x.RaceHorses)
-                                    .ThenInclude(x => x.Horse)
-                                        .ThenInclude(x => x.Races)
-                                            .ThenInclude(x => x.Race)
-                                                .ThenInclude(x => x.Event)
-                .Include(x => x.Event)
-                .Where(x => x.race_url == raceURL).ToList().FirstOrDefault();
+            return _context.tb_race.Include(x => x.Event).Include(x => x.RaceHorses).ThenInclude(x => x.Horse).ThenInclude(x => x.Races).ThenInclude(x => x.Race).ThenInclude(x => x.Event)
+                .Where(x => x.race_url == raceURL).FirstOrDefault();
         }
         public List<RaceEntity> GetAllRaces()
         {

@@ -360,6 +360,11 @@ namespace Core.Services
                                 {
                                     raceHorse.description = "RO";
                                 }
+                                else 
+                                {
+                                    raceHorse.description = position;
+
+                                }
                             }
                             else 
                             {
