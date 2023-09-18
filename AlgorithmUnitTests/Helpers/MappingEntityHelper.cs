@@ -39,5 +39,33 @@ namespace AlgorithmUnitTests.Helpers
                 going_type = "Good"
             };
         }
+
+        public static MeetingType GetMeetingType()
+        {
+            return new MeetingType()
+            {
+                meeting_type_id = 1,
+                meeting_type = "Flat"
+            };
+        }
+
+        public static CourseEntity GetCourse()
+        {
+            return new CourseEntity()
+            {
+                course_id = 1,
+                name = "Ascot",
+                all_weather = false
+            };
+        }
+
+        public static SurfaceType GetSurface()
+        {
+            return new SurfaceType()
+            {
+                surface_type_id = 1,
+                surface_type = "Polytrack"
+            };
+        }
     }
 }

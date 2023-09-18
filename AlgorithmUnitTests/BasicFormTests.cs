@@ -3,11 +3,13 @@ using Core.Algorithms;
 using Core.Entities;
 using Core.Interfaces.Data;
 using Core.Models.GetRace;
+using FluentAssertions;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AlgorithmUnitTests
@@ -15,29 +17,76 @@ namespace AlgorithmUnitTests
     public class BasicFormTests
     {
         [Fact]
-        public void Test1()
+        public async Task BasicTwoHorseRace()
         {
-            var options = new DbContextOptions<DbContextData>();
-
             //Build Race
-            var race = RaceEntityHelper.BuildSimpleRace();
+            var race = RaceEntityHelper.BuildSimpleRace(2);
 
             //Add 2 horses, one with a win, one with no wins
-            //var raceHorses = new List<RaceHorseEntity>();
-            //raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(1, 1, 1, 1, 0, race));
-            //raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(2, 1, 1, 0, 0, race));
+            var raceHorses = new List<RaceHorseEntity>();
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(1, 1, 1, 0, race));
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(2, 1, 0, 0, race));
+            race.RaceHorses.AddRange(raceHorses);
 
+            var contextMock = DbSetMockHelper.GenerateContextMock();
 
-            //var contextMock = new Mock<IDbContextData>();
-            //var dbSet = new Mock<DbSet<Race>>();
-            //var queryable = 
-            //dbSet.As<IQueryable<Race>>().Setup(m => m.Provider).Returns(queryable.Provider);
-            //dbSet.As<IQueryable<Race>>().Setup(m => m.Expression).Returns(queryable.Expression);
-            //dbSet.As<IQueryable<Race>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
-            //dbSet.As<IQueryable<Race>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
-            //contextMock.SetupGet(x => x.tb_race).Returns(dbSet.Object);
+            var bentnersAlgorithm = new BentnersModel(contextMock.Object);
 
-            //var bentnersAlgorithm = new BentnersModel(context);
+            var result = await bentnersAlgorithm.RunModel(race);
+
+            var winner = result.OrderByDescending(x => x.Points).FirstOrDefault();
+
+            winner.horse_id.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task BasicCompetitiveTwoHorseRace()
+        {
+            //Build Race
+            var race = RaceEntityHelper.BuildSimpleRace(2);
+
+            //Add 2 horses, one with a win, one with no wins
+            var raceHorses = new List<RaceHorseEntity>();
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(2, 2, 1, 1, race));
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(1, 2, 2, 0, race));
+            race.RaceHorses.AddRange(raceHorses);
+
+            var contextMock = DbSetMockHelper.GenerateContextMock();
+
+            var bentnersAlgorithm = new BentnersModel(contextMock.Object);
+
+            var result = await bentnersAlgorithm.RunModel(race);
+
+            var winner = result.OrderByDescending(x => x.Points).FirstOrDefault();
+
+            winner.horse_id.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task BasicPlaceOnlyHorseRace()
+        {
+            //Build Race
+            var race = RaceEntityHelper.BuildSimpleRace(5);
+
+            //Add 2 horses, one with a win, one with no wins
+            var raceHorses = new List<RaceHorseEntity>();
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(1, 2, 0, 1, race));
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(2, 2, 0, 0, race));
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(3, 2, 0, 2, race));
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(4, 0, 0, 0, race));
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(5, 0, 0, 0, race));
+
+            race.RaceHorses.AddRange(raceHorses);
+
+            var contextMock = DbSetMockHelper.GenerateContextMock();
+
+            var bentnersAlgorithm = new BentnersModel(contextMock.Object);
+
+            var result = await bentnersAlgorithm.RunModel(race);
+
+            var winner = result.OrderByDescending(x => x.Points).FirstOrDefault();
+
+            winner.horse_id.Should().Be(3);
         }
     }
 }

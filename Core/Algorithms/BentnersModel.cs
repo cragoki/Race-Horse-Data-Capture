@@ -3,7 +3,6 @@ using Core.Enums;
 using Core.Helpers;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data;
-using Core.Interfaces.Data.Repositories;
 using Core.Models.Algorithm;
 using Core.Models.Algorithm.Bentners;
 using Infrastructure.PunterAdmin.ViewModels;
@@ -313,7 +312,7 @@ namespace Core.Algorithms
             var distances = _context.tb_distance_type.AsEnumerable();
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
 
-            if (distanceGroups == null) 
+            if (distanceGroups == null)
             {
                 return tracker;
             }
@@ -364,7 +363,7 @@ namespace Core.Algorithms
 
             var distances = _context.tb_distance_type.AsEnumerable();
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
-            if (distanceGroups == null) 
+            if (distanceGroups == null)
             {
                 return tracker;
             }
@@ -380,7 +379,7 @@ namespace Core.Algorithms
             var pointsForStrength = 0.5M;
             var racesWithGreaterRprs = 0;
 
-            if (pastRaces.Count() > 0) 
+            if (pastRaces.Count() > 0)
             {
                 foreach (var pastRace in pastRaces)
                 {
@@ -406,11 +405,11 @@ namespace Core.Algorithms
                     }
                 }
 
-                if (pastRaces.Count() > 0) 
+                if (pastRaces.Count() > 0)
                 {
                     //we then take that variable and work it out as a % against total races. Divide that by 10 and multiply it by points
                     var percentageOfRacesWithGreaterRpr = (int)Math.Round((double)(100 * racesWithGreaterRprs) / pastRaces.Count());
-                    result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength; 
+                    result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength;
                     tracker.TotalPointsForStrengthOfCompetition += FormatHelper.ToTwoPlaces((percentageOfRacesWithGreaterRpr / 10) * pointsForStrength);
                     tracker.GetPastPerformanceAdjustmentsDescription += $"--Plus {tracker.TotalPointsForStrengthOfCompetition} for strength of competition with {percentageOfRacesWithGreaterRpr}% of horses with greater rpr --";
                     //Optimal Weight in past races - Get each past race and get the weight for their top 3 performances
@@ -445,7 +444,7 @@ namespace Core.Algorithms
                         }
                         var multiplier = 0;
 
-                        if (placedWithJockey > 0) 
+                        if (placedWithJockey > 0)
                         {
                             multiplier = (racesWithJockey.Count() / placedWithJockey);
                         }
@@ -518,7 +517,7 @@ namespace Core.Algorithms
             var distanceGroups = VariableGroupings.GetDistanceGroupings(distances).Where(x => x.DistanceIds.Contains(race.distance ?? 0)).FirstOrDefault();
             var goingGroups = VariableGroupings.GetGoingGroupings(goings).Where(x => x.ElementIds.Contains(race.going ?? 0)).FirstOrDefault();
 
-            if (distanceGroups == null || goingGroups == null) 
+            if (distanceGroups == null || goingGroups == null)
             {
                 return tracker;
             }
@@ -614,7 +613,7 @@ namespace Core.Algorithms
             //Get Horses Going group they have performed best at... (Ie: 50% places at Going +1, 75% places at Going +2)
             var racesAtGoingGroup = horse.Races.Where(x => goingGroups.ElementIds.Contains(x.Race.going ?? 0) && x.position != 0).Take(3);
 
-            if (racesAtGoingGroup.Count() > 0) 
+            if (racesAtGoingGroup.Count() > 0)
             {
                 var pointsForEachC4 = FormatHelper.ToTwoPlaces((pointsForEachCondition / racesAtGoingGroup.Count()));
                 foreach (var condition4 in racesAtGoingGroup)
@@ -645,7 +644,7 @@ namespace Core.Algorithms
         {
             var result = 0;
 
-            if (raceHorse.Horse.Archive != null && raceHorse.Horse.Archive.Count() != 0)
+            if (raceHorse != null && raceHorse.Horse.Archive != null && raceHorse.Horse.Archive.Count() != 0)
             {
                 var archive = raceHorse.Horse.Archive;
                 var rprString = archive.Where(x => x.field_changed == "rpr" && x.date < created)
