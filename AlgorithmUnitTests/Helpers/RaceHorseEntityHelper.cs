@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Helpers;
+using System;
 using System.Collections.Generic;
 
 namespace AlgorithmUnitTests.Helpers
@@ -15,6 +16,8 @@ namespace AlgorithmUnitTests.Helpers
                 finished = false,
                 age = 2,
                 horse_id = index,
+                jockey_id = index,
+                trainer_id = index,
                 weight = " 10. 12",
                 Horse = new HorseEntity() 
                 {
@@ -29,6 +32,16 @@ namespace AlgorithmUnitTests.Helpers
                     Races = GenerateRaceHorseHistory(races, wins, places, race, index)
                 },
                 race_id = race.race_id,
+                Race = new RaceEntity() 
+                {
+                    race_id = 1000 + index,
+                    event_id = 1000 + index,
+                    Event = new EventEntity() 
+                    {
+                        course_id = race.Event.course_id
+                    },
+                    race_class = race.race_class
+                }
             };
         }
 
@@ -99,6 +112,43 @@ namespace AlgorithmUnitTests.Helpers
                 });
             }
             return result;
+        }
+
+        public static RaceHorseEntity GenerateJockeyHistory(int index, int position)
+        {
+            return new RaceHorseEntity()
+            {
+                race_horse_id = index,
+                description = "",
+                position = position,
+                finished = true,
+                age = 2,
+                jockey_id = index,
+                trainer_id = index,
+                horse_id = index,
+                weight = " 10. 12",
+                Horse = new HorseEntity()
+                {
+                    horse_id = index,
+                    horse_name = $"Horse {index}",
+                    rp_horse_id = index,
+                    Archive = null,
+                    dob = null,
+                    horse_url = null,
+                    rpr = null,
+                    top_speed = null
+                },
+                race_id = 1000 + index,
+                Race = new RaceEntity() 
+                {
+                    race_id = 1000 + index,
+                    event_id = 1000 + index,
+                    Event = new EventEntity() 
+                    {
+                        created = DateTime.Now.AddMonths(-3)
+                    }
+                }
+            };
         }
     }
 }

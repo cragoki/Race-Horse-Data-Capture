@@ -17,7 +17,7 @@ namespace AlgorithmUnitTests.Helpers
                 rp_race_id = 1,
                 stalls = null,
                 //Variables
-                race_class = 0,
+                race_class = 5,
                 no_of_horses = numberOfHorses,
                 //Foreign Keys
                 distance = 1,
@@ -46,7 +46,7 @@ namespace AlgorithmUnitTests.Helpers
                 rp_race_id = race.rp_race_id + 1,
                 stalls = null,
                 //Variables
-                race_class = 0,
+                race_class = race.race_class,
                 no_of_horses = race.no_of_horses,
                 //Foreign Keys
                 distance = race.distance,

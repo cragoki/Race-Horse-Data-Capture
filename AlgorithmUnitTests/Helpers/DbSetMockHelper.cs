@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Data;
+using Core.Models.GetRace;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Collections.Generic;
@@ -63,7 +64,7 @@ namespace AlgorithmUnitTests.Helpers
                 new AlgorithmSettingsEntity(){algorithm_id = 1, algorithm_setting_id = 1, setting_name = AlgorithmSettingEnum.reliabilityCurrentCondition.ToString(), setting_value = "2" },
                 new AlgorithmSettingsEntity(){algorithm_id = 1, algorithm_setting_id = 2, setting_name = AlgorithmSettingEnum.reliabilityAdjustmentsPastPerformance.ToString(), setting_value = "2" },
                 new AlgorithmSettingsEntity(){algorithm_id = 1, algorithm_setting_id = 3, setting_name = AlgorithmSettingEnum.reliabilityPastPerformance.ToString(), setting_value = "2" },
-                new AlgorithmSettingsEntity(){algorithm_id = 1, algorithm_setting_id = 4, setting_name = AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString(), setting_value = "2" },
+                new AlgorithmSettingsEntity(){algorithm_id = 1, algorithm_setting_id = 4, setting_name = AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString(), setting_value = "0.5" },
                 new AlgorithmSettingsEntity(){algorithm_id = 1, algorithm_setting_id = 5, setting_name = AlgorithmSettingEnum.reliabilityHorsePreferences.ToString(), setting_value = "2" },
             };
 
@@ -119,10 +120,10 @@ namespace AlgorithmUnitTests.Helpers
             };
             #endregion
             var mockAlgorithmTrackerDbSet = new Mock<DbSet<GoingType>>();
-            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.Provider).Returns(mockAlgorithmTrackers.AsQueryable().Provider);
-            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.Expression).Returns(mockAlgorithmTrackers.AsQueryable().Expression);
-            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.ElementType).Returns(mockAlgorithmTrackers.AsQueryable().ElementType);
-            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.GetEnumerator()).Returns(mockAlgorithmTrackers.AsQueryable().GetEnumerator());
+            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.Provider).Returns(() => mockAlgorithmTrackers.AsQueryable().Provider);
+            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.Expression).Returns(() => mockAlgorithmTrackers.AsQueryable().Expression);
+            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.ElementType).Returns(() => mockAlgorithmTrackers.AsQueryable().ElementType);
+            mockAlgorithmTrackerDbSet.As<IQueryable<GoingType>>().Setup(m => m.GetEnumerator()).Returns(() => mockAlgorithmTrackers.AsQueryable().GetEnumerator());
 
             return mockAlgorithmTrackerDbSet;
         }
@@ -1066,6 +1067,17 @@ new DistanceType(){distance_type_id =927, distance_type ="6½f"}
             mockAlgorithmTrackerDbSet.As<IQueryable<DistanceType>>().Setup(m => m.Expression).Returns(() => mockAlgorithmTrackers.AsQueryable().Expression);
             mockAlgorithmTrackerDbSet.As<IQueryable<DistanceType>>().Setup(m => m.ElementType).Returns(() => mockAlgorithmTrackers.AsQueryable().ElementType);
             mockAlgorithmTrackerDbSet.As<IQueryable<DistanceType>>().Setup(m => m.GetEnumerator()).Returns(() => mockAlgorithmTrackers.AsQueryable().GetEnumerator());
+
+            return mockAlgorithmTrackerDbSet;
+        }
+
+        public static Mock<DbSet<RaceHorseEntity>> GetJockeyHistory(List<RaceHorseEntity> mockAlgorithmTrackers)
+        {
+            var mockAlgorithmTrackerDbSet = new Mock<DbSet<RaceHorseEntity>>();
+            mockAlgorithmTrackerDbSet.As<IQueryable<RaceHorseEntity>>().Setup(m => m.Provider).Returns(mockAlgorithmTrackers.AsQueryable().Provider);
+            mockAlgorithmTrackerDbSet.As<IQueryable<RaceHorseEntity>>().Setup(m => m.Expression).Returns(mockAlgorithmTrackers.AsQueryable().Expression);
+            mockAlgorithmTrackerDbSet.As<IQueryable<RaceHorseEntity>>().Setup(m => m.ElementType).Returns(mockAlgorithmTrackers.AsQueryable().ElementType);
+            mockAlgorithmTrackerDbSet.As<IQueryable<RaceHorseEntity>>().Setup(m => m.GetEnumerator()).Returns(mockAlgorithmTrackers.AsQueryable().GetEnumerator());
 
             return mockAlgorithmTrackerDbSet;
         }

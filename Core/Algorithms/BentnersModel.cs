@@ -96,8 +96,8 @@ namespace Core.Algorithms
             var result = new List<HorsePredictionModel>();
             var raceTracker = new RaceHorseStatisticsTracker();
             var presentRaceFactors = await GetPresentRaceFactors(race, raceTracker);
-            var topJockeys = raceTracker.JockeyRankings.OrderByDescending(x => x.Value).Take(2); // Needs to move out of foreach
-            var topTrainers = raceTracker.JockeyRankings.OrderByDescending(x => x.Value).Take(2);
+            var topJockeys = raceTracker.JockeyRankings.OrderBy(x => x.Value).Take(2); 
+            var topTrainers = raceTracker.JockeyRankings.OrderBy(x => x.Value).Take(2);
             foreach (var horse in horses)
             {
                 var tracker = new RaceHorseStatisticsTracker();
@@ -442,11 +442,11 @@ namespace Core.Algorithms
                                 placedWithJockey = placedWithJockey + 1;
                             }
                         }
-                        var multiplier = 0;
+                        decimal multiplier = 0M;
 
                         if (placedWithJockey > 0)
                         {
-                            multiplier = (racesWithJockey.Count() / placedWithJockey);
+                            multiplier = ((decimal)placedWithJockey / (decimal)racesWithJockey.Count());
                         }
                         result += (pointsForJockey * multiplier);
                         tracker.TotalPointsForJockeyContribution += FormatHelper.ToTwoPlaces((pointsForJockey * multiplier));
