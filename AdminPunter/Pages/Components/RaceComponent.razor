@@ -26,6 +26,7 @@
                 <table class="table">
                     <thead>
                         <tr class="horse-tbl-head">
+                           <td>Id</td>
                            <td>Name</td>
                            <td>Age</td>
                            <td>Jockey</td>
@@ -55,6 +56,7 @@
                             position = "?";
                         }
                         <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
+                            <td>@horse.RaceHorseId</td>
                             <td>@horse.Name</td>
                             <td>@horse.Age</td>
                             <td>@horse.JockeyName</td>
@@ -80,20 +82,21 @@
                             {
                                 position = "?";
                             }
-                            <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
-                                <td>@horse.Name</td>
-                                <td>@horse.Age</td>
-                                <td>@horse.JockeyName</td>
-                                <td>@horse.TrainerName</td>
-                                <td>@horse.RPR</td>
-                                <td>@horse.Ts</td>
-                                <td>@position</td>
-                                <td>@horse.Points</td>
-                                <td>@horse.HorseReliability</td>
-                                <td>@horse.PredictedPosition</td>
-                                <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
-                                <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))" > Statistics</button></td>
-                            </tr>
+                                <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
+                                    <td>@horse.RaceHorseId</td>
+                                    <td>@horse.Name</td>
+                                    <td>@horse.Age</td>
+                                    <td>@horse.JockeyName</td>
+                                    <td>@horse.TrainerName</td>
+                                    <td>@horse.RPR</td>
+                                    <td>@horse.Ts</td>
+                                    <td>@position</td>
+                                    <td>@horse.Points</td>
+                                    <td>@horse.HorseReliability</td>
+                                    <td>@horse.PredictedPosition</td>
+                                    <td><Tooltip Text="@horse.PointsDescription">PD</Tooltip></td>
+                                    <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowHorseStatistics(horse.HorseId, Race.RaceId, Race.EventId))"> Statistics</button></td>
+                                </tr>
                         }
                         else if (horse.PredictedPosition != null && horse.PredictedPosition == 3)
                         {
@@ -107,6 +110,7 @@
                             position = "?";
                         }
                             <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
+                                <td>@horse.RaceHorseId</td>
                                 <td>@horse.Name</td>
                                 <td>@horse.Age</td>
                                 <td>@horse.JockeyName</td>
@@ -133,6 +137,7 @@
                                 position = "?";
                             }
                             <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
+                                <td>@horse.RaceHorseId</td>
                                 <td>@horse.Name</td>
                                 <td>@horse.Age</td>
                                 <td>@horse.JockeyName</td>
@@ -159,6 +164,7 @@
                             position = "?";
                         }
                         <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                            <td>@horse.RaceHorseId</td>
                             <td>@horse.Name</td>
                             <td>@horse.Age</td>
                             <td>@horse.JockeyName</td>
@@ -205,6 +211,7 @@ else
                 <table class="table">
                     <thead>
                         <tr class="horse-tbl-head">
+                           <td>Id</td>
                            <td>Name</td>
                            <td>Age</td>
                            <td>Jockey</td>
@@ -234,6 +241,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -260,6 +268,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -286,6 +295,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -312,6 +322,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -338,6 +349,7 @@ else
                                     position = "?";
                                 }
                                 <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                                    <td>@horse.RaceHorseId</td>
                                     <td>@horse.Name</td>
                                     <td>@horse.Age</td>
                                     <td>@horse.JockeyName</td>
@@ -380,6 +392,7 @@ else
                 <table class="table">
                     <thead>
                         <tr class="horse-tbl-head">
+                           <td>Id</td>
                            <td>Name</td>
                            <td>Age</td>
                            <td>Jockey</td>
@@ -409,6 +422,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-first" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -435,6 +449,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-second" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -461,6 +476,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-third" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -487,6 +503,7 @@ else
                                         position = "?";
                                     }
                                     <tr class="horse-tbl-body predicted-fourth" id="horse-@Race.RaceId-@horse.HorseId">
+                                        <td>@horse.RaceHorseId</td>
                                         <td>@horse.Name</td>
                                         <td>@horse.Age</td>
                                         <td>@horse.JockeyName</td>
@@ -513,6 +530,7 @@ else
                                     position = "?";
                                 }
                                 <tr class="horse-tbl-body" id="horse-@Race.RaceId-@horse.HorseId">
+                                    <td>@horse.RaceHorseId</td>
                                     <td>@horse.Name</td>
                                     <td>@horse.Age</td>
                                     <td>@horse.JockeyName</td>

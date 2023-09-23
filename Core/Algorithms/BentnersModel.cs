@@ -188,7 +188,7 @@ namespace Core.Algorithms
             var reliabilityCurrentCondition = _context.tb_algorithm_settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).First().setting_value.ToString();
 
             //Performance in last 2 races. 0.5 for a single place 0.75 for 2 places, 1 for a place and a win, 1.5 for two wins
-            var lastTwo = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id).OrderByDescending(x => x.Race.Event.created).Take(2);
+            var lastTwo = horse.Races.Where(x => x.position != 0 && x.Race.Event.created < race.Event.created && x.race_id != race.race_id && x.Race.race_class <= race.race_class).OrderByDescending(x => x.Race.Event.created).Take(2);
             int placed = 0;
             int won = 0;
 
@@ -376,42 +376,42 @@ namespace Core.Algorithms
             //So Higher the better, could do it as % of horses in past races where RPR > horses RPR. 
             //We would even need to look deeper into this. Horse won last race but all horses had a lower RPR, this should not award as many points as when a horse has raced against 50% field of higher rprs. could get tricky.
             //So to keep this simple for V1, we get the average rpr for each race, and if it is greater than the horses rpr for that race we increment a variable by one. 
-            var pointsForStrength = 0.5M;
-            var racesWithGreaterRprs = 0;
+            //var pointsForStrength = 0.5M;
+            //var racesWithGreaterRprs = 0;
 
             if (pastRaces.Count() > 0)
             {
-                foreach (var pastRace in pastRaces)
-                {
-                    var horseForThisRace = pastRace.Race.RaceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
-                    var horseForThisRaceRpr = ConfigureRPR(horseForThisRace, pastRace.Race.Event.created) ?? 0;
+                //    foreach (var pastRace in pastRaces)
+                //    {
+                //        var horseForThisRace = pastRace.Race.RaceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
+                //        var horseForThisRaceRpr = ConfigureRPR(horseForThisRace, pastRace.Race.Event.created) ?? 0;
 
-                    var allRprs = new List<int>();
-                    var averages = new List<double>();
-                    foreach (var pastHorseForRace in pastRace.Race.RaceHorses.Where(x => x.horse_id != horse.horse_id))
-                    {
-                        var rpr = ConfigureRPR(pastHorseForRace, pastRace.Race.Event.created) ?? 0;
-                        allRprs.Add(rpr);
-                    }
+                //        var allRprs = new List<int>();
+                //        var averages = new List<double>();
+                //        foreach (var pastHorseForRace in pastRace.Race.RaceHorses.Where(x => x.horse_id != horse.horse_id))
+                //        {
+                //            var rpr = ConfigureRPR(pastHorseForRace, pastRace.Race.Event.created) ?? 0;
+                //            allRprs.Add(rpr);
+                //        }
 
-                    if (allRprs.Where(x => x != 0).Count() > 0)
-                    {
-                        averages.Add(allRprs.Where(x => x != 0).Average());
+                //        if (allRprs.Where(x => x != 0).Count() > 0)
+                //        {
+                //            averages.Add(allRprs.Where(x => x != 0).Average());
 
-                        if (averages.Average() > horseForThisRaceRpr)
-                        {
-                            racesWithGreaterRprs = racesWithGreaterRprs + 1;
-                        }
-                    }
-                }
+                //            if (averages.Average() > horseForThisRaceRpr)
+                //            {
+                //                racesWithGreaterRprs = racesWithGreaterRprs + 1;
+                //            }
+                //        }
+                //    }
 
                 if (pastRaces.Count() > 0)
                 {
                     //we then take that variable and work it out as a % against total races. Divide that by 10 and multiply it by points
-                    var percentageOfRacesWithGreaterRpr = (int)Math.Round((double)(100 * racesWithGreaterRprs) / pastRaces.Count());
-                    result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength;
-                    tracker.TotalPointsForStrengthOfCompetition += FormatHelper.ToTwoPlaces((percentageOfRacesWithGreaterRpr / 10) * pointsForStrength);
-                    tracker.GetPastPerformanceAdjustmentsDescription += $"--Plus {tracker.TotalPointsForStrengthOfCompetition} for strength of competition with {percentageOfRacesWithGreaterRpr}% of horses with greater rpr --";
+                    //var percentageOfRacesWithGreaterRpr = (int)Math.Round((double)(100 * racesWithGreaterRprs) / pastRaces.Count());
+                    //result += (percentageOfRacesWithGreaterRpr / 10) * pointsForStrength;
+                    //tracker.TotalPointsForStrengthOfCompetition += FormatHelper.ToTwoPlaces((percentageOfRacesWithGreaterRpr / 10) * pointsForStrength);
+                    //tracker.GetPastPerformanceAdjustmentsDescription += $"--Plus {tracker.TotalPointsForStrengthOfCompetition} for strength of competition with {percentageOfRacesWithGreaterRpr}% of horses with greater rpr --";
                     //Optimal Weight in past races - Get each past race and get the weight for their top 3 performances
                     //May need some sort of diff value (ie. if weight = -2 compared to previous race, +x if -1 +y etc...)
                     var pointsForWeight = 0.5M;
