@@ -401,9 +401,19 @@ namespace Core.Services
             catch (Exception ex)
             {
                 Logger.Error($"Failed to retrieve results for race horse {raceHorse.race_horse_id} ... {ex.Message}");
-                raceHorse.position = -1;
-                raceHorse.description = ex.Message;
-                raceHorse.finished = false;
+                if (ex.Message == "Response status code does not indicate success: 404 (Not Found).")
+                {
+                    raceHorse.position = 0;
+                    raceHorse.description = "ABANDONED";
+                    raceHorse.finished = false;
+                }
+                else 
+                {
+                    raceHorse.position = -1;
+                    raceHorse.description = ex.Message;
+                    raceHorse.finished = false;
+                }
+
             }
 
             return raceHorse;

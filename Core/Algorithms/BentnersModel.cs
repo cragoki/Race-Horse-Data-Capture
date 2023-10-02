@@ -428,7 +428,7 @@ namespace Core.Algorithms
 
                     //Has raced with jockey before? If so how has that gone? (performs well with this jockey?)
                     //So if the horse has 4 races with this jockey and has placed or won twice. Add pointsForJockey * 0.5
-                    var pointsForJockey = 1M;
+                    var pointsForJockey = 0.5M;
                     var racesWithJockey = pastRaces.Where(x => x.jockey_id == raceHorse.jockey_id);
                     int placedWithJockey = 0;
 

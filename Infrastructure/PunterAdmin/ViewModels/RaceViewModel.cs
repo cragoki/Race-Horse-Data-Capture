@@ -22,6 +22,9 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public bool Completed { get; set; }
         public bool ShowHorses { get; set; }
         public bool ShowResults { get; set; }
+        public decimal TotalPoints { get; set; }
+        public decimal AveragePoints { get; set; }
+        public decimal PointGap { get; set; }
 
         public List<RaceHorseViewModel> Horses { get; set; }
     }

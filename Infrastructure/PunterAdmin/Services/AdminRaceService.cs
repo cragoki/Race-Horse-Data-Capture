@@ -125,6 +125,7 @@ namespace Infrastructure.PunterAdmin.Services
                     result.Add(new RaceStatisticViewModel() 
                     {
                         Position = race.position,
+                        Description = race.description,
                         Weather = race.Race.Weather.weather_type,
                         Going = race.Race.Going.going_type,
                         Distance = race.Race.Distance.distance_type,
@@ -399,6 +400,11 @@ namespace Infrastructure.PunterAdmin.Services
                         Weather = $"Weather: {race.Weather?.weather_type}",
                         Horses = BuildRaceHorseViewModel(race.RaceHorses, race.Event)
                     };
+
+                    var horsesOrdered = toAdd.Horses.OrderByDescending(x => x.Points).ToList();
+                    toAdd.TotalPoints = toAdd.Horses.Sum(x => x.Points) ?? 0;
+                    toAdd.PointGap = (horsesOrdered[0].Points - horsesOrdered[1].Points) ?? 0;
+                    toAdd.AveragePoints = toAdd.Horses.Average(x => x.Points) ?? 0;
 
                     result.Add(toAdd);
                 }

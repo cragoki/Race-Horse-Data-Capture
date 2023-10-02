@@ -47,6 +47,7 @@
                     @if (horse.PredictedPosition != null && horse.PredictedPosition == 1)
                     {
                         var position = "";
+                        
                         @if (@Race.ShowResults) 
                         {
                             position = @horse.Position.ToString();
@@ -196,11 +197,12 @@ else
             <td>@Race.Weather</td>
             <td>@Race.NumberOfHorses</td>
             <td>@Race.Going</td>
-            <td>@Race.Stalls</td>
             <td>@Race.Distance</td>
             <td>@Race.RaceClass</td>
-            <td>@Race.Ages</td>
-            <td>@Race.RaceUrl</td>
+            <td>TP: @Race.TotalPoints.ToString("#.##")</td>
+            <td>AP: @Race.AveragePoints.ToString("#.##")</td>
+            <td>PD: @Race.PointGap.ToString("#.##")</td>
+
             <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowResults(Race.EventId, Race.RaceId))" > Show Results</button></td>
         </tr>
     
@@ -378,11 +380,11 @@ else
             <td>@Race.Weather</td>
             <td>@Race.NumberOfHorses</td>
             <td>@Race.Going</td>
-            <td>@Race.Stalls</td>
             <td>@Race.Distance</td>
             <td>@Race.RaceClass</td>
-            <td>@Race.Ages</td>
-            <td>@Race.RaceUrl</td>
+            <td>TP: @Race.TotalPoints.ToString("#.##")</td>
+            <td>AP: @Race.AveragePoints.ToString("#.##")</td>
+            <td>PD: @Race.PointGap.ToString("#.##")</td>
             <td><button type="button" class="btn btn-primary" @onclick="@(()=>ShowResults(Race.EventId, Race.RaceId))" > Show Results</button></td>
          </tr>
             @if (Race.ShowHorses)
