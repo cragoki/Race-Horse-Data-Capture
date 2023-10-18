@@ -34,6 +34,8 @@ namespace Core.Entities
         public string race_url { get; set; }
         public bool completed { get; set; }
         public List<RaceHorseEntity> RaceHorses { get; set; }
+        public string winning_time { get; set; }
+
 
     }
 }

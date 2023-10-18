@@ -684,6 +684,7 @@ namespace Infrastructure.PunterAdmin.Services
                     Ages = race.Ages?.age_type,
                     Completed = race.completed,
                     Description = race.description,
+                    RaceType = race.Event.MeetingType.meeting_type,
                     Distance = race.Distance?.distance_type,
                     EventId = race.event_id,
                     Going = $"Going: {race.Going?.going_type}",

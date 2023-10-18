@@ -46,7 +46,8 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Horse)
                             .ThenInclude(x => x.Races)
                                 .ThenInclude(x => x.Race)
-                                    .ThenInclude(x => x.Event)
+                                  .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.MeetingType)
                 .Include(x => x.Races)
                     .ThenInclude(y => y.Weather)
                 .Include(x => x.Races)
@@ -87,6 +88,7 @@ namespace Infrastructure.Data.Repositories
                           .ThenInclude(x => x.Races)
                               .ThenInclude(x => x.Race)
                                   .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.MeetingType)
               .Include(x => x.Races)
                   .ThenInclude(y => y.Weather)
               .Include(x => x.Races)
@@ -198,6 +200,7 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Races)
                             .ThenInclude(x => x.Race)
                                 .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.MeetingType)
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Horse)
                         .ThenInclude(x => x.Races)
@@ -227,6 +230,7 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Races)
                             .ThenInclude(x => x.Race)
                                 .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.MeetingType)
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Horse)
                         .ThenInclude(x => x.Races)
@@ -270,6 +274,12 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Races)
                             .ThenInclude(x => x.Race)
                                 .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.MeetingType)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.Event)
                                     .ThenInclude(x => x.Surface)
                 .Include(x => x.RaceHorses)
                     .ThenInclude(x => x.Jockey)
@@ -283,7 +293,7 @@ namespace Infrastructure.Data.Repositories
 
         public RaceEntity GetRaceByURL(string raceURL) 
         {
-            return _context.tb_race.Include(x => x.Event).Include(x => x.RaceHorses).ThenInclude(x => x.Horse).ThenInclude(x => x.Races).ThenInclude(x => x.Race).ThenInclude(x => x.Event)
+            return _context.tb_race.Include(x => x.Event).ThenInclude(x => x.MeetingType).Include(x => x.RaceHorses).ThenInclude(x => x.Horse).ThenInclude(x => x.Races).ThenInclude(x => x.Race).ThenInclude(x => x.Event)
                 .Where(x => x.race_url == raceURL).FirstOrDefault();
         }
         public List<RaceEntity> GetAllRaces()
@@ -297,6 +307,7 @@ namespace Infrastructure.Data.Repositories
                  .Include(x => x.Stalls)
                  .Include(x => x.Distance)
                  .Include(x => x.Event)
+                    .ThenInclude(x => x.MeetingType)
                  .ToList();
         }
         public void AddRace(RaceEntity raceToAdd)

@@ -126,6 +126,7 @@ namespace Infrastructure.PunterAdmin.Services
                     {
                         Position = race.position,
                         Description = race.description,
+                        RaceType = race.Race.Event.MeetingType.meeting_type,
                         Weather = race.Race.Weather.weather_type,
                         Going = race.Race.Going.going_type,
                         Distance = race.Race.Distance.distance_type,
@@ -135,50 +136,6 @@ namespace Infrastructure.PunterAdmin.Services
                 }
             }
             catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
-            return result;
-        }
-
-        private List<RaceViewModel> GetRacesForHorse(int horseId)
-        {
-            var result = new List<RaceViewModel>();
-            try 
-            {
-                var horse = _horseRepository.GetHorseWithRaces(horseId);
-
-                foreach (var race in horse.Races.OrderByDescending(x => x.Race.Event.created))
-                {
-                    var toAdd = new RaceViewModel()
-                    {
-                        RaceId = race.race_id,
-                        Date = race.Race.Event.created,
-                        Ages = race.Race.Ages?.age_type,
-                        Completed = race.Race.completed,
-                        Description = race.description,
-                        Distance = race.Race.Distance?.distance_type,
-                        EventId = race.Race.event_id,
-                        Going = $"Going: {race.Race.Going?.going_type}",
-                        NumberOfHorses = $"{race.Race.no_of_horses} Horses",
-                        RaceClass = $"Class: {race.Race.race_class ?? 0}",
-                        RaceTime = race.Race.race_time,
-                        RaceUrl = $"https://www.racingpost.com/{race.Race.race_url}",
-                        Stalls = $"Stalls: {race.Race.Stalls?.stalls_type}",
-                        Weather = $"Weather: {race.Race.Weather?.weather_type}",
-                        Horses = BuildRaceHorseViewModel(race.Race.RaceHorses, race.Race.Event)
-                    };
-
-                    if (toAdd.Horses.Any(x => x.PredictedPosition != 0)) 
-                    {
-                        toAdd.AlgorithmRan = true;
-                    }
-
-                    result.Add(toAdd);
-                }
-            }
-            catch(Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -387,6 +344,7 @@ namespace Infrastructure.PunterAdmin.Services
                         RaceId = race.race_id,
                         Date = date,
                         Ages = race.Ages?.age_type,
+                        RaceType = race.Event.MeetingType.meeting_type,
                         Completed = race.completed,
                         Description = race.description,
                         Distance = race.Distance?.distance_type,

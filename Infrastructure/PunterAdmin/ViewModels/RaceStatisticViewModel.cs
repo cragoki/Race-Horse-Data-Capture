@@ -4,6 +4,7 @@
     {
         public int Position { get; set; }
         public string Description { get; set; }
+        public string RaceType { get; set; }
         public string RaceUrl { get; set; }
         public int Class { get; set; }
         public string Distance { get; set; }

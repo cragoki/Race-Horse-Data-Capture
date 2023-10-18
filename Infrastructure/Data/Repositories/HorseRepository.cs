@@ -167,7 +167,7 @@ namespace Infrastructure.Data.Repositories
         }
         public IEnumerable<RaceHorseEntity> GetHorseRaces(int horse_id)
         {
-            return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event)
+            return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event).ThenInclude(x => x.MeetingType)
                 .Include(x => x.Race).ThenInclude(x => x.Weather)
                 .Include(x => x.Race).ThenInclude(x => x.Going)
                 .Include(x => x.Race).ThenInclude(x => x.Distance)

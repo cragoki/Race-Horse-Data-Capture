@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Enums
+﻿namespace Core.Enums
 {
     public enum AlgorithmEnum
     {
@@ -10,6 +6,7 @@ namespace Core.Enums
         TsRPR = 2,
         FormOnly = 3,
         FormRevamp = 4,
-        BentnersModel = 5
+        BentnersModel = 5,
+        MyModel = 6
     }
 }

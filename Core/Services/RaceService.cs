@@ -130,6 +130,48 @@ namespace Core.Services
                     }
                 }
 
+                var invalidResults = raceHorses.Where(x => String.IsNullOrEmpty(x.description) && x.position == 0).ToList();
+                var results = new List<RaceHorseEntity>();
+                foreach (var result in invalidResults) 
+                {
+                    try
+                    {
+                        results.Add(await _scraperService.GetResultsForRaceHorse(result));
+                    }
+                    catch (Exception ex)
+                    {
+                        var failedResult = new FailedResultEntity()
+                        {
+                            race_horse_id = result.race_horse_id,
+                            error_message = "Something went wrong collecting the results for this race"
+                        };
+
+                        _configRepo.AddFailedResult(failedResult);
+                        Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
+                    }
+
+                    foreach (var raceHorse in results)
+                    {
+                        //Check the Failed results table to remove this race_horse if result is retrieved successfully
+
+                        if (raceHorse.position == -1)
+                        {
+                            var failedResult = new FailedResultEntity()
+                            {
+                                race_horse_id = raceHorse.race_horse_id,
+                                error_message = raceHorse.description
+                            };
+
+                            raceHorse.description = "ERROR";
+                            raceHorse.position = 0;
+
+                            _configRepo.AddFailedResult(failedResult);
+                        }
+
+                        _horseRepository.UpdateRaceHorse(raceHorse);
+                    }
+                }
+
                 _eventRepository.UpdateRace(raceDb);
                 Logger.Info($"Update Complete!");
                 Logger.Info($"Finding next race...");

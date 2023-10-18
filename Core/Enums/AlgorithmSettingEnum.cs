@@ -37,6 +37,30 @@ namespace Core.Enums
         reliabilityPastPerformance,
         reliabilityAdjustmentsPastPerformance,
         reliabilityPresentRaceFactors,
-        reliabilityHorsePreferences
+        reliabilityHorsePreferences,
+
+
+        //My Model
+        //Experience
+        xp_track,
+        xp_going,
+        xp_distance,
+        xp_class,
+        xp_dg, //distance/going
+        xp_dgc, //distance/going/class
+        xp_surface, // Surface Type,
+        xp_jockey,
+        consistency_bonus,
+        class_bonus,
+        time_bonus, //time since last race
+        weight_bonus,
+        // Race Factors
+        rf_track,
+        rf_going,
+        rf_distance,
+        rf_class,
+        rf_dg, //distance/going
+        rf_dgc, //distance/going/class
+        rf_surface, // Surface Type
     }
 }

@@ -18,6 +18,7 @@ namespace Infrastructure.PunterAdmin.ViewModels
         public string RaceClass { get; set; }
         public string Ages { get; set; }
         public string Description { get; set; }
+        public string RaceType { get; set; }
         public string RaceUrl { get; set; }
         public bool Completed { get; set; }
         public bool ShowHorses { get; set; }
