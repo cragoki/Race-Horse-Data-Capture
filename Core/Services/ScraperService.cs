@@ -182,6 +182,10 @@ namespace Core.Services
                 if (rpRaceInfoDivs.Count() >= 2) 
                 {
                     var winningTime = rpRaceInfoDivs[2].InnerHtml;
+                    if (winningTime.Contains("%"))
+                    {
+                        winningTime = rpRaceInfoDivs[1].InnerHtml;
+                    }
                     if (winningTime != null)
                     {
                         race.winning_time = winningTime.Replace(" ", "").Replace("\n", "");
