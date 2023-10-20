@@ -222,8 +222,21 @@ namespace Core.Services
                     //Comment
                     //tr class rp-horseTable__commentRow
                     //var comment = commentDivs[i].SelectSingleNode("td").InnerText;
+                    if (rpRaceInfoDivs.Count() >= 2)
+                    {
+                        var winningTime = rpRaceInfoDivs[2].InnerHtml;
+                        if (winningTime.Contains("%"))
+                        {
+                            winningTime = rpRaceInfoDivs[1].InnerHtml;
+                        }
+                        if (winningTime != null)
+                        {
+                            race.winning_time = winningTime.Replace(" ", "").Replace("\n", "");
+                            var indexx = race.winning_time.IndexOf("(");
+                            race.winning_time = race.winning_time.Substring(0, indexx);
+                        }
+                    }
 
-                    
 
                     var horse = _horseRepository.GetHorseByRpId(horseId);
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();

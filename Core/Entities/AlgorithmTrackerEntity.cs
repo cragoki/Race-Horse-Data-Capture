@@ -15,6 +15,8 @@ namespace Core.Entities
         [ForeignKey("race_horse_id")]
         public RaceHorseEntity RaceHorse { get; set; }
         public decimal total_points { get; set; }
+
+        #region Bentners Model
         public decimal total_points_for_get_current_condition { get; set; }
         public decimal total_points_for_last_two_races { get; set; }
         public decimal total_points_for_time_since_last_race { get; set; }
@@ -34,6 +36,29 @@ namespace Core.Entities
         public decimal total_points_for_race_type { get; set; }
         public decimal total_points_for_going { get; set; }
         public string get_horse_preferences_description { get; set; }
+
+        #endregion
+        #region My Model
+        public decimal? points_xp_track { get; set; }
+        public decimal? points_xp_going { get; set; }
+        public decimal? points_xp_distance { get; set; }
+        public decimal? points_xp_class { get; set; }
+        public decimal? points_xp_dg { get; set; }
+        public decimal? points_xp_dgc { get; set; }
+        public decimal? points_xp_surface { get; set; }
+        public decimal? points_xp_jockey { get; set; }
+        public decimal? points_consistency_bonus { get; set; }
+        public decimal? points_class_bonus { get; set; }
+        public decimal? points_time_bonus { get; set; }
+        public decimal? points_weight_bonus { get; set; }
+        public decimal? points_rf_track { get; set; }
+        public decimal? points_rf_going { get; set; }
+        public decimal? points_rf_distance { get; set; }
+        public decimal? points_rf_class { get; set; }
+        public decimal? points_rf_dg { get; set; }
+        public decimal? points_rf_dgc { get; set; }
+        public decimal? points_rf_surface { get; set; }
+        #endregion
         public DateTime created { get; set; }
     }
 }
