@@ -1,8 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
-using Core.Models.GetRace;
-using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -24,42 +22,42 @@ namespace Infrastructure.Data.Repositories
         public IEnumerable<EventEntity> GetEvents()
         {
             //Get all events within the last 9 months
-              return _context.tb_event
-                .Include(x => x.Course)
-                .Include(x => x.MeetingType)
-                .Include(x => x.Surface)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(z => z.Horse)
-                            .ThenInclude(a => a.Archive)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(z => z.Jockey)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(x => x.Trainer)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
+            return _context.tb_event
+              .Include(x => x.Course)
+              .Include(x => x.MeetingType)
+              .Include(x => x.Surface)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(z => z.Horse)
+                          .ThenInclude(a => a.Archive)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(z => z.Jockey)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(x => x.Trainer)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
 
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.RaceHorses)
-                        .ThenInclude(x => x.Horse)
-                            .ThenInclude(x => x.Races)
-                                .ThenInclude(x => x.Race)
-                                  .ThenInclude(x => x.Event)
-                                    .ThenInclude(x => x.MeetingType)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Weather)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Stalls)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Distance)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Ages)
-                .Include(x => x.Races)
-                    .ThenInclude(y => y.Going)
-                .Where(x => x.created.Date != DateTime.Now.Date && x.created.Date > DateTime.Now.Date.AddMonths(-6))
-                .ToList();
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.RaceHorses)
+                      .ThenInclude(x => x.Horse)
+                          .ThenInclude(x => x.Races)
+                              .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.Event)
+                                  .ThenInclude(x => x.MeetingType)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Weather)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Stalls)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Distance)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Ages)
+              .Include(x => x.Races)
+                  .ThenInclude(y => y.Going)
+              .Where(x => x.created.Date != DateTime.Now.Date && x.created.Date > DateTime.Now.Date.AddMonths(-6))
+              .ToList();
         }
 
         public List<EventEntity> TestAlgorithmWithOneHundredEvents()
@@ -99,7 +97,7 @@ namespace Infrastructure.Data.Repositories
                   .ThenInclude(y => y.Ages)
               .Include(x => x.Races)
                   .ThenInclude(y => y.Going)
-              .Where(x => x.created.Date != DateTime.Now.Date && x.created.Date > DateTime.Now.Date.AddMonths(-8) && !ignore.Contains(x.event_id) )
+              .Where(x => x.created.Date != DateTime.Now.Date && x.created.Date > DateTime.Now.Date.AddMonths(-8) && !ignore.Contains(x.event_id))
               .Take(10)
               .OrderBy(r => Guid.NewGuid())
               .ToList();
@@ -107,7 +105,7 @@ namespace Infrastructure.Data.Repositories
             return events;
         }
 
-        public IEnumerable<EventEntity> GetTodaysEvents() 
+        public IEnumerable<EventEntity> GetTodaysEvents()
         {
             return _context.tb_event.Where(x => x.created.Date == DateTime.Now.Date).AsNoTracking();
         }
@@ -128,15 +126,25 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_surface_type.Where(x => x.surface_type_id == surfaceTypeId).ToList().FirstOrDefault();
         }
         public EventEntity GetEventById(int eventId)
-        
+
         {
             return _context.tb_event.Where(x => x.event_id == eventId).ToList().FirstOrDefault();
         }
 
-        public EventEntity GetEventByBatch(int courseId, Guid batch) 
+        public EventEntity GetEventByBatch(int courseId, Guid batch)
         {
             return _context.tb_event.Where(x => x.course_id == courseId && x.batch_id == batch).ToList().FirstOrDefault();
         }
+
+        public BatchEntity GetRandomBatch()
+        {
+            //Random Batch from db within last 2 months
+            var batches = _context.tb_batch.Where(x => x.date < DateTime.Now && x.date >= DateTime.Now.AddMonths(-2));
+            var randomBatch = batches.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
+
+            return randomBatch;
+        }
+
         public IQueryable<EventEntity> GetEventsByBatch(Guid batch)
         {
             return _context.tb_event.Where(x => x.batch_id == batch)
@@ -162,7 +170,7 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Races)
                     .ThenInclude(y => y.Ages)
                 .Include(x => x.Races)
-                    .ThenInclude(y => y.Going);           
+                    .ThenInclude(y => y.Going);
         }
         public IEnumerable<EventEntity> GetEventByCourse(int courseId)
         {
@@ -291,10 +299,28 @@ namespace Infrastructure.Data.Repositories
                 .Where(x => x.race_id == raceId).ToList().FirstOrDefault();
         }
 
-        public RaceEntity GetRaceByURL(string raceURL) 
+        public RaceEntity GetRaceByURL(string raceURL)
         {
-            return _context.tb_race.Include(x => x.Event).ThenInclude(x => x.MeetingType).Include(x => x.RaceHorses).ThenInclude(x => x.Horse).ThenInclude(x => x.Races).ThenInclude(x => x.Race).ThenInclude(x => x.Event)
-                .Where(x => x.race_url == raceURL).FirstOrDefault();
+            return _context.tb_race.Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Archive)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.Event)
+                                    .ThenInclude(x => x.MeetingType)
+                .Include(x => x.RaceHorses)
+                    .ThenInclude(x => x.Horse)
+                        .ThenInclude(x => x.Races)
+                            .ThenInclude(x => x.Race)
+                                .ThenInclude(x => x.RaceHorses)
+                                    .ThenInclude(x => x.Horse)
+                                        .ThenInclude(x => x.Races)
+                                            .ThenInclude(x => x.Race)
+                                                .ThenInclude(x => x.Event)
+                .Include(x => x.Event).Where(x => x.race_url == raceURL)
+                 .FirstOrDefault();
         }
         public List<RaceEntity> GetAllRaces()
         {
@@ -321,12 +347,12 @@ namespace Infrastructure.Data.Repositories
             SaveChanges();
         }
 
-        public List<RaceHorseEntity> GetRaceHorsesForRace(int raceId) 
+        public List<RaceHorseEntity> GetRaceHorsesForRace(int raceId)
         {
             return _context.tb_race_horse.Where(x => x.race_id == raceId).Include(x => x.Horse).ThenInclude(x => x.Archive).Include(x => x.Race).ThenInclude(x => x.Event).ToList();
         }
 
-        public List<RaceEntity> GetRacesWithMissingRaceHorses() 
+        public List<RaceEntity> GetRacesWithMissingRaceHorses()
         {
             return _context.tb_race.Include(x => x.RaceHorses).Include(x => x.Event).Where(x => x.RaceHorses.Count() == 0 && x.Event.created > DateTime.Now.Date.AddMonths(-4)).OrderBy(x => x.Event.created).Take(10).ToList();
         }

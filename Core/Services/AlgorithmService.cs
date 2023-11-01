@@ -1,14 +1,9 @@
-﻿
-using Core.Algorithms;
-using Core.Entities;
+﻿using Core.Entities;
 using Core.Enums;
-using Core.Helpers;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models.Algorithm;
-using Core.Variables;
-using Infrastructure.PunterAdmin.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +21,9 @@ namespace Core.Services
         private static IFormAlgorithm _formAlgorithm;
         private static IFormRevamped _formRevampedAlgorithm;
         private static IBentnersModel _bentnersAlgorithm;
+        private static IMyModel _myAlgorithm;
 
-        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm, IFormAlgorithm formAlgorithm, IBentnersModel bentnersAlgorithm)
+        public AlgorithmService(IEventRepository eventRepository, IAlgorithmRepository algorithmRepository, ITopSpeedOnly topSpeedOnly, ITsRPR topSpeedRpr, IFormRevamped formRevampedAlgorithm, IFormAlgorithm formAlgorithm, IBentnersModel bentnersAlgorithm, IMyModel myAlgorithm)
         {
             _eventRepository = eventRepository;
             _algorithmRepository = algorithmRepository;
@@ -36,6 +32,7 @@ namespace Core.Services
             _formAlgorithm = formAlgorithm;
             _formRevampedAlgorithm = formRevampedAlgorithm;
             _bentnersAlgorithm = bentnersAlgorithm;
+            _myAlgorithm = myAlgorithm;
         }
 
         public async Task<AlgorithmResult> ExecuteActiveAlgorithm()
@@ -52,7 +49,7 @@ namespace Core.Services
                     var algorithmVariables = _algorithmRepository.GetAlgorithmVariableByAlgorithmId(activeAlgorithm.algorithm_id);
                     var races = _eventRepository.GetAllRaces();
 
-                    switch ((AlgorithmEnum)activeAlgorithm.algorithm_id) 
+                    switch ((AlgorithmEnum)activeAlgorithm.algorithm_id)
                     {
                         case AlgorithmEnum.TopSpeedOnly:
                             result = await _topSpeedOnly.GenerateAlgorithmResult(races);
@@ -69,6 +66,9 @@ namespace Core.Services
                         case AlgorithmEnum.BentnersModel:
                             result = await _bentnersAlgorithm.GenerateAlgorithmResult(races);
                             break;
+                        case AlgorithmEnum.MyModel:
+                            result = await _myAlgorithm.GenerateAlgorithmResult(races);
+                            break;
                     }
 
                     result.AlgorithmId = activeAlgorithm.algorithm_id;
@@ -82,7 +82,7 @@ namespace Core.Services
             return result;
         }
 
-        public AlgorithmEntity GetActiveAlgorithm() 
+        public AlgorithmEntity GetActiveAlgorithm()
         {
             var result = new AlgorithmEntity();
 
@@ -110,13 +110,13 @@ namespace Core.Services
 
                 _algorithmRepository.UpdateActiveAlgorithm(update);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Error trying to store Algorithm result...{ex.Message}");
             }
         }
 
-        public async Task<AlgorithmResult> ExecuteSelectedAlgorithm(List<RaceEntity> algorithm, List<AlgorithmEntity> events, List<AlgorithmVariableEntity> algorithmVariables )
+        public async Task<AlgorithmResult> ExecuteSelectedAlgorithm(List<RaceEntity> algorithm, List<AlgorithmEntity> events, List<AlgorithmVariableEntity> algorithmVariables)
         {
             var result = new AlgorithmResult();
             try
@@ -171,7 +171,7 @@ namespace Core.Services
             return result;
         }
 
-        public void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction) 
+        public void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction)
         {
             _algorithmRepository.AddAlgorithmPrediction(prediction);
         }

@@ -27,9 +27,10 @@ namespace Infrastructure.PunterAdmin.Services
         private IBentnersModel _bentnersModel;
         private IConfigurationRepository _configurationRepository;
         private IHorseRepository _horseRepository;
+        private IMyModel _myModel;
 
 
-        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository, IFormRevamped formRevamp, IBentnersModel bentnersModel, IConfigurationRepository configurationRepository, IHorseRepository horseRepository)
+        public AdminAlgorithmService(IAlgorithmRepository algorithmRepository, IEventRepository eventRepository, ITopSpeedOnly topSpeed, ITsRPR topSpeedRpr, IAlgorithmService algorithmService, IFormAlgorithm form, IMappingTableRepository mappingRepository, IFormRevamped formRevamp, IBentnersModel bentnersModel, IConfigurationRepository configurationRepository, IHorseRepository horseRepository, IMyModel myModel)
         {
             _algorithmRepository = algorithmRepository;
             _eventRepository = eventRepository;
@@ -42,6 +43,7 @@ namespace Infrastructure.PunterAdmin.Services
             _bentnersModel = bentnersModel;
             _configurationRepository = configurationRepository;
             _horseRepository = horseRepository;
+            _myModel = myModel;
         }
 
         public async Task<List<AlgorithmTableViewModel>> GetAlgorithmTableData()
@@ -263,6 +265,43 @@ namespace Infrastructure.PunterAdmin.Services
                             }
                         }
                         break;
+                    case (int)AlgorithmEnum.MyModel:
+                        foreach (var even in events)
+                        {
+                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
+                            var distances = _mappingRepository.GetDistanceTypes();
+                            var goings = _mappingRepository.GetGoingTypes();
+
+                            foreach (var race in even.EventRaces)
+                            {
+                                race.Horses.Select(x => { x.PredictedPosition = null; return x; }).ToList();
+                            }
+
+                            foreach (var race in races)
+                            {
+
+                                var settings = await BuildAlgorithmSettings(algorithm);
+
+                                var predictions = await _myModel.RunModel(race);
+
+                                if (predictions == null || predictions.Count() == 0)
+                                {
+                                    continue;
+                                }
+
+                                foreach (var prediction in predictions.OrderByDescending(x => x.Points).Select((value, i) => new { i, value }))
+                                {
+                                    var thisRace = even.EventRaces.Where(x => x.RaceId == race.race_id).FirstOrDefault();
+                                    thisRace.AlgorithmRan = true;
+                                    var horse = thisRace.Horses.Where(x => x.HorseId == prediction.value.horse_id).FirstOrDefault();
+                                    horse.PredictedPosition = prediction.i + 1;
+                                    horse.HorseReliability = prediction.value.Predictability;
+                                    horse.Points = prediction.value.Points;
+                                    horse.PointsDescription = prediction.value.PointsDescription;
+                                }
+                            }
+                        }
+                        break;
                 }
             }
             catch (Exception ex)
@@ -330,6 +369,17 @@ namespace Infrastructure.PunterAdmin.Services
                         foreach (var even in allEvents)
                         {
                             algorithmResult = await _bentnersModel.GenerateAlgorithmResult(even.Races);
+                            //If race counter > 0
+                            if (algorithmResult.RacesFiltered > 0)
+                            {
+                                results.Add(algorithmResult);
+                            }
+                        }
+                        break;
+                    case (int)AlgorithmEnum.MyModel:
+                        foreach (var even in allEvents)
+                        {
+                            algorithmResult = await _myModel.GenerateAlgorithmResult(even.Races);
                             //If race counter > 0
                             if (algorithmResult.RacesFiltered > 0)
                             {
@@ -433,6 +483,9 @@ namespace Infrastructure.PunterAdmin.Services
                         break;
                     case ((int)AlgorithmEnum.BentnersModel):
                         predictions = await _bentnersModel.RunModel(race);
+                        break;
+                    case ((int)AlgorithmEnum.MyModel):
+                        predictions = await _myModel.RunModel(race);
                         break;
                     default:
                         throw new Exception("Selected Algorithm is not set up for URL Predictions");

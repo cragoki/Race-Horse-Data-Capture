@@ -190,7 +190,10 @@ namespace Core.Services
                     {
                         race.winning_time = winningTime.Replace(" ", "").Replace("\n", "");
                         int index = race.winning_time.IndexOf("(");
-                        race.winning_time = race.winning_time.Substring(0, index);
+                        if (race.winning_time.Length != -1) 
+                        {
+                            race.winning_time = race.winning_time.Substring(0, index);
+                        }
                     }
                 }
 
@@ -203,6 +206,10 @@ namespace Core.Services
                     var rpHorseurl = horseDiv.SelectSingleNode(".//a[contains(@class,'rp-horseTable__horse__name')]")?.Attributes["href"].Value ?? "";
                     var horseId = await ExtractHorseIdFromUrl(rpHorseurl);
 
+                    if (horseId == -1) 
+                    {
+                        continue;
+                    }
 
                     //Position
                     //div class rp-horseTable__pos__numWrapper
@@ -222,21 +229,6 @@ namespace Core.Services
                     //Comment
                     //tr class rp-horseTable__commentRow
                     //var comment = commentDivs[i].SelectSingleNode("td").InnerText;
-                    if (rpRaceInfoDivs.Count() >= 2)
-                    {
-                        var winningTime = rpRaceInfoDivs[2].InnerHtml;
-                        if (winningTime.Contains("%"))
-                        {
-                            winningTime = rpRaceInfoDivs[1].InnerHtml;
-                        }
-                        if (winningTime != null)
-                        {
-                            race.winning_time = winningTime.Replace(" ", "").Replace("\n", "");
-                            var indexx = race.winning_time.IndexOf("(");
-                            race.winning_time = race.winning_time.Substring(0, indexx);
-                        }
-                    }
-
 
                     var horse = _horseRepository.GetHorseByRpId(horseId);
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
@@ -718,9 +710,16 @@ namespace Core.Services
 
         private async Task<int> ExtractHorseIdFromUrl(string horseUrl) 
         {
-            var rpHorseIdSubstr = horseUrl.Substring(15);
-            var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
-            return Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
+            if (horseUrl.Length >= 15)
+            {
+                var rpHorseIdSubstr = horseUrl.Substring(15);
+                var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
+                return Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
+            }
+            else 
+            {
+                return -1;
+            }
         }
 
         private async Task<DailyRaces> ConvertNewRPStructureToOld(string page) 

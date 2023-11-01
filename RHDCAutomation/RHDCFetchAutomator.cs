@@ -33,9 +33,10 @@ namespace RHDCAutomation
         private IFormAlgorithm _form;
         private IFormRevamped _formRevampedAlgorithm;
         private IBentnersModel _bentnersModel;
+        private IMyModel _myModel;
 
         private static Guid _batch;
-        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService, IFormRevamped formRevampedAlgorithm, IBentnersModel bentnersModel)
+        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService, IFormRevamped formRevampedAlgorithm, IBentnersModel bentnersModel, IMyModel myModel)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
@@ -48,6 +49,7 @@ namespace RHDCAutomation
             _formRevampedAlgorithm = formRevampedAlgorithm;
             _algorithmService = algorithmService;
             _bentnersModel = bentnersModel;
+            _myModel = myModel;
         }
         private void OnStopping()
         {
@@ -138,6 +140,11 @@ namespace RHDCAutomation
                                         if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
                                         {
                                             prediction = await _bentnersModel.RunModel(race);
+                                        }
+                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.MyModel) 
+                                        {
+                                            prediction = await _myModel.RunModel(race);
+
                                         }
                                         if (prediction == null || prediction.Count() == 0)
                                         {

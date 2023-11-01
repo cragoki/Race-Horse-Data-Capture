@@ -13,5 +13,6 @@ namespace Core.Interfaces.Services
         Task<bool> GetBacklogEvents(Guid batch, DateTime date);
         Task<List<EventEntity>> GetEventsFromDatabase();
         Task<IEnumerable<RaceEntity>> GetRacesFromDatabaseForAlgorithm(int event_id);
+        List<EventEntity> GetRandomEventsFromDatabase();
     }
 }

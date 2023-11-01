@@ -167,6 +167,23 @@ namespace Core.Services
 
         }
 
+        public List<EventEntity> GetRandomEventsFromDatabase() 
+        {
+            var result = new List<EventEntity>();
+
+            try
+            {
+                var batch = _eventRepository.GetRandomBatch();
+                result =  _eventRepository.GetEventsByBatch(batch.batch_id).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error trying to retrieve a random batch {ex.Message}");
+            }
+
+            return result;
+        }
+
         private void CheckAndAddCourse(CourseEntity course) 
         {
             try

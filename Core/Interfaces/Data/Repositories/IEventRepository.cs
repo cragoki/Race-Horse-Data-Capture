@@ -34,5 +34,6 @@ namespace Core.Interfaces.Data.Repositories
         RaceEntity GetAllRaceDataById(int raceId);
         List<RaceEntity> GetRacesWithMissingRaceHorses();
         IEnumerable<RaceEntity> GetRacesForEventSimple(int eventId);
+        BatchEntity GetRandomBatch();
     }
 }
