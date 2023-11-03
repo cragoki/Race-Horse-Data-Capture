@@ -102,6 +102,7 @@ namespace Core.Algorithms
             {
                 var tracker = new AlgorithmTrackerEntity();
                 var toAdd = new HorsePredictionModel();
+                tracker.race_horse_id = horse.race_horse_id;
                 toAdd.points = 0;
                 toAdd.horse_id = horse.horse_id;
                 toAdd.race_horse_id = horse.race_horse_id;

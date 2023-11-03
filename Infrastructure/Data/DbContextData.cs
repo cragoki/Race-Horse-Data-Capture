@@ -52,5 +52,8 @@ namespace Infrastructure.Data
         public DbSet<AlgorithmTrackerEntity> tb_algorithm_tracker { get; set; }
         public DbSet<FailedResultEntity> tb_failed_result { get; set; }
         public DbSet<FailedRaceEntity> tb_failed_race { get; set; }
+        public DbSet<AlgorithmSettingsArchiveEntity> tb_algorithm_settings_archive { get; set; }
+        public DbSet<AlgorithmVariableSequenceEntity> tb_algorithm_variable_sequence { get; set; }
+
     }
 }

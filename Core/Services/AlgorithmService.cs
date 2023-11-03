@@ -1,9 +1,11 @@
 ﻿using Core.Entities;
 using Core.Enums;
+using Core.Helpers;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models.Algorithm;
+using Core.Models.MachineLearning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,6 +100,7 @@ namespace Core.Services
             return result;
         }
 
+
         public async Task StoreAlgorithmResults(AlgorithmResult result)
         {
             try
@@ -171,9 +174,45 @@ namespace Core.Services
             return result;
         }
 
+        public void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId)
+        {
+            var toAdd = new List<AlgorithmSettingsArchiveEntity>();
+
+            foreach (var setting in settings)
+            {
+                toAdd.Add(new AlgorithmSettingsArchiveEntity()
+                {
+                    algorithm_setting_id = setting.algorithm_setting_id,
+                    batch_id = batchId,
+                    algorithm_id = setting.algorithm_id,
+                    setting_name = setting.setting_name,
+                    setting_value = setting.setting_value
+                });
+            }
+
+            _algorithmRepository.ArchiveAlgorithmSettings(toAdd);
+        }
+
+        public async Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
+        {
+            try
+            {
+                _algorithmRepository.UpdateAlgorithmSettings(settings);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error trying to update algorithm settings...{ex.Message}");
+            }
+        }
+
         public void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction)
         {
             _algorithmRepository.AddAlgorithmPrediction(prediction);
+        }
+
+        public void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
+        {
+            _algorithmRepository.AddAlgorithmVariableSequence(sequence);
         }
 
         public void AddAlgorithmTracker(AlgorithmTrackerEntity tracker)
@@ -181,5 +220,142 @@ namespace Core.Services
             _algorithmRepository.AddAlgorithmTracker(tracker);
         }
 
+        public VariableAnalysisModel IdentifyWinningAlgorithmVariables(List<AlgorithmPredictionEntity> predictions, List<AlgorithmTrackerEntity> trackers, RaceEntity race)
+        {
+            var result = new VariableAnalysisModel();
+            result.IsComplete = false;
+            try
+            {
+                //Check if placed.
+                var placedPositions = SharedCalculations.GetTake(race.no_of_horses ?? 0);
+                var horsesWithTrackers = trackers.Where(x => x != null).Select(x => x.race_horse_id);
+                var placedHorses = race.RaceHorses.Where(x => x.position != 0 && horsesWithTrackers.Contains(x.race_horse_id)).OrderBy(x => x.position).Take(placedPositions);
+
+                if (placedHorses == null || placedHorses.Count() == 0) 
+                {
+                    return result;
+                }
+                var predictedPlacer = predictions.FirstOrDefault(x => (x.predicted_position == 1 && race.RaceHorses.FirstOrDefault(y => y.race_horse_id == x.race_horse_id).position != 0) || (x.predicted_position == 2 && race.RaceHorses.FirstOrDefault(y => y.race_horse_id == x.race_horse_id).position != 0) || (x.predicted_position == 3 && race.RaceHorses.FirstOrDefault(y => y.race_horse_id == x.race_horse_id).position != 0));
+
+                if (predictedPlacer == null) 
+                {
+                    return result;
+                }
+
+                var tracker = trackers.FirstOrDefault(x => x.race_horse_id == predictedPlacer.race_horse_id);
+                if (placedHorses.Select(x => x.race_horse_id).Contains(predictedPlacer.race_horse_id))
+                {
+                    //Placed
+                    result.IsCorrect = true;
+                    result.Rankings = DetermineVariableRankings(tracker);
+                    result.RaceType = race.Event.meeting_type;
+                }
+                else
+                {
+                    //Not Placed
+                    result.IsCorrect = false;
+                    result.RaceType = race.Event.meeting_type;
+                    var accumulatedTracker = new AlgorithmTrackerEntity();
+
+                    foreach (var placedHorse in placedHorses.Where(x => x.Horse.Races.Count() >= 2))
+                    {
+                        var placedHorseTracker = trackers.Where(x => x.race_horse_id == placedHorse.race_horse_id).FirstOrDefault();
+                        if (placedHorseTracker == null) 
+                        {
+                            continue;
+                        }
+                        accumulatedTracker.points_xp_track += placedHorseTracker.points_xp_track;
+                        accumulatedTracker.points_xp_going += placedHorseTracker.points_xp_going;
+                        accumulatedTracker.points_xp_distance += placedHorseTracker.points_xp_distance;
+                        accumulatedTracker.points_xp_class += placedHorseTracker.points_xp_class;
+                        accumulatedTracker.points_xp_dg += placedHorseTracker.points_xp_dg;
+                        accumulatedTracker.points_xp_dgc += placedHorseTracker.points_xp_dgc;
+                        accumulatedTracker.points_xp_surface += placedHorseTracker.points_xp_surface;
+                        accumulatedTracker.points_xp_jockey += placedHorseTracker.points_xp_jockey;
+                        accumulatedTracker.points_consistency_bonus += placedHorseTracker.points_consistency_bonus;
+                        accumulatedTracker.points_class_bonus += placedHorseTracker.points_class_bonus;
+                        accumulatedTracker.points_time_bonus += placedHorseTracker.points_time_bonus;
+                        accumulatedTracker.points_weight_bonus += placedHorseTracker.points_weight_bonus;
+                        accumulatedTracker.points_rf_track += placedHorseTracker.points_rf_track;
+                        accumulatedTracker.points_rf_going += placedHorseTracker.points_rf_going;
+                        accumulatedTracker.points_rf_distance += placedHorseTracker.points_rf_distance;
+                        accumulatedTracker.points_rf_class += placedHorseTracker.points_rf_class;
+                        accumulatedTracker.points_rf_dg += placedHorseTracker.points_rf_dg;
+                        accumulatedTracker.points_rf_dgc += placedHorseTracker.points_rf_dgc;
+                        accumulatedTracker.points_rf_surface += placedHorseTracker.points_rf_surface;
+                    }
+
+                    result.Rankings = DetermineVariableRankings(accumulatedTracker);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            result.IsComplete = true;
+            return result;
+        }
+
+        private List<string> MyModelProperies = new List<string>()
+        {
+        "points_xp_track",
+        "points_xp_going",
+        "points_xp_distance",
+        "points_xp_class",
+        "points_xp_dg",
+        "points_xp_dgc",
+        "points_xp_surface",
+        "points_xp_jockey",
+        "points_consistency_bonus",
+        "points_class_bonus",
+        "points_time_bonus",
+        "points_weight_bonus",
+        "points_rf_track",
+        "points_rf_going",
+        "points_rf_distance",
+        "points_rf_class",
+        "points_rf_dg",
+        "points_rf_dgc",
+        "points_rf_surface"
+        };
+
+        private class PropertyValuePair
+        {
+            public string PropertyName { get; set; }
+            public decimal? PropertyValue { get; set; }
+        }
+
+        private List<VariableRankings> DetermineVariableRankings(AlgorithmTrackerEntity tracker)
+        {
+            var rankings = new List<VariableRankings>();
+            var result = new List<PropertyValuePair>();
+            //19 Variables
+            //So winner = 18 points, all the way down to loser which gets 0 points
+            var points = 18;
+            var properties = tracker.GetType().GetProperties().Where(x => MyModelProperies.Contains(x.Name));
+
+            foreach (var property in properties)
+            {
+                decimal? value = property.GetValue(tracker) as decimal?;
+                result.Add(new PropertyValuePair
+                {
+                    PropertyName = property.Name,
+                    PropertyValue = value
+                });
+            }
+
+            foreach (var rank in result.OrderByDescending(x => x.PropertyValue))
+            {
+                rankings.Add(new VariableRankings()
+                {
+                    AlgorithmVariable = Enum.Parse<AlgorithmSettingEnum>(rank.PropertyName.Replace("points_", "")),
+                    Points = points
+                });
+
+                points--;
+            }
+
+            return rankings;
+        }
     }
 }

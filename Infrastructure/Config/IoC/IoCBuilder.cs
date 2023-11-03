@@ -91,10 +91,6 @@ namespace Infrastructure.Config.IoC
 
             //container.RegisterScoped<IEmailClient, EmailClient>();
 
-            //container.RegisterSingleton<IPaytahClient, PaytahClient>();
-            //container.RegisterSingleton<INovapagoClient, NovapagoClient>();
-            //container.RegisterSingleton<IMonitoringClient, MonitoringClient>();
-
 
             return container;
         }

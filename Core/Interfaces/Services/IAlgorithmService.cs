@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Models.Algorithm;
+using Core.Models.MachineLearning;
 using Infrastructure.PunterAdmin.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,10 @@ namespace Core.Interfaces.Services
         Task StoreAlgorithmResults(AlgorithmResult result);
         Task<List<AlgorithmSettingsEntity>> GetSettingsForAlgorithm(int algorithm_id);
         void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction);
-        void AddAlgorithmTracker(AlgorithmTrackerEntity tracker);      
+        void AddAlgorithmTracker(AlgorithmTrackerEntity tracker);
+        VariableAnalysisModel IdentifyWinningAlgorithmVariables(List<AlgorithmPredictionEntity> predictions, List<AlgorithmTrackerEntity> trackers, RaceEntity race);
+        void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId);
+        Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> settings);
+        void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
     }
 }

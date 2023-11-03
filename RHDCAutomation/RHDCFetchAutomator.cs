@@ -1,18 +1,14 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Algorithms;
-using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.Mail;
-using Infrastructure.Data.Repositories;
-using Infrastructure.PunterAdmin.Services;
 using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -20,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace RHDCAutomation
 {
-    public class RHDCFetchAutomator: BackgroundService
+    public class RHDCFetchAutomator : BackgroundService
     {
         private readonly IHostApplicationLifetime _hostApplicationLifetime;
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
@@ -29,14 +25,11 @@ namespace RHDCAutomation
         private readonly IRaceService _raceService;
         private readonly IConfigurationService _configService;
         private IMailService _mailService;
-        private IMappingTableRepository _mappingRepository;
-        private IFormAlgorithm _form;
-        private IFormRevamped _formRevampedAlgorithm;
         private IBentnersModel _bentnersModel;
         private IMyModel _myModel;
 
         private static Guid _batch;
-        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IMappingTableRepository mappingRepository, IFormAlgorithm form, IHorseRepository horseRepository, IAlgorithmService algorithmService, IFormRevamped formRevampedAlgorithm, IBentnersModel bentnersModel, IMyModel myModel)
+        public RHDCFetchAutomator(IHostApplicationLifetime hostApplicationLifetime, ILogger<RHDCFetchAutomator> logger, IEventService eventService, IRaceService raceService, IConfigurationService configService, IMailService mailService, IAlgorithmService algorithmService, IBentnersModel bentnersModel, IMyModel myModel)
         {
             _hostApplicationLifetime = hostApplicationLifetime;
             _hostApplicationLifetime.ApplicationStopping.Register(OnStopping);
@@ -44,9 +37,6 @@ namespace RHDCAutomation
             _raceService = raceService;
             _configService = configService;
             _mailService = mailService;
-            _mappingRepository = mappingRepository;
-            _form = form;
-            _formRevampedAlgorithm = formRevampedAlgorithm;
             _algorithmService = algorithmService;
             _bentnersModel = bentnersModel;
             _myModel = myModel;
@@ -141,7 +131,7 @@ namespace RHDCAutomation
                                         {
                                             prediction = await _bentnersModel.RunModel(race);
                                         }
-                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.MyModel) 
+                                        else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.MyModel)
                                         {
                                             prediction = await _myModel.RunModel(race);
 
@@ -172,7 +162,6 @@ namespace RHDCAutomation
                                                 horse_predictability = prediction.value.Predictability
                                             };
                                             _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
-
                                             if (prediction.value.Tracker != null)
                                             {
                                                 _algorithmService.AddAlgorithmTracker(prediction.value.Tracker);
@@ -190,7 +179,7 @@ namespace RHDCAutomation
                         {
                             Console.WriteLine($"Error Occured while running predictions. All Races have still been saved. Error: {ex.Message} ---- Inner Exception: {ex.InnerException}");
                         }
-                        
+
 
                         Console.WriteLine($"Completed Algorithm Checks");
 

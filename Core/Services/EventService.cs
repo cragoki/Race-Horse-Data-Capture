@@ -6,7 +6,6 @@ using Core.Models.GetRace;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -66,7 +65,7 @@ namespace Core.Services
             return false;
         }
 
-        public async Task<List<EventEntity>> GetEventsFromDatabase() 
+        public async Task<List<EventEntity>> GetEventsFromDatabase()
         {
             var result = new List<EventEntity>();
 
@@ -74,7 +73,7 @@ namespace Core.Services
             {
                 result = _eventRepository.GetTodaysEvents().ToList();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Failed to get entities from the database. Error: {ex.InnerException}");
             }
@@ -112,7 +111,7 @@ namespace Core.Services
 
                 CheckAndAddCourse(course);
 
-                if (!String.IsNullOrEmpty(even.SurfaceType)) 
+                if (!String.IsNullOrEmpty(even.SurfaceType))
                 {
                     surfaceTypeId = _mappingTableRepository.AddOrReturnSurfaceType(even.SurfaceType);
                 }
@@ -139,7 +138,7 @@ namespace Core.Services
                 int eventId = _eventRepository.AddEvent(ev);
                 CheckAndAddCourse(course);
 
-                foreach (var race in even.Races) 
+                foreach (var race in even.Races)
                 {
                     var raceEntity = new RaceEntity()
                     {
@@ -160,21 +159,21 @@ namespace Core.Services
                     _eventRepository.AddRace(raceEntity);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Failed to add entity to the database for event {eventName}. Error: {ex.InnerException}");
             }
 
         }
 
-        public List<EventEntity> GetRandomEventsFromDatabase() 
+        public async Task<List<EventEntity>> GetRandomEventsFromDatabase()
         {
             var result = new List<EventEntity>();
 
             try
             {
                 var batch = _eventRepository.GetRandomBatch();
-                result =  _eventRepository.GetEventsByBatch(batch.batch_id).ToList();
+                result = _eventRepository.GetEventsByBatch(batch.batch_id).ToList();
             }
             catch (Exception ex)
             {
@@ -184,7 +183,7 @@ namespace Core.Services
             return result;
         }
 
-        private void CheckAndAddCourse(CourseEntity course) 
+        private void CheckAndAddCourse(CourseEntity course)
         {
             try
             {
@@ -194,13 +193,13 @@ namespace Core.Services
                 {
                     Logger.Info($"{course.name} already exists in the database.");
                 }
-                else 
+                else
                 {
                     _eventRepository.AddCourse(course);
                     _eventRepository.SaveChanges();
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"!!! Error attempting to store course {course.name}.. {ex.Message} !!!");
             }

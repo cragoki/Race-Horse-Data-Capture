@@ -73,9 +73,21 @@ namespace Infrastructure.Data.Repositories
             SaveChanges();
         }
 
+        public void ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings)
+        {
+            _context.tb_algorithm_settings_archive.AddRange(settings);
+            SaveChanges();
+        }
+
         public void AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction)
         {
             _context.tb_algorithm_prediction.Add(algorithmPrediction);
+            SaveChanges();
+        }
+
+        public void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
+        {
+            _context.tb_algorithm_variable_sequence.Add(sequence);
             SaveChanges();
         }
 

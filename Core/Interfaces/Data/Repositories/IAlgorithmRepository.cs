@@ -22,5 +22,7 @@ namespace Core.Interfaces.Data.Repositories
         IQueryable<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id);
         List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id);
         void AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker);
+        void ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings);
+        void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
     }
 }

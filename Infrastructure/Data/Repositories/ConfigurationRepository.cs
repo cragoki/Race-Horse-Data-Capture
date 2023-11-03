@@ -80,7 +80,10 @@ namespace Infrastructure.Data.Repositories
                     jobDb.next_execution = DateTime.Now.AddMinutes(30);
                     break;
                 case JobEnum.rhdcresultretriever:
-                    jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 22, 00, 00);
+                    jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 21, 00, 00);
+                    break;
+                case JobEnum.rhdcalgorithmadjuster:
+                    jobDb.next_execution = new DateTime(2030, tomorrow.Month, tomorrow.Day, 21, 00, 00);
                     break;
             }
             jobDb.last_execution = DateTime.Now;

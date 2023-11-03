@@ -32,6 +32,8 @@ namespace Core.Interfaces.Data
         DbSet<AlgorithmTrackerEntity> tb_algorithm_tracker { get; set; }
         DbSet<FailedResultEntity> tb_failed_result { get; set; }
         DbSet<FailedRaceEntity> tb_failed_race { get; set; }
+        DbSet<AlgorithmSettingsArchiveEntity> tb_algorithm_settings_archive { get; set; }
+        DbSet<AlgorithmVariableSequenceEntity> tb_algorithm_variable_sequence { get; set; }
 
         void DetachAllEntities();
     }
