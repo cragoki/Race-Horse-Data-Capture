@@ -215,12 +215,13 @@ namespace RHDCMachineLearning
                     }
                     isFirst = false;
                 }
+
+                await _configService.UpdateJob(JobEnum.rhdcalgorithmadjuster);
             }
             else 
             {
                 Console.WriteLine($"Health check, everything Okay! The time is {DateTime.Now} Sleeping....");
             }
-            await _configService.UpdateJob(JobEnum.rhdcalgorithmadjuster);
             Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
         }
     }
