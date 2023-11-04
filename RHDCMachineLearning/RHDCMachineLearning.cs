@@ -172,22 +172,22 @@ namespace RHDCMachineLearning
                                     foreach (var y in topTier)
                                     {
                                         var setting = algorithmSettings.FirstOrDefault(x => x.setting_name == y.ToString());
-                                        setting.setting_value = (Decimal.Parse(setting.setting_value) + 0.25M).ToString();
+                                        setting.setting_value = (Decimal.Parse(setting.setting_value) + 0.1M).ToString();
                                     }
                                     foreach (var y in secondTier)
                                     {
                                         var setting = algorithmSettings.FirstOrDefault(x => x.setting_name == y.ToString());
-                                        setting.setting_value = (Decimal.Parse(setting.setting_value) + 0.10M).ToString();
+                                        setting.setting_value = (Decimal.Parse(setting.setting_value) + 0.05M).ToString();
                                     }
                                     foreach (var y in lowerTier)
                                     {
                                         var setting = algorithmSettings.FirstOrDefault(x => x.setting_name == y.ToString());
-                                        setting.setting_value = (Decimal.Parse(setting.setting_value) - 0.10M).ToString();
+                                        setting.setting_value = (Decimal.Parse(setting.setting_value) - 0.05M).ToString();
                                     }
                                     foreach (var y in bottomTier)
                                     {
                                         var setting = algorithmSettings.FirstOrDefault(x => x.setting_name == y.ToString());
-                                        setting.setting_value = (Decimal.Parse(setting.setting_value) - 0.25M).ToString();
+                                        setting.setting_value = (Decimal.Parse(setting.setting_value) - 0.1M).ToString();
                                     }
 
                                     if (await _algorithmService.AlgorithmSettingsAreUnique(algorithmSettings)) 
