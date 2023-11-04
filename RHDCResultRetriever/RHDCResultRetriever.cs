@@ -44,8 +44,15 @@ namespace RHDCResultRetriever
                     var job = await _configService.GetJobInfo(JobEnum.rhdcresultretriever);
 
                     Console.WriteLine("No errors, DB connection successful.");
+                    var adjuster = await _configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
+                    bool wait = false;
 
-                    if (job.next_execution < DateTime.Now)
+                    if (job.next_execution < DateTime.Now && adjuster.start == true)
+                    {
+                        await _configService.UpdateJob(JobEnum.rhdcalgorithmadjuster);
+                    }
+
+                    if (job.next_execution < DateTime.Now && !wait)
                     {
                         Console.WriteLine($"Beginning Batch at {DateTime.Now}");
                         _batch = Guid.NewGuid();

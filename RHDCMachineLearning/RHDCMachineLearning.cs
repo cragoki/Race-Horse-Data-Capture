@@ -131,7 +131,8 @@ namespace RHDCMachineLearning
                                 }
 
                                 //Determine the % correct and add to DB
-                                decimal percentageCorrect = (rankings.Where(x => x.IsCorrect).Count() / rankings.Count()) * 100;
+                                var percentageCorrect = (decimal)((double)rankings.Count(x => x.IsCorrect) / rankings.Count()) * 100;
+
                                 result.percentage_correct = percentageCorrect;
                                 result.no_of_races = numberOfRaces;
                                 result.batch_id = _batch;
@@ -227,6 +228,7 @@ namespace RHDCMachineLearning
                             Thread.Sleep((int)TimeSpan.FromMinutes(10).TotalMilliseconds);
                         }
                     isFirst = false;
+                    Thread.Sleep((int)TimeSpan.FromMinutes(5).TotalMilliseconds);
                 }
                 else
                 {
