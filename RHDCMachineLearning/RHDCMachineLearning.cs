@@ -22,6 +22,7 @@ namespace RHDCMachineLearning
         private readonly IRaceService _raceService;
         private IMyModel _myModel;
         private readonly IConfigurationService _configService;
+        private static Guid _batch;
 
         public RHDCMachineLearning(IHostApplicationLifetime hostApplicationLifetime, IEventService eventService, IRaceService raceService, IAlgorithmService algorithmService, IMyModel myModel, IConfigurationService configService)
         {
@@ -60,7 +61,7 @@ namespace RHDCMachineLearning
                             Console.WriteLine("-------------------------------------------------------------------------------------------------");
                             Console.WriteLine("-------------------------------------------------------------------------------------------------");
                             Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                            var batch = new Guid();
+                            _batch = Guid.NewGuid();
                             var result = new AlgorithmVariableSequenceEntity();
                             int numberOfRaces = 0;
                             //Get todays Events
@@ -133,7 +134,7 @@ namespace RHDCMachineLearning
                                 decimal percentageCorrect = (rankings.Where(x => x.IsCorrect).Count() / rankings.Count()) * 100;
                                 result.percentage_correct = percentageCorrect;
                                 result.no_of_races = numberOfRaces;
-                                result.batch_id = batch;
+                                result.batch_id = _batch;
                                 result.is_first_in_sequence = isFirst;
                                 result.date = DateTime.Now;
 
@@ -159,12 +160,12 @@ namespace RHDCMachineLearning
                                 var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.MyModel);
 
                                 //Archive existing settings
-                                _algorithmService.ArchiveAlgorithmSettings(algorithmSettings, batch);
+                                _algorithmService.ArchiveAlgorithmSettings(algorithmSettings, _batch);
 
                                 //Get all settings archive to ensure that the new settings we are about to generate, do not already exist, if they do, adjust everything by .1 and try again
                                 bool originalAlgorithm = false;
 
-                                while (originalAlgorithm) 
+                                while (!originalAlgorithm) 
                                 {
                                     //while settings contains our settings
                                     foreach (var y in topTier)
