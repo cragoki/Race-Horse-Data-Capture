@@ -179,23 +179,23 @@ namespace Core.Services
                 var resultDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__mainRow')]");
                 var commentDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__commentRow')]");
                 var rpRaceInfoDivs = htmlDoc.DocumentNode.SelectNodes("//span[contains(@class,'rp-raceInfo__value')]");
-                if (rpRaceInfoDivs.Count() >= 2) 
-                {
-                    var winningTime = rpRaceInfoDivs[2].InnerHtml;
-                    if (winningTime.Contains("%"))
-                    {
-                        winningTime = rpRaceInfoDivs[1].InnerHtml;
-                    }
-                    if (winningTime != null)
-                    {
-                        race.winning_time = winningTime.Replace(" ", "").Replace("\n", "");
-                        int index = race.winning_time.IndexOf("(");
-                        if (race.winning_time.Length != -1) 
-                        {
-                            race.winning_time = race.winning_time.Substring(0, index);
-                        }
-                    }
-                }
+                //if (rpRaceInfoDivs.Count() >= 2) 
+                //{
+                //    var winningTime = rpRaceInfoDivs[2].InnerHtml;
+                //    if (winningTime.Contains("%"))
+                //    {
+                //        winningTime = rpRaceInfoDivs[1].InnerHtml;
+                //    }
+                //    if (winningTime != null)
+                //    {
+                //        race.winning_time = winningTime.Replace(" ", "").Replace("\n", "");
+                //        int index = race.winning_time.IndexOf("(");
+                //        if (race.winning_time.Length != -1) 
+                //        {
+                //            race.winning_time = race.winning_time.Substring(0, index);
+                //        }
+                //    }
+                //}
 
                 for (int i = 0; i < resultDivs.Count; i++) 
                 {

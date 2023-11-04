@@ -20,5 +20,7 @@ namespace Core.Interfaces.Services
         void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId);
         Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> settings);
         void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
+        Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedSettingsForAlgorithm();
+        Task<bool> AlgorithmSettingsAreUnique(List<AlgorithmSettingsEntity> settings);
     }
 }

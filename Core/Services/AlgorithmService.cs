@@ -174,6 +174,18 @@ namespace Core.Services
             return result;
         }
 
+        public async Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedSettingsForAlgorithm()
+        {
+            try
+            {
+                return _algorithmRepository.GetArchivedAlgorithmSettings();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId)
         {
             var toAdd = new List<AlgorithmSettingsArchiveEntity>();
@@ -293,6 +305,32 @@ namespace Core.Services
                 throw new Exception(ex.Message);
             }
             result.IsComplete = true;
+            return result;
+        }
+
+
+        public async Task<bool> AlgorithmSettingsAreUnique(List<AlgorithmSettingsEntity> settings) 
+        {
+            var result = true;
+            var archives = await GetArchivedSettingsForAlgorithm();
+
+            foreach(var archive in archives.GroupBy(x => x.batch_id))
+            {
+                bool isIdentical = true;
+                foreach (var setting in settings) 
+                {
+                    if (archive.FirstOrDefault(x => x.setting_name == setting.setting_name).setting_value != setting.setting_value) 
+                    {
+                        isIdentical = false;
+                        continue;
+                    }
+                }
+                if (isIdentical) 
+                {
+                    result = false;
+                }
+            }
+
             return result;
         }
 

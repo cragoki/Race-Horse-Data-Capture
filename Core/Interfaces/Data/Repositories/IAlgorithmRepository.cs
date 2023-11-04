@@ -24,5 +24,6 @@ namespace Core.Interfaces.Data.Repositories
         void AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker);
         void ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings);
         void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
+        List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettings();
     }
 }

@@ -83,7 +83,7 @@ namespace Infrastructure.Data.Repositories
                     jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 21, 00, 00);
                     break;
                 case JobEnum.rhdcalgorithmadjuster:
-                    jobDb.next_execution = new DateTime(2030, tomorrow.Month, tomorrow.Day, 21, 00, 00);
+                    jobDb.start = !jobDb.start;
                     break;
             }
             jobDb.last_execution = DateTime.Now;

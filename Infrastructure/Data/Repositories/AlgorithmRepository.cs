@@ -55,6 +55,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm_tracker.Where(x => x.race_horse_id == raceHorse).OrderByDescending(x => x.created).FirstOrDefault();
         }
 
+        public List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettings()
+        {
+            return _context.tb_algorithm_settings_archive.ToList();
+        }
+
         public void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity)
         {
             _context.tb_algorithm.Update(algorithmEntity);
