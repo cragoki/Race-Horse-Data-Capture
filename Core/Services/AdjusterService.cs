@@ -234,7 +234,7 @@ namespace Core.Services
                 {
                     //If we are doing course analysis, run predictions against only the courses with a greater than 50% accuracy
                     var courseAccuracyBatch = await _algorithmService.GetSequenceCourseAccuracy(sequence.batch_id);
-                    var coursesToUse = courseAccuracyBatch.Where(x => x.percentage_correct >= 50).Select(x => x.course_id);
+                    var coursesToUse = courseAccuracyBatch.Where(x => x.percentage_correct >= 60).Select(x => x.course_id);
                     events = events.Where(x => coursesToUse.Contains(x.course_id)).ToList();
                 }
 
