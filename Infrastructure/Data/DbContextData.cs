@@ -54,6 +54,8 @@ namespace Infrastructure.Data
         public DbSet<FailedRaceEntity> tb_failed_race { get; set; }
         public DbSet<AlgorithmSettingsArchiveEntity> tb_algorithm_settings_archive { get; set; }
         public DbSet<AlgorithmVariableSequenceEntity> tb_algorithm_variable_sequence { get; set; }
+        public DbSet<SequenceAnalysisEntity> tb_sequence_analysis { get; set; }
+        public DbSet<SequenceCourseAccuracyEntity> tb_sequence_course_accuracy { get; set; }
 
     }
 }

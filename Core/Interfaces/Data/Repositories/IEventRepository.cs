@@ -35,5 +35,6 @@ namespace Core.Interfaces.Data.Repositories
         List<RaceEntity> GetRacesWithMissingRaceHorses();
         IEnumerable<RaceEntity> GetRacesForEventSimple(int eventId);
         BatchEntity GetRandomBatch();
+        IQueryable<EventEntity> GetLastTwoMonthsEvents();
     }
 }

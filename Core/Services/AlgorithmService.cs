@@ -186,6 +186,18 @@ namespace Core.Services
             }
         }
 
+        public async Task<List<SequenceCourseAccuracyEntity>> GetSequenceCourseAccuracy(Guid batch_id)
+        {
+            try
+            {
+                return _algorithmRepository.GetCourseAccuracy(batch_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId)
         {
             var toAdd = new List<AlgorithmSettingsArchiveEntity>();
@@ -235,6 +247,7 @@ namespace Core.Services
         public VariableAnalysisModel IdentifyWinningAlgorithmVariables(List<AlgorithmPredictionEntity> predictions, List<AlgorithmTrackerEntity> trackers, RaceEntity race)
         {
             var result = new VariableAnalysisModel();
+            result.CourseId = race.Event.course_id;
             result.IsComplete = false;
             try
             {
@@ -332,6 +345,78 @@ namespace Core.Services
             }
 
             return result;
+        }
+
+        public async Task<List<SequenceAnalysisEntity>> GetSequenceAnalysis() 
+        {
+            try 
+            {
+                return _algorithmRepository.GetSequenceAnalysis();
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<AlgorithmVariableSequenceEntity>> GetAlgorithmVariableSequence()
+        {
+            try
+            {
+                return _algorithmRepository.GetAlgorithmVariableSequence();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedSettingsForBatch(Guid batch_id)
+        {
+            try
+            {
+                return _algorithmRepository.GetArchivedAlgorithmSettingsForBatch(batch_id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task AddSequenceAnalysis(SequenceAnalysisEntity entity)
+        {
+            try
+            {
+                _algorithmRepository.AddSequenceAnalysis(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task UpdateSequenceAnalysis(SequenceAnalysisEntity entity)
+        {
+            try
+            {
+                _algorithmRepository.UpdateSequenceAnalysis(entity);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entites)
+        {
+            try
+            {
+                _algorithmRepository.AddCourseAccuracy(entites);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         private List<string> MyModelProperies = new List<string>()

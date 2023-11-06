@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Enums;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Core.Entities
@@ -12,5 +13,7 @@ namespace Core.Entities
         public DateTime next_execution { get; set; }
         public int interval_check_minutes { get; set; }
         public bool? start { get; set; }
+        public AlgorithmModeEnum? mode { get; set; }
+
     }
 }

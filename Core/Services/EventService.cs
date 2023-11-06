@@ -183,6 +183,22 @@ namespace Core.Services
             return result;
         }
 
+        public async Task<List<EventEntity>> GetLastTwoMonthsEvents()
+        {
+            var result = new List<EventEntity>();
+
+            try
+            {
+                result = _eventRepository.GetLastTwoMonthsEvents().ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error trying to retrieve events {ex.Message}");
+            }
+
+            return result;
+        }
+
         private void CheckAndAddCourse(CourseEntity course)
         {
             try

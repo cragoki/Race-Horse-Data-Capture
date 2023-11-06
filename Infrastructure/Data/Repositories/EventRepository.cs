@@ -172,6 +172,34 @@ namespace Infrastructure.Data.Repositories
                 .Include(x => x.Races)
                     .ThenInclude(y => y.Going);
         }
+
+        public IQueryable<EventEntity> GetLastTwoMonthsEvents()
+        {
+            return _context.tb_event.Where(x => x.created < DateTime.Now && x.created >= DateTime.Now.AddMonths(-2))
+                .Include(x => x.Course)
+                .Include(x => x.MeetingType)
+                .Include(x => x.Surface)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Horse)
+                            .ThenInclude(a => a.Archive)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Jockey)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.RaceHorses)
+                        .ThenInclude(z => z.Trainer)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Weather)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Stalls)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Distance)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Ages)
+                .Include(x => x.Races)
+                    .ThenInclude(y => y.Going);
+        }
         public IEnumerable<EventEntity> GetEventByCourse(int courseId)
         {
             return _context.tb_event.Where(x => x.course_id == courseId).ToList();

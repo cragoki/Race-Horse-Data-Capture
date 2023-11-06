@@ -7,6 +7,7 @@ namespace Core.Models.MachineLearning
         public List<VariableRankings> Rankings { get; set; }
         public bool IsCorrect { get; set; }
         public int? RaceType { get; set; }
+        public int CourseId { get; set; }
         public bool IsComplete { get; set; }
     }
 }

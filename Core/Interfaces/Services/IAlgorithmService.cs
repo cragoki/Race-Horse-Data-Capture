@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.Interfaces.Data.Repositories;
 using Core.Models.Algorithm;
 using Core.Models.MachineLearning;
 using Infrastructure.PunterAdmin.ViewModels;
@@ -22,5 +23,12 @@ namespace Core.Interfaces.Services
         void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
         Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedSettingsForAlgorithm();
         Task<bool> AlgorithmSettingsAreUnique(List<AlgorithmSettingsEntity> settings);
+        Task<List<SequenceAnalysisEntity>> GetSequenceAnalysis();
+        Task<List<AlgorithmVariableSequenceEntity>> GetAlgorithmVariableSequence();
+        Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedSettingsForBatch(Guid batch_id);
+        Task<List<SequenceCourseAccuracyEntity>> GetSequenceCourseAccuracy(Guid batch_id);
+        Task AddSequenceAnalysis(SequenceAnalysisEntity entity);
+        Task UpdateSequenceAnalysis(SequenceAnalysisEntity entity);
+        Task AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entites);
     }
 }

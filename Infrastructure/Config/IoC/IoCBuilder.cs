@@ -75,6 +75,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IConfigurationService, ConfigurationService>();
             container.RegisterScoped<IMailService, MailService>();
             container.RegisterScoped<IAlgorithmService, AlgorithmService>();
+            container.RegisterScoped<IAdjusterService, AdjusterService>();
 
             return container;
         }

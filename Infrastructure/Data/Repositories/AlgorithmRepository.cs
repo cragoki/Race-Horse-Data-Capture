@@ -2,6 +2,7 @@
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -55,6 +56,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm_tracker.Where(x => x.race_horse_id == raceHorse).OrderByDescending(x => x.created).FirstOrDefault();
         }
 
+        public List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettingsForBatch(Guid batch_id)
+        {
+            return _context.tb_algorithm_settings_archive.Where(x => x.batch_id == batch_id).ToList();
+        }
+
         public List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettings()
         {
             return _context.tb_algorithm_settings_archive.ToList();
@@ -89,6 +95,10 @@ namespace Infrastructure.Data.Repositories
             _context.tb_algorithm_prediction.Add(algorithmPrediction);
             SaveChanges();
         }
+        public List<AlgorithmVariableSequenceEntity> GetAlgorithmVariableSequence()
+        {
+            return _context.tb_algorithm_variable_sequence.ToList();
+        }
 
         public void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
         {
@@ -116,6 +126,35 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.Event)
                 .Where(x => x.RaceHorse.Horse.horse_id == horse_id).ToList();
         }
+
+        public List<SequenceAnalysisEntity> GetSequenceAnalysis() 
+        {
+            return _context.tb_sequence_analysis.ToList();
+        }
+
+        public void AddSequenceAnalysis(SequenceAnalysisEntity entity) 
+        {
+            _context.tb_sequence_analysis.Add(entity);
+            SaveChanges();
+        }
+
+        public void UpdateSequenceAnalysis(SequenceAnalysisEntity entity)
+        {
+            _context.tb_sequence_analysis.Update(entity);
+            SaveChanges();
+        }
+
+        public List<SequenceCourseAccuracyEntity> GetCourseAccuracy(Guid batch)
+        {
+            return _context.tb_sequence_course_accuracy.Where(x => x.batch_id == batch).ToList();
+        }
+
+        public void AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entities)
+        {
+            _context.tb_sequence_course_accuracy.AddRange(entities);
+            SaveChanges();
+        }
+
         public void SaveChanges()
         {
             if (_configService.SavePermitted())

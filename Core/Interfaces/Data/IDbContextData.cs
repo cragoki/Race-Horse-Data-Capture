@@ -34,6 +34,8 @@ namespace Core.Interfaces.Data
         DbSet<FailedRaceEntity> tb_failed_race { get; set; }
         DbSet<AlgorithmSettingsArchiveEntity> tb_algorithm_settings_archive { get; set; }
         DbSet<AlgorithmVariableSequenceEntity> tb_algorithm_variable_sequence { get; set; }
+        DbSet<SequenceAnalysisEntity> tb_sequence_analysis { get; set; }
+        DbSet<SequenceCourseAccuracyEntity> tb_sequence_course_accuracy { get; set; }
 
         void DetachAllEntities();
     }

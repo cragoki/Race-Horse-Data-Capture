@@ -14,5 +14,6 @@ namespace Core.Interfaces.Services
         Task<List<EventEntity>> GetEventsFromDatabase();
         Task<IEnumerable<RaceEntity>> GetRacesFromDatabaseForAlgorithm(int event_id);
         Task<List<EventEntity>> GetRandomEventsFromDatabase();
+        Task<List<EventEntity>> GetLastTwoMonthsEvents();
     }
 }

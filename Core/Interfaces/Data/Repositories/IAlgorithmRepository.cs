@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,5 +26,12 @@ namespace Core.Interfaces.Data.Repositories
         void ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings);
         void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
         List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettings();
+        List<SequenceAnalysisEntity> GetSequenceAnalysis();
+        void AddSequenceAnalysis(SequenceAnalysisEntity entity);
+        void UpdateSequenceAnalysis(SequenceAnalysisEntity entity);
+        List<SequenceCourseAccuracyEntity> GetCourseAccuracy(Guid batch);
+        void AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entities);
+        List<AlgorithmVariableSequenceEntity> GetAlgorithmVariableSequence();
+        List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettingsForBatch(Guid batch_id);
     }
 }
