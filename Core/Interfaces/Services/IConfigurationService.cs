@@ -2,6 +2,7 @@
 using Core.Enums;
 using Core.Models.Settings;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Core.Interfaces.Services
@@ -16,6 +17,6 @@ namespace Core.Interfaces.Services
         MailSettings GetMailSettings();
         Task<bool> UpdateJob(JobEnum job);
         Task<JobEntity> GetJobInfo(JobEnum job);
-
+        List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
      }
 }

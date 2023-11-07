@@ -122,7 +122,7 @@ namespace RHDCAutomation
 
                                 var settings = await _algorithmService.GetArchivedSettingsForBatch(activeAlgorithm.active_batch.Value);
                                 //Reset Algorithm settings
-                                var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.MyModel);
+                                var algorithmSettings = _configService.GetAlgorithmSettings((int)AlgorithmEnum.MyModel);
                                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value;
                                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value;
                                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value;
@@ -147,12 +147,13 @@ namespace RHDCAutomation
 
                                 var coursesForThisBatch = await _algorithmService.GetSequenceCourseAccuracy(activeAlgorithm.active_batch.Value);
                                 var validCourses = coursesForThisBatch.Where(x => x.percentage_correct >= 60).Select(x => x.course_id).ToList();
-                                foreach (var even in events)
+                                var eventEntities = await _eventService.GetEventsFromDatabase();
+                                foreach (var even in eventEntities)
                                 {
-                                    var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.EventId);
+                                    var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.event_id);
 
                                     //filter events down so that we only analyse those which are accurate enough for this batch
-                                    if (!validCourses.Contains(races.Select(x => x.Event.course_id).FirstOrDefault())) 
+                                    if (!validCourses.Contains(even.course_id))
                                     {
                                         continue;
                                     }
@@ -201,10 +202,10 @@ namespace RHDCAutomation
                                                 points_description = prediction.value.PointsDescription,
                                                 horse_predictability = prediction.value.Predictability
                                             };
-                                            _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
+                                            await _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
                                             if (prediction.value.Tracker != null)
                                             {
-                                                _algorithmService.AddAlgorithmTracker(prediction.value.Tracker);
+                                                await _algorithmService.AddAlgorithmTracker(prediction.value.Tracker);
                                             }
                                         }
                                         catch (Exception ex)

@@ -15,23 +15,23 @@ namespace Core.Interfaces.Data.Repositories
         List<AlgorithmVariableEntity> GetAlgorithmVariableByAlgorithmId(int algorithmId);
         AlgorithmVariableEntity GetAlgorithmVariableById(int algorithmVariableId);
         VariableEntity GetVariableById(int variableId);
-        void SaveChanges();
-        void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity);
-        void UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings);
-        void UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables);
-        void AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction);
+        Task SaveChanges();
+        Task UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity);
+        Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings);
+        Task UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables);
+        Task AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction);
         IQueryable<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id);
         List<AlgorithmPredictionEntity> GetAlgorithmPredictionForHorse(int horse_id);
-        void AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker);
-        void ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings);
-        void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
+        Task AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker);
+        Task ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings);
+        Task AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
         List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettings();
         List<SequenceAnalysisEntity> GetSequenceAnalysis();
-        void AddSequenceAnalysis(SequenceAnalysisEntity entity);
-        void UpdateSequenceAnalysis(SequenceAnalysisEntity entity);
-        List<SequenceCourseAccuracyEntity> GetCourseAccuracy(Guid batch);
-        void AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entities);
+        Task AddSequenceAnalysis(SequenceAnalysisEntity entity);
+        Task UpdateSequenceAnalysis(SequenceAnalysisEntity entity);
+        Task<List<SequenceCourseAccuracyEntity>> GetCourseAccuracy(Guid batch);
+        Task AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entities);
         List<AlgorithmVariableSequenceEntity> GetAlgorithmVariableSequence();
-        List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettingsForBatch(Guid batch_id);
+        Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedAlgorithmSettingsForBatch(Guid batch_id);
     }
 }

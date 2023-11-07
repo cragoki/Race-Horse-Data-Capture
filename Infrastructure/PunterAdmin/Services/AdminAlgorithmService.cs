@@ -232,8 +232,6 @@ namespace Infrastructure.PunterAdmin.Services
                         foreach (var even in events)
                         {
                             var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
-                            var distances = _mappingRepository.GetDistanceTypes();
-                            var goings = _mappingRepository.GetGoingTypes();
 
                             foreach (var race in even.EventRaces)
                             {
@@ -242,9 +240,6 @@ namespace Infrastructure.PunterAdmin.Services
 
                             foreach (var race in races)
                             {
-
-                                var settings = await BuildAlgorithmSettings(algorithm);
-
                                 var predictions = await _bentnersModel.RunModel(race);
 
                                 if (predictions == null || predictions.Count() == 0)
@@ -265,12 +260,10 @@ namespace Infrastructure.PunterAdmin.Services
                             }
                         }
                         break;
-                    case (int)AlgorithmEnum.MyModel:
+                    case (int)AlgorithmEnum.MyModel:                       
                         foreach (var even in events)
                         {
                             var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
-                            var distances = _mappingRepository.GetDistanceTypes();
-                            var goings = _mappingRepository.GetGoingTypes();
 
                             foreach (var race in even.EventRaces)
                             {
@@ -279,8 +272,6 @@ namespace Infrastructure.PunterAdmin.Services
 
                             foreach (var race in races)
                             {
-
-                                var settings = await BuildAlgorithmSettings(algorithm);
 
                                 var predictions = await _myModel.RunModel(race);
 
@@ -423,7 +414,7 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var algorithmSettings = await BuildAlgorithmSettings(algorithm);
 
-                _algorithmRepository.UpdateAlgorithmSettings(algorithmSettings);
+                await _algorithmRepository.UpdateAlgorithmSettings(algorithmSettings);
             }
             catch (Exception ex)
             {
@@ -439,7 +430,7 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var algorithmVariables = await BuildAlgorithmVariables(algorithm);
 
-                _algorithmRepository.UpdateAlgorithmVariables(algorithmVariables);
+                await _algorithmRepository.UpdateAlgorithmVariables(algorithmVariables);
             }
             catch (Exception ex)
             {

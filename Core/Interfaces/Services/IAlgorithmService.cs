@@ -15,12 +15,12 @@ namespace Core.Interfaces.Services
         AlgorithmEntity GetActiveAlgorithm();
         Task StoreAlgorithmResults(AlgorithmResult result);
         Task<List<AlgorithmSettingsEntity>> GetSettingsForAlgorithm(int algorithm_id);
-        void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction);
-        void AddAlgorithmTracker(AlgorithmTrackerEntity tracker);
+        Task AddAlgorithmPrediction(AlgorithmPredictionEntity prediction);
+        Task AddAlgorithmTracker(AlgorithmTrackerEntity tracker);
         VariableAnalysisModel IdentifyWinningAlgorithmVariables(List<AlgorithmPredictionEntity> predictions, List<AlgorithmTrackerEntity> trackers, RaceEntity race);
-        void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId);
+        Task ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId);
         Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> settings);
-        void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
+        Task AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence);
         Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedSettingsForAlgorithm();
         Task<bool> AlgorithmSettingsAreUnique(List<AlgorithmSettingsEntity> settings);
         Task<List<SequenceAnalysisEntity>> GetSequenceAnalysis();

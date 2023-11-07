@@ -6,6 +6,8 @@ using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using System.Threading.Tasks;
 using Core.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.Services
 {
@@ -87,6 +89,11 @@ namespace Core.Services
         public async Task<JobEntity> GetJobInfo(JobEnum job)
         {
             return _repository.GetJobInfo(job);
+        }
+
+        public List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId) 
+        {
+            return _repository.GetAlgorithmSettings(algorithmId).ToList();
         }
     }
 }

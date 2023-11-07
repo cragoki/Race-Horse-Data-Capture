@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -56,9 +57,9 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm_tracker.Where(x => x.race_horse_id == raceHorse).OrderByDescending(x => x.created).FirstOrDefault();
         }
 
-        public List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettingsForBatch(Guid batch_id)
+        public async Task<List<AlgorithmSettingsArchiveEntity>> GetArchivedAlgorithmSettingsForBatch(Guid batch_id)
         {
-            return _context.tb_algorithm_settings_archive.Where(x => x.batch_id == batch_id).ToList();
+            return await _context.tb_algorithm_settings_archive.Where(x => x.batch_id == batch_id).ToListAsync();
         }
 
         public List<AlgorithmSettingsArchiveEntity> GetArchivedAlgorithmSettings()
@@ -66,50 +67,50 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm_settings_archive.ToList();
         }
 
-        public void UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity)
+        public async Task UpdateActiveAlgorithm(AlgorithmEntity algorithmEntity)
         {
             _context.tb_algorithm.Update(algorithmEntity);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings)
+        public async Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> algorithmSettings)
         {
             _context.tb_algorithm_settings.UpdateRange(algorithmSettings);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables)
+        public async Task UpdateAlgorithmVariables(List<AlgorithmVariableEntity> algorithmVariables)
         {
             _context.tb_algorithm_variable.UpdateRange(algorithmVariables);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings)
+        public async Task ArchiveAlgorithmSettings(List<AlgorithmSettingsArchiveEntity> settings)
         {
             _context.tb_algorithm_settings_archive.AddRange(settings);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction)
+        public async Task AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction)
         {
             _context.tb_algorithm_prediction.Add(algorithmPrediction);
-            SaveChanges();
+            await SaveChanges();
         }
         public List<AlgorithmVariableSequenceEntity> GetAlgorithmVariableSequence()
         {
             return _context.tb_algorithm_variable_sequence.ToList();
         }
 
-        public void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
+        public async Task AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
         {
             _context.tb_algorithm_variable_sequence.Add(sequence);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker)
+        public async Task AddAlgorithmTracker(AlgorithmTrackerEntity algorithmTracker)
         {
             _context.tb_algorithm_tracker.Add(algorithmTracker);
-            SaveChanges();
+            await SaveChanges();
         }
 
         public IQueryable<AlgorithmPredictionEntity> GetAlgorithmPrediction(int race_horse_id)
@@ -132,34 +133,34 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_sequence_analysis.ToList();
         }
 
-        public void AddSequenceAnalysis(SequenceAnalysisEntity entity) 
+        public async Task AddSequenceAnalysis(SequenceAnalysisEntity entity) 
         {
             _context.tb_sequence_analysis.Add(entity);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void UpdateSequenceAnalysis(SequenceAnalysisEntity entity)
+        public async Task UpdateSequenceAnalysis(SequenceAnalysisEntity entity)
         {
             _context.tb_sequence_analysis.Update(entity);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public List<SequenceCourseAccuracyEntity> GetCourseAccuracy(Guid batch)
+        public async Task<List<SequenceCourseAccuracyEntity>> GetCourseAccuracy(Guid batch)
         {
-            return _context.tb_sequence_course_accuracy.Where(x => x.batch_id == batch).ToList();
+            return await _context.tb_sequence_course_accuracy.Where(x => x.batch_id == batch).ToListAsync();
         }
 
-        public void AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entities)
+        public async Task AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entities)
         {
             _context.tb_sequence_course_accuracy.AddRange(entities);
-            SaveChanges();
+            await SaveChanges();
         }
 
-        public void SaveChanges()
+        public async Task SaveChanges()
         {
             if (_configService.SavePermitted())
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }

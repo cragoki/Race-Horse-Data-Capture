@@ -111,7 +111,7 @@ namespace Core.Services
                 update.number_of_races = result.RacesFiltered;
                 update.active = false;
 
-                _algorithmRepository.UpdateActiveAlgorithm(update);
+                await _algorithmRepository.UpdateActiveAlgorithm(update);
             }
             catch (Exception ex)
             {
@@ -190,7 +190,8 @@ namespace Core.Services
         {
             try
             {
-                return _algorithmRepository.GetCourseAccuracy(batch_id);
+                var result = await _algorithmRepository.GetCourseAccuracy(batch_id);
+                return result;
             }
             catch (Exception ex)
             {
@@ -198,7 +199,7 @@ namespace Core.Services
             }
         }
 
-        public void ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId)
+        public async Task ArchiveAlgorithmSettings(List<AlgorithmSettingsEntity> settings, Guid batchId)
         {
             var toAdd = new List<AlgorithmSettingsArchiveEntity>();
 
@@ -214,14 +215,14 @@ namespace Core.Services
                 });
             }
 
-            _algorithmRepository.ArchiveAlgorithmSettings(toAdd);
+            await _algorithmRepository.ArchiveAlgorithmSettings(toAdd);
         }
 
         public async Task UpdateAlgorithmSettings(List<AlgorithmSettingsEntity> settings)
         {
             try
             {
-                _algorithmRepository.UpdateAlgorithmSettings(settings);
+                await _algorithmRepository.UpdateAlgorithmSettings(settings);
             }
             catch (Exception ex)
             {
@@ -229,19 +230,19 @@ namespace Core.Services
             }
         }
 
-        public void AddAlgorithmPrediction(AlgorithmPredictionEntity prediction)
+        public async Task AddAlgorithmPrediction(AlgorithmPredictionEntity prediction)
         {
-            _algorithmRepository.AddAlgorithmPrediction(prediction);
+            await _algorithmRepository.AddAlgorithmPrediction(prediction);
         }
 
-        public void AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
+        public async Task AddAlgorithmVariableSequence(AlgorithmVariableSequenceEntity sequence)
         {
-            _algorithmRepository.AddAlgorithmVariableSequence(sequence);
+            await _algorithmRepository.AddAlgorithmVariableSequence(sequence);
         }
 
-        public void AddAlgorithmTracker(AlgorithmTrackerEntity tracker)
+        public async Task AddAlgorithmTracker(AlgorithmTrackerEntity tracker)
         {
-            _algorithmRepository.AddAlgorithmTracker(tracker);
+            await _algorithmRepository.AddAlgorithmTracker(tracker);
         }
 
         public VariableAnalysisModel IdentifyWinningAlgorithmVariables(List<AlgorithmPredictionEntity> predictions, List<AlgorithmTrackerEntity> trackers, RaceEntity race)
@@ -375,7 +376,8 @@ namespace Core.Services
         {
             try
             {
-                return _algorithmRepository.GetArchivedAlgorithmSettingsForBatch(batch_id);
+                var result = await _algorithmRepository.GetArchivedAlgorithmSettingsForBatch(batch_id);
+                return result;
             }
             catch (Exception ex)
             {
@@ -387,7 +389,7 @@ namespace Core.Services
         {
             try
             {
-                _algorithmRepository.AddSequenceAnalysis(entity);
+                await _algorithmRepository.AddSequenceAnalysis(entity);
             }
             catch (Exception ex)
             {
@@ -399,7 +401,7 @@ namespace Core.Services
         {
             try
             {
-                _algorithmRepository.UpdateSequenceAnalysis(entity);
+                await _algorithmRepository.UpdateSequenceAnalysis(entity);
             }
             catch (Exception ex)
             {
@@ -411,7 +413,7 @@ namespace Core.Services
         {
             try
             {
-                _algorithmRepository.AddCourseAccuracy(entites);
+                await _algorithmRepository.AddCourseAccuracy(entites);
             }
             catch (Exception ex)
             {
