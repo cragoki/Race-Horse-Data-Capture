@@ -203,7 +203,7 @@ namespace Infrastructure.PunterAdmin.Services
                 foreach (var raceHorse in horses)
                 {
                     var rh = raceHorse.RaceHorse;
-                    _horseRepository.AddRaceHorse(rh);
+                    await _horseRepository.AddRaceHorse(rh);
                 }
 
                 //Add to missing results table
@@ -215,12 +215,12 @@ namespace Infrastructure.PunterAdmin.Services
                         error_message = "BACKLOG"
                     };
 
-                    _configRepo.AddFailedResult(failedResult);
+                    await _configRepo.AddFailedResult(failedResult);
                 }
 
                 //Delete from missing Race Table
                 var existing = _configRepo.GetFailedRace(failedRace.RaceId);
-                _configRepo.DeleteFailedRace(existing);
+                await _configRepo.DeleteFailedRace(existing);
             }
             catch (Exception ex)
             {
@@ -228,7 +228,7 @@ namespace Infrastructure.PunterAdmin.Services
                 var existing = _configRepo.GetFailedRace(failedRace.RaceId);
                 existing.attempts++;
                 existing.error_message = ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message;
-                _configRepo.UpdateFailedRace(existing);
+                await _configRepo.UpdateFailedRace(existing);
                 throw new Exception(ex.Message);
             }
 
@@ -243,12 +243,12 @@ namespace Infrastructure.PunterAdmin.Services
                 var raceHorse = _horseRepository.GetRaceHorseById(failedResult.RaceHorseId);
                 raceHorse.position = failedResult.Position;
                 raceHorse.description = failedResult.Description;
-                _horseRepository.UpdateRaceHorse(raceHorse);
+                await _horseRepository.UpdateRaceHorse(raceHorse);
                 result = true;
 
                 //Delete from missing Result Table
                 var existing = _configRepo.GetFailedResult(failedResult.Id);
-                _configRepo.DeleteFailedResult(existing);
+                await _configRepo.DeleteFailedResult(existing);
             }
             catch (Exception ex) 
             {
@@ -296,7 +296,7 @@ namespace Infrastructure.PunterAdmin.Services
                         horse.description = "ERROR";
                         horse.position = 0;
 
-                        _configRepo.AddFailedResult(failedResult);
+                        await _configRepo.AddFailedResult(failedResult);
                     }
                 }
 
@@ -315,10 +315,10 @@ namespace Infrastructure.PunterAdmin.Services
                         raceHorse.description = "ERROR";
                         raceHorse.position = 0;
 
-                        _configRepo.AddFailedResult(failedResult);
+                        await _configRepo.AddFailedResult(failedResult);
                     }
 
-                    _horseRepository.UpdateRaceHorse(raceHorse);
+                    await _horseRepository.UpdateRaceHorse(raceHorse);
                     processed++;
                 }
             }

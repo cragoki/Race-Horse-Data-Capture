@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Core.Interfaces.Data.Repositories
 { 
@@ -14,13 +15,13 @@ namespace Core.Interfaces.Data.Repositories
         string GetStallsType(int stalls);
         string GetWeatherType(int weather);
         string GetSurfaceType(int surface);
-        int? AddOrReturnAgeType(string age);
-        int? AddOrReturnDistanceType(string distance);
-        int? AddOrReturnGoingType(string going);
-        int? AddOrReturnMeetingType(string meeting);
-        int? AddOrReturnStallsType(string stalls);
-        int? AddOrReturnSurfaceType(string surface);
-        int? AddOrReturnWeatherType(string weather);
-        void SaveChanges();
+        Task<int?> AddOrReturnAgeType(string age);
+        Task<int?> AddOrReturnDistanceType(string distance);
+        Task<int?> AddOrReturnGoingType(string going);
+        Task<int?> AddOrReturnMeetingType(string meeting);
+        Task<int?> AddOrReturnStallsType(string stalls);
+        Task<int?> AddOrReturnSurfaceType(string surface);
+        Task<int?> AddOrReturnWeatherType(string weather);
+        Task SaveChanges();
     }
 }

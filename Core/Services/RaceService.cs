@@ -53,7 +53,7 @@ namespace Core.Services
                             foreach (var raceHorse in horses)
                             {
                                 var rh = raceHorse.RaceHorse;
-                                _horseRepository.AddRaceHorse(rh);
+                                await _horseRepository.AddRaceHorse(rh);
                             }
                         }
                         catch (Exception ex)
@@ -121,10 +121,10 @@ namespace Core.Services
                                 raceHorse.description = "ERROR";
                                 raceHorse.position = 0;
 
-                                _configRepo.AddFailedResult(failedResult);
+                                await _configRepo.AddFailedResult(failedResult);
 
 
-                                _horseRepository.UpdateRaceHorse(raceHorse);
+                                await _horseRepository.UpdateRaceHorse(raceHorse);
                             }
                         }
                     }
@@ -146,7 +146,7 @@ namespace Core.Services
                             error_message = "Something went wrong collecting the results for this race"
                         };
 
-                        _configRepo.AddFailedResult(failedResult);
+                        await _configRepo.AddFailedResult(failedResult);
                         Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
                     }
 
@@ -165,14 +165,14 @@ namespace Core.Services
                             raceHorse.description = "ERROR";
                             raceHorse.position = 0;
 
-                            _configRepo.AddFailedResult(failedResult);
+                            await _configRepo.AddFailedResult(failedResult);
                         }
 
-                        _horseRepository.UpdateRaceHorse(raceHorse);
+                        await _horseRepository.UpdateRaceHorse(raceHorse);
                     }
                 }
 
-                _eventRepository.UpdateRace(raceDb);
+                await _eventRepository.UpdateRace(raceDb);
                 Logger.Info($"Update Complete!");
                 Logger.Info($"Finding next race...");
 
@@ -187,7 +187,7 @@ namespace Core.Services
                         error_message = "Something went wrong collecting the results for this race"
                     };
 
-                    _configRepo.AddFailedResult(failedResult);
+                    await _configRepo.AddFailedResult(failedResult);
                     Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
                 }
                 else 
@@ -198,7 +198,7 @@ namespace Core.Services
                         error_message = "Something went wrong collecting the results for this race"
                     };
 
-                    _configRepo.AddFailedRace(failedResult);
+                    await _configRepo.AddFailedRace(failedResult);
                     Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
                 }
 
@@ -241,10 +241,10 @@ namespace Core.Services
                         raceHorse.description = "ERROR";
                         raceHorse.position = 0;
 
-                        _configRepo.AddFailedResult(failedResult);
+                        await _configRepo.AddFailedResult(failedResult);
                     }
 
-                    _horseRepository.UpdateRaceHorse(raceHorse);
+                    await _horseRepository.UpdateRaceHorse(raceHorse);
                 }
             }
             catch (Exception ex)
@@ -313,12 +313,12 @@ namespace Core.Services
                         foreach (var raceHorse in horses)
                         {
                             var rh = raceHorse.RaceHorse;
-                            _horseRepository.AddRaceHorse(rh);
+                            await _horseRepository.AddRaceHorse(rh);
                         }
                     }
                     catch (Exception ex)
                     {
-                        FailedRace(race, ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message);
+                        await FailedRace(race, ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message);
                     }
 
                     result++;
@@ -332,7 +332,7 @@ namespace Core.Services
             return result;
         }
 
-        private void FailedRace(RaceEntity race, string exception) 
+        private async Task FailedRace(RaceEntity race, string exception) 
         {
             var existing = _configRepo.GetFailedRace(race.race_id);
             if (existing == null)
@@ -343,13 +343,13 @@ namespace Core.Services
                     error_message = exception
                 };
 
-                _configRepo.AddFailedRace(failedResult);
+                await _configRepo.AddFailedRace(failedResult);
             }
             else
             {
                 existing.attempts++;
                 existing.error_message = exception;
-                _configRepo.UpdateFailedRace(existing);
+                await _configRepo.UpdateFailedRace(existing);
             }
         }
     }

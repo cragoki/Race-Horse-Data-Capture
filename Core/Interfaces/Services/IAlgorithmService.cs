@@ -1,8 +1,6 @@
 ﻿using Core.Entities;
-using Core.Interfaces.Data.Repositories;
 using Core.Models.Algorithm;
 using Core.Models.MachineLearning;
-using Infrastructure.PunterAdmin.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

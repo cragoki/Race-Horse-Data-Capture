@@ -38,7 +38,7 @@ namespace Core.Services
                 //Return necessary information
                 foreach (var even in todaysRaces.Courses)
                 {
-                    AddDbInfoForEventAndRaces(even, batch);
+                    await AddDbInfoForEventAndRaces(even, batch);
 
                     //Now Collect the generated event_id based on the course and batch
                     var res = new Event()
@@ -91,7 +91,7 @@ namespace Core.Services
             return _eventRepository.GetTodaysRacesTest();
         }
 
-        private void AddDbInfoForEventAndRaces(Course even, Guid batchId)
+        private async Task AddDbInfoForEventAndRaces(Course even, Guid batchId)
         {
             var eventName = $"{even.Name}_{DateTime.Now.ToShortDateString()}";
             int? surfaceTypeId = null;
@@ -109,15 +109,15 @@ namespace Core.Services
                     all_weather = even.AllWeather
                 };
 
-                CheckAndAddCourse(course);
+                await CheckAndAddCourse(course);
 
                 if (!String.IsNullOrEmpty(even.SurfaceType))
                 {
-                    surfaceTypeId = _mappingTableRepository.AddOrReturnSurfaceType(even.SurfaceType);
+                    surfaceTypeId = await _mappingTableRepository.AddOrReturnSurfaceType(even.SurfaceType);
                 }
                 if (!String.IsNullOrEmpty(even.meetingTypeCode))
                 {
-                    meetingTypeId = _mappingTableRepository.AddOrReturnMeetingType(even.meetingTypeCode);
+                    meetingTypeId = await _mappingTableRepository.AddOrReturnMeetingType(even.meetingTypeCode);
                 }
 
                 //Event:
@@ -135,8 +135,8 @@ namespace Core.Services
                     batch_id = batchId
                 };
 
-                int eventId = _eventRepository.AddEvent(ev);
-                CheckAndAddCourse(course);
+                int eventId = await _eventRepository.AddEvent(ev);
+                await CheckAndAddCourse(course);
 
                 foreach (var race in even.Races)
                 {
@@ -145,18 +145,18 @@ namespace Core.Services
                         event_id = eventId,
                         no_of_horses = race.Runners,
                         race_class = race.RaceClass,
-                        distance = _mappingTableRepository.AddOrReturnDistanceType(race.Distance),
-                        ages = _mappingTableRepository.AddOrReturnAgeType(race.Ages),
+                        distance = await _mappingTableRepository.AddOrReturnDistanceType(race.Distance),
+                        ages = await _mappingTableRepository.AddOrReturnAgeType(race.Ages),
                         description = "",
                         completed = false,
-                        going = _mappingTableRepository.AddOrReturnGoingType(race.Going),
+                        going = await _mappingTableRepository.AddOrReturnGoingType(race.Going),
                         race_time = race.Time,
                         race_url = race.RaceURL,
-                        weather = _mappingTableRepository.AddOrReturnWeatherType(race.Weather),
+                        weather = await _mappingTableRepository.AddOrReturnWeatherType(race.Weather),
                         rp_race_id = race.Id
                     };
 
-                    _eventRepository.AddRace(raceEntity);
+                    await _eventRepository.AddRace(raceEntity);
                 }
             }
             catch (Exception ex)
@@ -199,7 +199,7 @@ namespace Core.Services
             return result;
         }
 
-        private void CheckAndAddCourse(CourseEntity course)
+        private async Task CheckAndAddCourse(CourseEntity course)
         {
             try
             {
@@ -211,8 +211,7 @@ namespace Core.Services
                 }
                 else
                 {
-                    _eventRepository.AddCourse(course);
-                    _eventRepository.SaveChanges();
+                    await _eventRepository.AddCourse(course);
                 }
             }
             catch (Exception ex)

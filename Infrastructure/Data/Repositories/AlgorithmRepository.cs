@@ -93,6 +93,26 @@ namespace Infrastructure.Data.Repositories
 
         public async Task AddAlgorithmPrediction(AlgorithmPredictionEntity algorithmPrediction)
         {
+            var pendingChanges = _context.ChangeTracker.Entries()
+            .Where(e => e.State != EntityState.Unchanged)
+            .ToList();
+
+            foreach (var entry in pendingChanges)
+            {
+                // Check the state of the entry and the properties that are being modified
+                Console.WriteLine($"Entity Name: {entry.Entity.GetType().Name}, State: {entry.State}");
+
+                foreach (var property in entry.OriginalValues.Properties)
+                {
+                    var originalValue = entry.OriginalValues[property];
+                    var currentValue = entry.CurrentValues[property];
+                    if (originalValue != currentValue)
+                    {
+                        Console.WriteLine($"Property Name: {property.Name}, Original Value: {originalValue}, Current Value: {currentValue}");
+                    }
+                }
+            }
+
             _context.tb_algorithm_prediction.Add(algorithmPrediction);
             await SaveChanges();
         }

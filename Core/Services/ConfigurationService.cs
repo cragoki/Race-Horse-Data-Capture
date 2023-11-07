@@ -48,7 +48,7 @@ namespace Core.Services
             return _config.GetValue<bool>("AppSettings:SaveData");
         }
 
-        public void AddBatch(Guid batchId, string diagnostics) 
+        public async Task AddBatch(Guid batchId, string diagnostics) 
         {
             var batchEntity = new BatchEntity()
             {
@@ -57,7 +57,7 @@ namespace Core.Services
                 date = DateTime.Now
             };
 
-            _repository.AddBatch(batchEntity);
+            await _repository.AddBatch(batchEntity);
         }
 
         public DateTime GetLastBackfillDate()
@@ -69,14 +69,14 @@ namespace Core.Services
 
         public async Task UpdateBackfillDate(DateTime newDate) 
         {
-            _repository.UpdateBacklogDate(newDate);
+            await _repository.UpdateBacklogDate(newDate);
         }
 
         public async Task<bool> UpdateJob(JobEnum job) 
         {
             try
             {
-                _repository.UpdateNextExecution(job);
+                await _repository.UpdateNextExecution(job);
 
                 return true;
             }

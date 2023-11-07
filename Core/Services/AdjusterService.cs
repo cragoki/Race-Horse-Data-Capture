@@ -126,7 +126,7 @@ namespace Core.Services
                 var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.MyModel);
 
                 //Archive existing settings
-                _algorithmService.ArchiveAlgorithmSettings(algorithmSettings, _batch);
+                await _algorithmService.ArchiveAlgorithmSettings(algorithmSettings, _batch);
 
                 //Get all settings archive to ensure that the new settings we are about to generate, do not already exist, if they do, adjust everything by .1 and try again
                 bool originalAlgorithm = false;
@@ -162,7 +162,7 @@ namespace Core.Services
                 }
 
                 await _algorithmService.UpdateAlgorithmSettings(algorithmSettings);
-                _algorithmService.AddAlgorithmVariableSequence(result);
+                await _algorithmService.AddAlgorithmVariableSequence(result);
 
 
                 //Save Result

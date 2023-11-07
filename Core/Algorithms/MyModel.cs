@@ -98,11 +98,17 @@ namespace Core.Algorithms
             //Race wide factors
             // Get a list of horses who have won at the D&G Group, after analysis, inspect winning times of those races
 
+            if (horses.Count() == 0) 
+            {
+                return result;
+            }
             foreach (var horse in horses)
             {
                 var tracker = new AlgorithmTrackerEntity();
                 var toAdd = new HorsePredictionModel();
                 tracker.race_horse_id = horse.race_horse_id;
+                tracker.created = DateTime.Now;
+                tracker.algorithm_id = (int)AlgorithmEnum.MyModel;
                 toAdd.points = 0;
                 toAdd.horse_id = horse.horse_id;
                 toAdd.race_horse_id = horse.race_horse_id;

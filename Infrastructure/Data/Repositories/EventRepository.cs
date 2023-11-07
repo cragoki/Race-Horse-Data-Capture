@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -216,21 +217,21 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_event.Where(x => x.course_id == courseId).ToList();
         }
-        public int AddEvent(EventEntity eventToAdd)
+        public async Task<int> AddEvent(EventEntity eventToAdd)
         {
             _context.tb_event.Add(eventToAdd);
-            SaveChanges();
+            await SaveChanges();
             return eventToAdd.event_id;
         }
-        public void AddCourse(CourseEntity courseToAdd)
+        public async Task AddCourse(CourseEntity courseToAdd)
         {
             _context.tb_course.Add(courseToAdd);
-            SaveChanges();
+            await SaveChanges();
         }
-        public void UpdateCourse(CourseEntity courseToUpdate)
+        public async Task UpdateCourse(CourseEntity courseToUpdate)
         {
             _context.tb_course.Update(courseToUpdate);
-            SaveChanges();
+            await SaveChanges();
         }
         public IEnumerable<RaceEntity> GetTodaysRacesTest()
         {
@@ -376,15 +377,15 @@ namespace Infrastructure.Data.Repositories
                     .ThenInclude(x => x.MeetingType)
                  .ToList();
         }
-        public void AddRace(RaceEntity raceToAdd)
+        public async Task AddRace(RaceEntity raceToAdd)
         {
             _context.tb_race.Add(raceToAdd);
-            SaveChanges();
+            await SaveChanges();
         }
-        public void UpdateRace(RaceEntity raceToUpdate)
+        public async Task UpdateRace(RaceEntity raceToUpdate)
         {
             _context.tb_race.Update(raceToUpdate);
-            SaveChanges();
+            await SaveChanges();
         }
 
         public List<RaceHorseEntity> GetRaceHorsesForRace(int raceId)
@@ -397,11 +398,11 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_race.Include(x => x.RaceHorses).Include(x => x.Event).Where(x => x.RaceHorses.Count() == 0 && x.Event.created > DateTime.Now.Date.AddMonths(-4)).OrderBy(x => x.Event.created).Take(10).ToList();
         }
 
-        public void SaveChanges()
+        public async Task SaveChanges()
         {
             if (_configService.SavePermitted())
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }

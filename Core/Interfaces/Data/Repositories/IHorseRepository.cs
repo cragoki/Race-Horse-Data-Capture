@@ -7,20 +7,20 @@ namespace Core.Interfaces.Data.Repositories
 {
     public interface IHorseRepository
     {
-        void AddArchiveHorse(HorseArchiveEntity horse);
-        int AddHorse(HorseEntity horse);
+        Task AddArchiveHorse(HorseArchiveEntity horse);
+        Task<int> AddHorse(HorseEntity horse);
         IEnumerable<RaceHorseEntity> GetRaceHorsesForRace(int raceId);
-        void AddRaceHorse(RaceHorseEntity horse);
-        void UpdateRaceHorse(RaceHorseEntity horse);
+        Task AddRaceHorse(RaceHorseEntity horse);
+        Task UpdateRaceHorse(RaceHorseEntity horse);
         HorseEntity GetHorse(int horse_id);
         HorseEntity GetHorseWithRaces(int horse_id);
         List<HorseArchiveEntity> GetHorseArchive(int horse_id);
         Task<HorseEntity> GetHorseByRpId(int rp_id);
-        void SaveChanges();
-        void UpdateHorse(HorseEntity horse);
-        void UpdateHorseArchive(HorseArchiveEntity horse);
-        int AddJockey(JockeyEntity jockey);
-        int AddTrainer(TrainerEntity trainer);
+        Task SaveChanges();
+        Task UpdateHorse(HorseEntity horse);
+        Task UpdateHorseArchive(HorseArchiveEntity horse);
+        Task<int> AddJockey(JockeyEntity jockey);
+        Task<int> AddTrainer(TrainerEntity trainer);
         Task<JockeyEntity> GetJockeyByName(string name);
         JockeyEntity GetJockeyById(int id);
         Task<TrainerEntity> GetTrainerByName(string name);

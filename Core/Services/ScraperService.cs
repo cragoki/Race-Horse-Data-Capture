@@ -294,7 +294,7 @@ namespace Core.Services
                         toUpdate.description = "Unknown Error";
                     }
                     result.Add(toUpdate);
-                    _horseRepository.UpdateRaceHorse(toUpdate);
+                    await _horseRepository.UpdateRaceHorse(toUpdate);
 
                 }
 
@@ -480,11 +480,11 @@ namespace Core.Services
             var no_of_horses = nodeDescription.SelectSingleNode("span[contains(@data-test-selector, 'RC-meetingDay__raceRunnersNo')]")?.InnerText ?? "0";
             var race_class = nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceClass')]")?.InnerText ?? "0";
 
-            raceEntity.ages = _mappingTableRepository.AddOrReturnAgeType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceAgesAllowed')]")?.InnerText.Replace(" ", "") ?? "");
-            raceEntity.going = _mappingTableRepository.AddOrReturnGoingType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceGoingType')]")?.InnerText ?? "");
-            raceEntity.stalls = _mappingTableRepository.AddOrReturnStallsType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceStalls')]")?.InnerText ?? "");
+            raceEntity.ages = await _mappingTableRepository.AddOrReturnAgeType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceAgesAllowed')]")?.InnerText.Replace(" ", "") ?? "");
+            raceEntity.going = await _mappingTableRepository.AddOrReturnGoingType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceGoingType')]")?.InnerText ?? "");
+            raceEntity.stalls = await _mappingTableRepository.AddOrReturnStallsType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceStalls')]")?.InnerText ?? "");
             raceEntity.no_of_horses = Extractor.ExtractIntsFromString(no_of_horses);
-            raceEntity.distance = _mappingTableRepository.AddOrReturnDistanceType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceDistance')]")?.InnerText.Replace(" ", "") ?? "");
+            raceEntity.distance = await _mappingTableRepository.AddOrReturnDistanceType(nodeDescription.SelectSingleNode("span[contains(@data-test-selector,'RC-meetingDay__raceDistance')]")?.InnerText.Replace(" ", "") ?? "");
             raceEntity.description = nodeDescription.SelectSingleNode("a[contains(@class,'RC-meetingDay__raceTitle')]")?.InnerText ?? "";
             raceEntity.race_class = Extractor.ExtractIntsFromString(race_class);
 
@@ -613,13 +613,13 @@ namespace Core.Services
                         existingHorse.Archive.Add(horseArchiveTS);
                     }
 
-                    _horseRepository.UpdateHorse(existingHorse);
+                    await _horseRepository.UpdateHorse(existingHorse);
 
                 }
             }
             else 
             {
-                result.HorseId = _horseRepository.AddHorse(horse);
+                result.HorseId = await _horseRepository.AddHorse(horse);
             }
 
             if (existingJockey != null)
@@ -628,7 +628,7 @@ namespace Core.Services
             }
             else 
             {
-                result.JockeyId = _horseRepository.AddJockey(jockey);
+                result.JockeyId = await _horseRepository.AddJockey(jockey);
             }
 
             if (existingTrainer != null)
@@ -637,7 +637,7 @@ namespace Core.Services
             }
             else 
             {
-                result.TrainerId = _horseRepository.AddTrainer(trainer);
+                result.TrainerId = await _horseRepository.AddTrainer(trainer);
             }
 
             return result;

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -17,10 +18,10 @@ namespace Infrastructure.Data.Repositories
             _context = context;
         }
 
-        public void AddBatch(BatchEntity batch)
+        public async Task AddBatch(BatchEntity batch)
         {
             _context.tb_batch.Add(batch);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public BatchEntity GetMostRecentBatch()
@@ -50,11 +51,11 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_backlog_date.ToList().FirstOrDefault();
         }
-        public void UpdateBacklogDate(DateTime date)
+        public async Task UpdateBacklogDate(DateTime date)
         {
             var toUpdate = new BacklogDateEntity() { backlog_date = date};
             _context.tb_backlog_date.Update(toUpdate);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public JobEntity GetJobInfo(JobEnum job)
@@ -67,7 +68,7 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm_settings.Where(x => x.algorithm_id == algorithmId);
         }
 
-        public void UpdateNextExecution(JobEnum job)
+        public async Task UpdateNextExecution(JobEnum job)
         {
             var jobDb = _context.tb_job.Where(x => x.job_id == (int)job).ToList().FirstOrDefault();
             var tomorrow = DateTime.Now.AddDays(1);
@@ -89,19 +90,19 @@ namespace Infrastructure.Data.Repositories
             jobDb.last_execution = DateTime.Now;
 
             _context.tb_job.Update(jobDb);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteFailedResult(FailedResultEntity entity)
+        public async Task DeleteFailedResult(FailedResultEntity entity)
         {
             _context.tb_failed_result.Remove(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void DeleteFailedRace(FailedRaceEntity entity)
+        public async Task DeleteFailedRace(FailedRaceEntity entity)
         {
             _context.tb_failed_race.Remove(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public IEnumerable<FailedResultEntity> GetFailedResults()
@@ -124,21 +125,21 @@ namespace Infrastructure.Data.Repositories
         }
 
 
-        public void AddFailedResult(FailedResultEntity entity) 
+        public async Task AddFailedResult(FailedResultEntity entity) 
         {
             _context.tb_failed_result.Add(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void AddFailedRace(FailedRaceEntity entity)
+        public async Task AddFailedRace(FailedRaceEntity entity)
         {
             _context.tb_failed_race.Add(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public void UpdateFailedRace(FailedRaceEntity entity)
+        public async Task UpdateFailedRace(FailedRaceEntity entity)
         {
             _context.tb_failed_race.Update(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
     }

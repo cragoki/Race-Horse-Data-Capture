@@ -1,9 +1,9 @@
 ﻿using Core.Entities;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
-using Core.Models.RP.GetRaceNew;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -55,7 +55,7 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_surface_type.Where(x => x.surface_type_id == surface).ToList().FirstOrDefault().surface_type;
         }
 
-        public int? AddOrReturnAgeType(string age)
+        public async Task<int?> AddOrReturnAgeType(string age)
         {
             int result = 0;
 
@@ -74,7 +74,7 @@ namespace Infrastructure.Data.Repositories
                     age_type = age
                 };
                 _context.tb_age_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.age_type_id;
             }
@@ -86,7 +86,7 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int? AddOrReturnDistanceType(string distance)
+        public async Task<int?> AddOrReturnDistanceType(string distance)
         {
             int result = 0;
 
@@ -105,7 +105,7 @@ namespace Infrastructure.Data.Repositories
                     distance_type = distance
                 };
                 _context.tb_distance_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.distance_type_id;
             }
@@ -117,7 +117,7 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int? AddOrReturnGoingType(string going)
+        public async Task<int?> AddOrReturnGoingType(string going)
         {
             int result = 0;
 
@@ -136,7 +136,7 @@ namespace Infrastructure.Data.Repositories
                     going_type = going
                 };
                 _context.tb_going_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.going_type_id;
             }
@@ -148,7 +148,7 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int? AddOrReturnMeetingType(string meeting)
+        public async Task<int?> AddOrReturnMeetingType(string meeting)
         {
             int result = 0;
 
@@ -167,7 +167,7 @@ namespace Infrastructure.Data.Repositories
                     meeting_type = meeting
                 };
                 _context.tb_meeting_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.meeting_type_id;
             }
@@ -179,7 +179,7 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int? AddOrReturnStallsType(string stalls)
+        public async Task<int?> AddOrReturnStallsType(string stalls)
         {
             int result = 0;
 
@@ -198,7 +198,7 @@ namespace Infrastructure.Data.Repositories
                     stalls_type = stalls
                 };
                 _context.tb_stalls_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.stalls_type_id;
             }
@@ -210,7 +210,7 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int? AddOrReturnSurfaceType(string surface)
+        public async Task<int?> AddOrReturnSurfaceType(string surface)
         {
             int result = 0;
 
@@ -229,7 +229,7 @@ namespace Infrastructure.Data.Repositories
                     surface_type = surface
                 };
                 _context.tb_surface_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.surface_type_id;
             }
@@ -241,11 +241,11 @@ namespace Infrastructure.Data.Repositories
             return result;
         }
 
-        public int? AddOrReturnWeatherType(string weather)
+        public async Task<int?> AddOrReturnWeatherType(string weather)
         {
             int result = 0;
 
-            if (string.IsNullOrEmpty(weather)) 
+            if (string.IsNullOrEmpty(weather))
             {
                 return null;
             }
@@ -260,7 +260,7 @@ namespace Infrastructure.Data.Repositories
                     weather_type = weather
                 };
                 _context.tb_weather_type.Add(toAdd);
-                SaveChanges();
+                await SaveChanges();
 
                 result = toAdd.weather_type_id;
             }
@@ -273,11 +273,11 @@ namespace Infrastructure.Data.Repositories
         }
 
 
-        public void SaveChanges()
+        public async Task SaveChanges()
         {
             if (_configService.SavePermitted())
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
     }

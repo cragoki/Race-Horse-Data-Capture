@@ -2,29 +2,30 @@
 using Core.Enums;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Core.Interfaces.Data.Repositories
 {
     public interface IConfigurationRepository
     {
-        void AddBatch(BatchEntity batch);
+        Task AddBatch(BatchEntity batch);
         BatchEntity GetMostRecentBatch();
         BatchEntity GetNextBatch(Guid currentBatch);
         BatchEntity GetPreviousBatch(Guid currentBatch);
         BacklogDateEntity GetBacklogDate();
-        void UpdateBacklogDate(DateTime date);
+        Task UpdateBacklogDate(DateTime date);
         JobEntity GetJobInfo(JobEnum job);
         IEnumerable<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
-        void UpdateNextExecution(JobEnum job);
-        void DeleteFailedResult(FailedResultEntity entity);
+        Task UpdateNextExecution(JobEnum job);
+        Task DeleteFailedResult(FailedResultEntity entity);
         IEnumerable<FailedResultEntity> GetFailedResults();
-        void AddFailedResult(FailedResultEntity entity);
-        void AddFailedRace(FailedRaceEntity entity);
+        Task AddFailedResult(FailedResultEntity entity);
+        Task AddFailedRace(FailedRaceEntity entity);
         FailedRaceEntity GetFailedRace(int race_id);
         FailedResultEntity GetFailedResult(int id);
 
-        void UpdateFailedRace(FailedRaceEntity entity);
+        Task UpdateFailedRace(FailedRaceEntity entity);
         IEnumerable<FailedRaceEntity> GetFailedRaces();
-        void DeleteFailedRace(FailedRaceEntity entity);
+        Task DeleteFailedRace(FailedRaceEntity entity);
     }
 }

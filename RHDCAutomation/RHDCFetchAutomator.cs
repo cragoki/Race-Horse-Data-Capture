@@ -192,20 +192,21 @@ namespace RHDCAutomation
                                         try
                                         {
                                             //store in db
-                                            //Create new table for predictions
-                                            var algorithmPrediction = new AlgorithmPredictionEntity()
-                                            {
-                                                race_horse_id = prediction.value.RaceHorseId,
-                                                algorithm_id = activeAlgorithm.algorithm_id,
-                                                predicted_position = prediction.i + 1,
-                                                points = prediction.value.Points ?? 0,
-                                                points_description = prediction.value.PointsDescription,
-                                                horse_predictability = prediction.value.Predictability
-                                            };
-                                            await _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
-                                            if (prediction.value.Tracker != null)
+                                            if (prediction.value.Tracker != null && prediction.value.Tracker.race_horse_id != 0)
                                             {
                                                 await _algorithmService.AddAlgorithmTracker(prediction.value.Tracker);
+
+                                                //Create new table for predictions
+                                                var algorithmPrediction = new AlgorithmPredictionEntity()
+                                                {
+                                                    race_horse_id = prediction.value.RaceHorseId,
+                                                    algorithm_id = activeAlgorithm.algorithm_id,
+                                                    predicted_position = prediction.i + 1,
+                                                    points = prediction.value.Points ?? 0,
+                                                    points_description = prediction.value.PointsDescription,
+                                                    horse_predictability = prediction.value.Predictability
+                                                };
+                                                await _algorithmService.AddAlgorithmPrediction(algorithmPrediction);
                                             }
                                         }
                                         catch (Exception ex)
@@ -231,7 +232,7 @@ namespace RHDCAutomation
                         diagnostics.EllapsedTime = (diagnostics.TimeCompleted - diagnostics.TimeInitialized).TotalSeconds;
                         //Store Batch in the database
                         var diagnosticsString = JsonSerializer.Serialize(diagnostics);
-                        _configService.AddBatch(_batch, diagnosticsString);
+                        await _configService.AddBatch(_batch, diagnosticsString);
                         Console.WriteLine(diagnosticsString);
                         Console.WriteLine("-------------------------------------------------------------------------------------------------");
                         Console.WriteLine("-------------------------------------------------------------------------------------------------");

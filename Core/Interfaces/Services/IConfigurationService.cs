@@ -11,7 +11,7 @@ namespace Core.Interfaces.Services
     {
         RacingPostSettings GetRacingPostSettings();
         bool SavePermitted();
-        void AddBatch(Guid batchId, string diagnostics);
+        Task AddBatch(Guid batchId, string diagnostics);
         DateTime GetLastBackfillDate();
         Task UpdateBackfillDate(DateTime newDate);
         MailSettings GetMailSettings();
