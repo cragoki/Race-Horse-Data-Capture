@@ -230,7 +230,7 @@ namespace Core.Services
                     //tr class rp-horseTable__commentRow
                     //var comment = commentDivs[i].SelectSingleNode("td").InnerText;
 
-                    var horse = _horseRepository.GetHorseByRpId(horseId);
+                    var horse = await _horseRepository.GetHorseByRpId(horseId);
                     var toUpdate = raceHorses.Where(x => x.horse_id == horse.horse_id).FirstOrDefault();
 
                     try
@@ -352,7 +352,7 @@ namespace Core.Services
                     //tr class rp-horseTable__commentRow
                     var comment = commentDivs[i].SelectSingleNode("td").InnerText;
 
-                    var horse = _horseRepository.GetHorseByRpId(horseId);
+                    var horse = await _horseRepository.GetHorseByRpId(horseId);
 
                     if (horse != null && horse.horse_id == raceHorse.horse_id) 
                     {
@@ -576,9 +576,9 @@ namespace Core.Services
         private async Task<AddUpdateHorseModel> AddOrUpdateHorseData(HorseEntity horse, JockeyEntity jockey, TrainerEntity trainer)
         {
             var result = new AddUpdateHorseModel();
-            var existingHorse = _horseRepository.GetHorseByRpId(horse.rp_horse_id);
-            var existingJockey = _horseRepository.GetJockeyByName(jockey.jockey_name);
-            var existingTrainer = _horseRepository.GetTrainerByName(trainer.trainer_name);
+            var existingHorse = await _horseRepository.GetHorseByRpId(horse.rp_horse_id);
+            var existingJockey = await _horseRepository.GetJockeyByName(jockey.jockey_name);
+            var existingTrainer = await _horseRepository.GetTrainerByName(trainer.trainer_name);
 
             if (existingHorse != null)
             {

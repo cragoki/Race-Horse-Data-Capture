@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+
 namespace Infrastructure.Data.Repositories
 {
     public class HorseRepository : IHorseRepository
@@ -56,7 +58,7 @@ namespace Infrastructure.Data.Repositories
                         .ThenInclude(x => x.RaceHorses)
                             .ThenInclude(x => x.Horse).FirstOrDefault();
         }
-        public HorseEntity GetHorseByRpId(int rp_id)
+        public async Task<HorseEntity> GetHorseByRpId(int rp_id)
         {
             var result = _context.tb_horse.Include(x => x.Archive).Where(x => x.rp_horse_id == rp_id).ToList().FirstOrDefault();
             return result;
@@ -129,7 +131,7 @@ namespace Infrastructure.Data.Repositories
             return trainer.trainer_id;
         }
 
-        public JockeyEntity GetJockeyByName(string name)
+        public async Task<JockeyEntity> GetJockeyByName(string name)
         {
             return _context.tb_jockey.Where(x => x.jockey_name == name).ToList().FirstOrDefault();
         }
@@ -138,7 +140,7 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_jockey.Where(x => x.jockey_id == id).ToList().FirstOrDefault();
         }
-        public TrainerEntity GetTrainerByName(string name)
+        public async Task<TrainerEntity> GetTrainerByName(string name)
         {
             return _context.tb_trainer.Where(x => x.trainer_name == name).FirstOrDefault();
         }

@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Core.Interfaces.Data.Repositories
 {
@@ -14,15 +15,15 @@ namespace Core.Interfaces.Data.Repositories
         HorseEntity GetHorse(int horse_id);
         HorseEntity GetHorseWithRaces(int horse_id);
         List<HorseArchiveEntity> GetHorseArchive(int horse_id);
-        HorseEntity GetHorseByRpId(int rp_id);
+        Task<HorseEntity> GetHorseByRpId(int rp_id);
         void SaveChanges();
         void UpdateHorse(HorseEntity horse);
         void UpdateHorseArchive(HorseArchiveEntity horse);
         int AddJockey(JockeyEntity jockey);
         int AddTrainer(TrainerEntity trainer);
-        JockeyEntity GetJockeyByName(string name);
+        Task<JockeyEntity> GetJockeyByName(string name);
         JockeyEntity GetJockeyById(int id);
-        TrainerEntity GetTrainerByName(string name);
+        Task<TrainerEntity> GetTrainerByName(string name);
         TrainerEntity GetTrainerById(int id);
         IEnumerable<RaceEntity> GetNoResultRaces();
         IEnumerable<RaceHorseEntity> GetAllRacesForHorse(int horse_id);
