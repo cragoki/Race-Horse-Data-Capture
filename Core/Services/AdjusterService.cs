@@ -182,14 +182,12 @@ namespace Core.Services
                 bool isCourseAnalysis = false;
                 //Get Sequences from sequence table where the batch_id does not exist in analysis table
                 var sequences = await _algorithmService.GetSequenceAnalysis();
-                var existingBatches = sequences.Where(x => x.is_complete).Select(x => x.batch_id);
+                var existingBatches = sequences.Where(x => x.is_complete && x.last_checked <= DateTime.Now.AddDays(15)).Select(x => x.batch_id);
                 var batches = await _algorithmService.GetAlgorithmVariableSequence();
                 var batch = batches.OrderByDescending(x => x.percentage_correct).FirstOrDefault(x => !existingBatches.Contains(x.batch_id));
 
                 //Get the algorithm settings from the top one batch ordered by percentage_correct desc
                 var settings = await _algorithmService.GetArchivedSettingsForBatch(batch.batch_id);
-
-
 
                 //Update the existing algorithm settings to those of the sequence
                 var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.MyModel);
@@ -218,7 +216,6 @@ namespace Core.Services
                 //Get all event data within the past 2 months (test this locally with just .take 1 on the repo method)
                 var events = await _eventService.GetLastTwoMonthsEvents();
                 var sequence = new SequenceAnalysisEntity();
-
                 if (sequences.Where(x => x.batch_id == batch.batch_id).Count() > 0)
                 {
                     //In this case we would be running the course analysis and then setting the sequence to iscomplete = true after finishing
@@ -228,6 +225,7 @@ namespace Core.Services
                 else
                 {
                     sequence.batch_id = batch.batch_id;
+                    sequence.last_checked = DateTime.Now;
                 }
 
                 if (isCourseAnalysis) 
