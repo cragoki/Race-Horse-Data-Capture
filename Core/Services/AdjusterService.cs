@@ -62,7 +62,7 @@ namespace Core.Services
 
                         //If we have data for 40% of the horses in the race
                         decimal? fortyPercent = race.no_of_horses * 0.4M;
-                        if (prediction.Count(x => x.Points != 0) < Decimal.Round(fortyPercent.Value))
+                        if (prediction.Count(x => x.Points != 0) >= Decimal.Round(fortyPercent.Value))
                         {
                             continue;
                         }
@@ -267,7 +267,7 @@ namespace Core.Services
                         }
                         //If we have data for 40% of the horses in the race
                         decimal? fortyPercent = race.no_of_horses * 0.4M;
-                        if (prediction.Count(x => x.Points != 0) < Decimal.Round(fortyPercent.Value))
+                        if (prediction.Count(x => x.Points != 0) >= Decimal.Round(fortyPercent.Value))
                         {
                             continue;
                         }
