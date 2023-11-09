@@ -1,13 +1,11 @@
 ﻿@page "/Races/AdminPage"
 @using AdminPunter.Pages.Components
-@using Core.Enums
 @using Core.Interfaces.Services;
 
 <PageTitle>Admin</PageTitle>
 
 @inject IAdminAlgorithmService algorithmService;
 @inject IAdminRaceService adminRaceService;
-@inject IConfigurationService configService;
 
 
 @if (isLoading)
@@ -26,23 +24,11 @@
         </div>
     </div>
 }
-
 <div class="row">
-    <div class="col-lg-6">
-       <input value="Get Missing Data" type="button" class="btn btn-primary" @onclick="@(e => @GetMissingData())" />
-    </div>
-    <div class="col-lg-6">
-        @if (adjusterRunning)
-        {
-            <input value= "Stop Algorithm Adjuster" type="button" class="btn btn-primary" @onclick="@(e => @ToggleAdjuster())" />
-        }
-        else
-        {
-            <input value="Run Algorithm Adjuster" type="button" class="btn btn-primary" @onclick="@(e => @ToggleAdjuster())" />
-        }
+    <div class="col-lg-12">
+        <input value="Get Missing Data" type="button" class="btn btn-primary" @onclick="@(e => @GetMissingData())" />
     </div>
 </div>
-
 <div class="row">
     <div class="col-lg-12">
         <input class="form-attr" placeholder="Race Horse Ids" @bind="@raceHorseIds"/>
@@ -115,7 +101,6 @@
     }
 </div>
 @code {
-    bool adjusterRunning = false;
     bool isLoading = false;
     string error = "";
     private List<FailedResultsViewModel> FailedResults;
@@ -126,7 +111,6 @@
     {
         FailedResults = algorithmService.GetFailedResultsTable();
         FailedRaces = algorithmService.GetFailedRacesTable();
-        await CheckAdjuster();
     }
 
     private async Task GetMissingData()
@@ -137,12 +121,6 @@
         error = $"Processed {processed} Race Horse Results";
         raceHorseIds = "";
         isLoading = false;
-    }
-
-    private async Task ToggleAdjuster()
-    {
-        await configService.UpdateJob(JobEnum.rhdcalgorithmadjuster);
-        await CheckAdjuster();
     }
 
     private async Task<bool> RetryGetRace(FailedRacesViewModel failedRace)
@@ -193,19 +171,5 @@
         FailedResults = algorithmService.GetFailedResultsTable();
 
         return result;
-    }
-
-    private async Task CheckAdjuster()
-    {    
-        var adjuster = await configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
-
-        if (adjuster.start == true)
-        {
-            adjusterRunning = true;
-        }
-        else
-        {
-            adjusterRunning = false;
-        }
     }
 }

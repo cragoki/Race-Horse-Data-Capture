@@ -35,7 +35,7 @@ namespace RHDCMachineLearning
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
+            bool isFirstInSequence = true;
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var job = await _configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
@@ -55,7 +55,8 @@ namespace RHDCMachineLearning
                             if (job.mode == AlgorithmModeEnum.Adjust)
                             {
                             Console.WriteLine($"Running in Adjust Mode");
-                            await _adjusterService.AdjustAlgorithmSettings();
+                            await _adjusterService.AdjustAlgorithmSettings(isFirstInSequence);
+                            isFirstInSequence = false;
                             }
                             else if (job.mode == AlgorithmModeEnum.Analyse)
                             {

@@ -26,7 +26,7 @@ namespace Core.Services
             _myModel = myModel;
         }
 
-        public async Task AdjustAlgorithmSettings()
+        public async Task AdjustAlgorithmSettings(bool isFirstInSequence)
         {
             _batch = Guid.NewGuid();
             var result = new AlgorithmVariableSequenceEntity();
@@ -104,7 +104,7 @@ namespace Core.Services
                 result.percentage_correct = percentageCorrect;
                 result.no_of_races = rankings.Count();
                 result.batch_id = _batch;
-                result.is_first_in_sequence = true;
+                result.is_first_in_sequence = isFirstInSequence;
                 result.date = DateTime.Now;
 
 

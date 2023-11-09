@@ -4,7 +4,7 @@ namespace Core.Interfaces.Services
 {
     public interface IAdjusterService
     {
-        Task AdjustAlgorithmSettings();
+        Task AdjustAlgorithmSettings(bool isFirstInSequence);
         Task AnalyseAlgorithmSettings();
     }
 }
