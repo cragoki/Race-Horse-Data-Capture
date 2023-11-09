@@ -2,6 +2,7 @@
 using Core.Enums;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Services;
+using Core.Models.GetRace;
 using Core.Models.MachineLearning;
 using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -17,13 +18,16 @@ namespace Core.Services
         private readonly IEventService _eventService;
         private readonly IAlgorithmService _algorithmService;
         private IMyModel _myModel;
+        private IBentnersModel _bentnersModel;
+
         private static Guid _batch;
 
-        public AdjusterService(IEventService eventService, IAlgorithmService algorithmService, IMyModel myModel)
+        public AdjusterService(IEventService eventService, IAlgorithmService algorithmService, IMyModel myModel, IBentnersModel bentnersModel)
         {
             _eventService = eventService;
             _algorithmService = algorithmService;
             _myModel = myModel;
+            _bentnersModel = bentnersModel;
         }
 
         public async Task AdjustAlgorithmSettings(bool isFirstInSequence)
@@ -38,6 +42,7 @@ namespace Core.Services
 
             try
             {
+                var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
                 var rankings = new List<VariableAnalysisModel>();
                 foreach (var even in events)
                 {
@@ -53,7 +58,15 @@ namespace Core.Services
 
                         Console.WriteLine($"Running Algorithm at {DateTime.Now}");
 
-                        prediction = await _myModel.RunModel(race);
+                        switch (activeAlgorithm.algorithm_id)
+                        {
+                            case (int)AlgorithmEnum.BentnersModel:
+                                    prediction = await _bentnersModel.RunModel(race);
+                                break;
+                            case (int)AlgorithmEnum.MyModel:
+                                    prediction = await _myModel.RunModel(race);
+                                break;
+                        }
 
                         if (prediction == null || prediction.Count() == 0)
                         {
@@ -104,6 +117,7 @@ namespace Core.Services
                 result.percentage_correct = percentageCorrect;
                 result.no_of_races = rankings.Count();
                 result.batch_id = _batch;
+                result.algorithm_id = activeAlgorithm.algorithm_id;
                 result.is_first_in_sequence = isFirstInSequence;
                 result.date = DateTime.Now;
 
@@ -120,13 +134,35 @@ namespace Core.Services
                 .OrderByDescending(x => x.Points)
                 .ToList();
 
-                var topTier = aggregatedRankings.Take(3).Select(x => x.AlgorithmVariable); //Plus 0.25
-                var secondTier = aggregatedRankings.Skip(3).Take(4).Select(x => x.AlgorithmVariable);//Plus 0.1
-                var noChange = aggregatedRankings.Skip(7).Take(5).Select(x => x.AlgorithmVariable);//No Change
-                var lowerTier = aggregatedRankings.Skip(12).Take(5).Select(x => x.AlgorithmVariable);//Minus 0.1
-                var bottomTier = aggregatedRankings.Skip(17).Take(2).Select(x => x.AlgorithmVariable); //Minus 0.25
+                var topTier = new List<AlgorithmSettingEnum>();
+                var secondTier = new List<AlgorithmSettingEnum>();
+                var noChange = new List<AlgorithmSettingEnum>();
+                var lowerTier = new List<AlgorithmSettingEnum>();
+                var bottomTier = new List<AlgorithmSettingEnum>();
 
-                var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.MyModel);
+
+                switch (activeAlgorithm.algorithm_id) 
+                {
+                    case (int)AlgorithmEnum.MyModel:
+                            topTier = aggregatedRankings.Take(3).Select(x => x.AlgorithmVariable).ToList(); //Plus 0.25
+                            secondTier = aggregatedRankings.Skip(3).Take(4).Select(x => x.AlgorithmVariable).ToList();//Plus 0.1
+                            noChange = aggregatedRankings.Skip(7).Take(5).Select(x => x.AlgorithmVariable).ToList();//No Change
+                            lowerTier = aggregatedRankings.Skip(12).Take(5).Select(x => x.AlgorithmVariable).ToList();//Minus 0.1
+                            bottomTier = aggregatedRankings.Skip(17).Take(2).Select(x => x.AlgorithmVariable).ToList(); //Minus 0.25
+                    break;
+                    case (int)AlgorithmEnum.BentnersModel:
+                        topTier = aggregatedRankings.Take(1).Select(x => x.AlgorithmVariable).ToList(); //Plus 0.25
+                        secondTier = aggregatedRankings.Skip(1).Take(1).Select(x => x.AlgorithmVariable).ToList();//Plus 0.1
+                        noChange = aggregatedRankings.Skip(2).Take(1).Select(x => x.AlgorithmVariable).ToList();//No Change
+                        lowerTier = aggregatedRankings.Skip(3).Take(1).Select(x => x.AlgorithmVariable).ToList();//Minus 0.1
+                        bottomTier = aggregatedRankings.Skip(4).Take(1).Select(x => x.AlgorithmVariable).ToList(); //Minus 0.25
+                    break;
+                }
+
+
+                var algorithmSettings =  await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
+
+
 
                 //Archive existing settings
                 await _algorithmService.ArchiveAlgorithmSettings(algorithmSettings, _batch);
@@ -181,6 +217,7 @@ namespace Core.Services
         {
             try 
             {
+                var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
                 var rankings = new List<VariableAnalysisModel>();
                 bool isCourseAnalysis = false;
                 //Get Sequences from sequence table where the batch_id does not exist in analysis table
@@ -193,28 +230,7 @@ namespace Core.Services
                 var settings = await _algorithmService.GetArchivedSettingsForBatch(batch.batch_id);
 
                 //Update the existing algorithm settings to those of the sequence
-                var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm((int)AlgorithmEnum.MyModel);
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_class.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_class.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dg.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dg.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dgc.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_surface.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_jockey.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_jockey.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.consistency_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.consistency_bonus.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.class_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.class_bonus.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.time_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.time_bonus.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.weight_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.weight_bonus.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_track.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_going.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_distance.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_class.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_class.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dg.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dg.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value;
-                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value;
-
-                await _algorithmService.UpdateAlgorithmSettings(algorithmSettings);
+                await _algorithmService.AdjustAlgorithmSettings(batch.batch_id, activeAlgorithm);
 
                 //Get all event data within the past 2 months (test this locally with just .take 1 on the repo method)
                 var events = await _eventService.GetLastTwoMonthsEvents();
@@ -229,6 +245,7 @@ namespace Core.Services
                 {
                     sequence.batch_id = batch.batch_id;
                     sequence.last_checked = DateTime.Now;
+                    sequence.algorithm_id = activeAlgorithm.algorithm_id;
                 }
 
                 if (isCourseAnalysis) 
@@ -259,7 +276,15 @@ namespace Core.Services
 
                         Console.WriteLine($"Running Algorithm at {DateTime.Now}");
 
-                        prediction = await _myModel.RunModel(race);
+                        switch (activeAlgorithm.algorithm_id)
+                        {
+                            case (int)AlgorithmEnum.MyModel:
+                                    prediction = await _myModel.RunModel(race);
+                                break;
+                            case (int)AlgorithmEnum.BentnersModel:
+                                    prediction = await _bentnersModel.RunModel(race);
+                                break;
+                        }
 
                         if (prediction == null || prediction.Count() == 0)
                         {
@@ -278,7 +303,7 @@ namespace Core.Services
                             var algorithmPrediction = new AlgorithmPredictionEntity()
                             {
                                 race_horse_id = p.value.RaceHorseId,
-                                algorithm_id = (int)AlgorithmEnum.MyModel,
+                                algorithm_id = activeAlgorithm.algorithm_id,
                                 predicted_position = p.i + 1,
                                 points = p.value.Points ?? 0,
                                 points_description = p.value.PointsDescription,
@@ -311,7 +336,7 @@ namespace Core.Services
                 {
                     sequence.percentage_correct_with_course_adjustment = percentageCorrect;
                     sequence.is_complete = true;
-
+                    sequence.no_of_races_with_adjustment = rankings.Count();
                     //Update Sequence
                     await _algorithmService.UpdateSequenceAnalysis(sequence);
                 }
@@ -333,6 +358,7 @@ namespace Core.Services
 
                     sequence.percentage_correct = percentageCorrect;
                     sequence.is_complete = false;
+                    sequence.no_of_races = rankings.Count();
 
                     //Add Sequence and batches
                     await _algorithmService.AddSequenceAnalysis(sequence);

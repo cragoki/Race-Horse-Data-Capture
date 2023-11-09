@@ -54,14 +54,14 @@ namespace RHDCMachineLearning
                         {
                             if (job.mode == AlgorithmModeEnum.Adjust)
                             {
-                            Console.WriteLine($"Running in Adjust Mode");
-                            await _adjusterService.AdjustAlgorithmSettings(isFirstInSequence);
-                            isFirstInSequence = false;
+                                Console.WriteLine($"Running in Adjust Mode");
+                                await _adjusterService.AdjustAlgorithmSettings(isFirstInSequence);
+                                isFirstInSequence = false;
                             }
                             else if (job.mode == AlgorithmModeEnum.Analyse)
                             {
-                            Console.WriteLine($"Running in Analyse Mode");
-                            await _adjusterService.AnalyseAlgorithmSettings();
+                                Console.WriteLine($"Running in Analyse Mode");
+                                await _adjusterService.AnalyseAlgorithmSettings();
                             }
                         }
                         catch (Exception ex)

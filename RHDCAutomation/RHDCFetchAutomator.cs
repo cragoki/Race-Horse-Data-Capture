@@ -122,28 +122,7 @@ namespace RHDCAutomation
 
                                 var settings = await _algorithmService.GetArchivedSettingsForBatch(activeAlgorithm.active_batch.Value);
                                 //Reset Algorithm settings
-                                var algorithmSettings = _configService.GetAlgorithmSettings((int)AlgorithmEnum.MyModel);
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_class.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_class.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dg.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dg.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dgc.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_surface.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_jockey.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_jockey.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.consistency_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.consistency_bonus.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.class_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.class_bonus.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.time_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.time_bonus.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.weight_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.weight_bonus.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_track.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_going.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_distance.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_class.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_class.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dg.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dg.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value;
-                                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value;
-                                await _algorithmService.UpdateAlgorithmSettings(algorithmSettings);
-
+                                await _algorithmService.AdjustAlgorithmSettings(activeAlgorithm.active_batch.Value, activeAlgorithm);
 
                                 var coursesForThisBatch = await _algorithmService.GetSequenceCourseAccuracy(activeAlgorithm.active_batch.Value);
                                 var validCourses = coursesForThisBatch.Where(x => x.percentage_correct >= 60).Select(x => x.course_id).ToList();

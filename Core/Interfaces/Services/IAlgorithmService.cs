@@ -28,5 +28,6 @@ namespace Core.Interfaces.Services
         Task AddSequenceAnalysis(SequenceAnalysisEntity entity);
         Task UpdateSequenceAnalysis(SequenceAnalysisEntity entity);
         Task AddCourseAccuracy(List<SequenceCourseAccuracyEntity> entites);
+        Task AdjustAlgorithmSettings(Guid batch_id, AlgorithmEntity activeAlgorithm);
     }
 }

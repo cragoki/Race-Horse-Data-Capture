@@ -9,6 +9,7 @@ using Core.Models.MachineLearning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -252,6 +253,7 @@ namespace Core.Services
             result.IsComplete = false;
             try
             {
+                var activeAlgorithm = GetActiveAlgorithm();
                 //Check if placed.
                 var placedPositions = SharedCalculations.GetTake(race.no_of_horses ?? 0);
                 var horsesWithTrackers = trackers.Where(x => x != null).Select(x => x.race_horse_id);
@@ -273,7 +275,7 @@ namespace Core.Services
                 {
                     //Placed
                     result.IsCorrect = true;
-                    result.Rankings = DetermineVariableRankings(tracker);
+                    result.Rankings = DetermineVariableRankings(tracker, (AlgorithmEnum)activeAlgorithm.algorithm_id);
                     result.RaceType = race.Event.meeting_type;
                 }
                 else
@@ -311,7 +313,7 @@ namespace Core.Services
                         accumulatedTracker.points_rf_surface += placedHorseTracker.points_rf_surface;
                     }
 
-                    result.Rankings = DetermineVariableRankings(accumulatedTracker);
+                    result.Rankings = DetermineVariableRankings(accumulatedTracker, (AlgorithmEnum)activeAlgorithm.algorithm_id);
                 }
             }
             catch (Exception ex)
@@ -421,6 +423,49 @@ namespace Core.Services
             }
         }
 
+        public async Task AdjustAlgorithmSettings(Guid batch_id, AlgorithmEntity activeAlgorithm ) 
+        {
+            var settings = await GetArchivedSettingsForBatch(batch_id);
+
+            //Update the existing algorithm settings to those of the sequence
+            var algorithmSettings = await GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
+
+            if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.MyModel)
+            {
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_track.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_going.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_distance.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_class.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_class.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dg.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dg.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_dgc.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_surface.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_jockey.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.xp_jockey.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.consistency_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.consistency_bonus.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.class_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.class_bonus.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.time_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.time_bonus.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.weight_bonus.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.weight_bonus.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_track.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_track.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_going.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_going.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_distance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_distance.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_class.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_class.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dg.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dg.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value;
+            }
+            else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel) 
+            {
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityPastPerformance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityPastPerformance.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityAdjustmentsPastPerformance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityAdjustmentsPastPerformance.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityPresentRaceFactors.ToString()).setting_value;
+                algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityHorsePreferences.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityHorsePreferences.ToString()).setting_value;
+
+            }
+
+
+            await UpdateAlgorithmSettings(algorithmSettings);
+        }
+
         private List<string> MyModelProperies = new List<string>()
         {
         "points_xp_track",
@@ -444,20 +489,41 @@ namespace Core.Services
         "points_rf_surface"
         };
 
+        private List<string> BentnersModelProperies = new List<string>()
+        {
+            "reliabilityCurrentCondition",
+            "reliabilityPastPerformance",
+            "reliabilityAdjustmentsPastPerformance",
+            "reliabilityPresentRaceFactors",
+            "reliabilityHorsePreferences"
+        };
+
         private class PropertyValuePair
         {
             public string PropertyName { get; set; }
             public decimal? PropertyValue { get; set; }
         }
 
-        private List<VariableRankings> DetermineVariableRankings(AlgorithmTrackerEntity tracker)
+        private List<VariableRankings> DetermineVariableRankings(AlgorithmTrackerEntity tracker, AlgorithmEnum algorithm)
         {
             var rankings = new List<VariableRankings>();
             var result = new List<PropertyValuePair>();
             //19 Variables
             //So winner = 18 points, all the way down to loser which gets 0 points
-            var points = 18;
-            var properties = tracker.GetType().GetProperties().Where(x => MyModelProperies.Contains(x.Name));
+            //14 for bentners
+            var points = 0;
+            var properties = new List<PropertyInfo>();
+            if (algorithm == AlgorithmEnum.BentnersModel)
+            {
+                properties = tracker.GetType().GetProperties().Where(x => BentnersModelProperies.Contains(x.Name)).ToList();
+                points = 5;
+            }
+            else if (algorithm == AlgorithmEnum.MyModel)
+            {
+                properties = tracker.GetType().GetProperties().Where(x => MyModelProperies.Contains(x.Name)).ToList();
+                points = 18;
+
+            }
 
             foreach (var property in properties)
             {
@@ -473,7 +539,7 @@ namespace Core.Services
             {
                 rankings.Add(new VariableRankings()
                 {
-                    AlgorithmVariable = Enum.Parse<AlgorithmSettingEnum>(rank.PropertyName.Replace("points_", "")),
+                    AlgorithmVariable = algorithm == AlgorithmEnum.MyModel ? Enum.Parse<AlgorithmSettingEnum>(rank.PropertyName.Replace("points_", "")) : Enum.Parse<AlgorithmSettingEnum>(rank.PropertyName),
                     Points = points
                 });
 
