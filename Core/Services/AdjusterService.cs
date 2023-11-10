@@ -75,7 +75,7 @@ namespace Core.Services
 
                         //If we have data for 40% of the horses in the race
                         decimal? fortyPercent = race.no_of_horses * 0.4M;
-                        if (prediction.Count(x => x.Points != 0) >= Decimal.Round(fortyPercent.Value))
+                        if (prediction.Count(x => x.Points != 0) < Decimal.Round(fortyPercent.Value))
                         {
                             continue;
                         }
@@ -112,7 +112,7 @@ namespace Core.Services
                 }
 
                 //Determine the % correct and add to DB
-                var percentageCorrect = (decimal)((double)rankings.Count(x => x.IsCorrect) / rankings.Count()) * 100;
+                var percentageCorrect = (decimal)((double)rankings.Count(x => x.IsCorrect) / (double)rankings.Count()) * 100;
                 Console.WriteLine($"Percentage Correct = {percentageCorrect}");
                 result.percentage_correct = percentageCorrect;
                 result.no_of_races = rankings.Count();
@@ -292,7 +292,7 @@ namespace Core.Services
                         }
                         //If we have data for 40% of the horses in the race
                         decimal? fortyPercent = race.no_of_horses * 0.4M;
-                        if (prediction.Count(x => x.Points != 0) >= Decimal.Round(fortyPercent.Value))
+                        if (prediction.Count(x => x.Points != 0) < Decimal.Round(fortyPercent.Value))
                         {
                             continue;
                         }
@@ -328,7 +328,7 @@ namespace Core.Services
                     }
                 }
 
-                var percentageCorrect = (decimal)((double)rankings.Count(x => x.IsCorrect) / rankings.Count()) * 100;
+                var percentageCorrect = (decimal)((double)rankings.Count(x => x.IsCorrect) / (double)rankings.Count()) * 100;
                 Console.WriteLine($"Percentage Correct = {percentageCorrect}");
 
                 //Add the course accuracy entity to the list

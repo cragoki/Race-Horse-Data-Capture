@@ -292,25 +292,41 @@ namespace Core.Services
                         {
                             continue;
                         }
-                        accumulatedTracker.points_xp_track += placedHorseTracker.points_xp_track;
-                        accumulatedTracker.points_xp_going += placedHorseTracker.points_xp_going;
-                        accumulatedTracker.points_xp_distance += placedHorseTracker.points_xp_distance;
-                        accumulatedTracker.points_xp_class += placedHorseTracker.points_xp_class;
-                        accumulatedTracker.points_xp_dg += placedHorseTracker.points_xp_dg;
-                        accumulatedTracker.points_xp_dgc += placedHorseTracker.points_xp_dgc;
-                        accumulatedTracker.points_xp_surface += placedHorseTracker.points_xp_surface;
-                        accumulatedTracker.points_xp_jockey += placedHorseTracker.points_xp_jockey;
-                        accumulatedTracker.points_consistency_bonus += placedHorseTracker.points_consistency_bonus;
-                        accumulatedTracker.points_class_bonus += placedHorseTracker.points_class_bonus;
-                        accumulatedTracker.points_time_bonus += placedHorseTracker.points_time_bonus;
-                        accumulatedTracker.points_weight_bonus += placedHorseTracker.points_weight_bonus;
-                        accumulatedTracker.points_rf_track += placedHorseTracker.points_rf_track;
-                        accumulatedTracker.points_rf_going += placedHorseTracker.points_rf_going;
-                        accumulatedTracker.points_rf_distance += placedHorseTracker.points_rf_distance;
-                        accumulatedTracker.points_rf_class += placedHorseTracker.points_rf_class;
-                        accumulatedTracker.points_rf_dg += placedHorseTracker.points_rf_dg;
-                        accumulatedTracker.points_rf_dgc += placedHorseTracker.points_rf_dgc;
-                        accumulatedTracker.points_rf_surface += placedHorseTracker.points_rf_surface;
+
+                        if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.MyModel)
+                        {
+                            accumulatedTracker.points_xp_track += placedHorseTracker.points_xp_track;
+                            accumulatedTracker.points_xp_going += placedHorseTracker.points_xp_going;
+                            accumulatedTracker.points_xp_distance += placedHorseTracker.points_xp_distance;
+                            accumulatedTracker.points_xp_class += placedHorseTracker.points_xp_class;
+                            accumulatedTracker.points_xp_dg += placedHorseTracker.points_xp_dg;
+                            accumulatedTracker.points_xp_dgc += placedHorseTracker.points_xp_dgc;
+                            accumulatedTracker.points_xp_surface += placedHorseTracker.points_xp_surface;
+                            accumulatedTracker.points_xp_jockey += placedHorseTracker.points_xp_jockey;
+                            accumulatedTracker.points_consistency_bonus += placedHorseTracker.points_consistency_bonus;
+                            accumulatedTracker.points_class_bonus += placedHorseTracker.points_class_bonus;
+                            accumulatedTracker.points_time_bonus += placedHorseTracker.points_time_bonus;
+                            accumulatedTracker.points_weight_bonus += placedHorseTracker.points_weight_bonus;
+                            accumulatedTracker.points_rf_track += placedHorseTracker.points_rf_track;
+                            accumulatedTracker.points_rf_going += placedHorseTracker.points_rf_going;
+                            accumulatedTracker.points_rf_distance += placedHorseTracker.points_rf_distance;
+                            accumulatedTracker.points_rf_class += placedHorseTracker.points_rf_class;
+                            accumulatedTracker.points_rf_dg += placedHorseTracker.points_rf_dg;
+                            accumulatedTracker.points_rf_dgc += placedHorseTracker.points_rf_dgc;
+                            accumulatedTracker.points_rf_surface += placedHorseTracker.points_rf_surface;
+                        }
+                        else 
+                        {
+                            accumulatedTracker.total_points_for_get_current_condition += placedHorseTracker.total_points_for_get_current_condition;
+                            accumulatedTracker.total_points_for_past_performance += placedHorseTracker.total_points_for_past_performance;
+                            accumulatedTracker.points_given_for_jockey += placedHorseTracker.points_given_for_jockey; //reliabilityPresentRaceFactors
+                            accumulatedTracker.points_given_for_trainer += placedHorseTracker.points_given_for_trainer; //reliabilityPresentRaceFactors
+                            accumulatedTracker.total_points_for_specific_track += placedHorseTracker.total_points_for_specific_track; //reliabilityHorsePreferences
+                            accumulatedTracker.total_points_for_distance += placedHorseTracker.total_points_for_distance; //reliabilityHorsePreferences
+                            accumulatedTracker.total_points_for_race_type += placedHorseTracker.total_points_for_race_type; //reliabilityHorsePreferences
+                            accumulatedTracker.total_points_for_going += placedHorseTracker.total_points_for_going; //reliabilityHorsePreferences
+                        }
+
                     }
 
                     result.Rankings = DetermineVariableRankings(accumulatedTracker, (AlgorithmEnum)activeAlgorithm.algorithm_id);
