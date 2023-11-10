@@ -56,7 +56,7 @@ namespace Infrastructure.PunterAdmin.Services
                 var checkIfFirst = _configRepo.GetPreviousBatch(batch.batch_id);
                 var checkIfLast = (batch.date.Date == DateTime.Now.Date);
                 //Get Events linked to that batch
-                var events = _eventRepository.GetEventsByBatch(batch.batch_id);
+                var events = _eventRepository.GetEventsByBatch(batch.batch_id).ToList();
 
                 //foreach event in events
                 foreach (var ev in events)
@@ -378,7 +378,10 @@ namespace Infrastructure.PunterAdmin.Services
         private List<RaceHorseViewModel> BuildRaceHorseViewModel(List<RaceHorseEntity> raceHorses, EventEntity even) 
         {
             var result = new List<RaceHorseViewModel>();
-
+            if (raceHorses.Count() == 0) 
+            {
+                return result;
+            }
             foreach (var raceHorse in raceHorses)
             {
                 var racePredictedPosition = 0;

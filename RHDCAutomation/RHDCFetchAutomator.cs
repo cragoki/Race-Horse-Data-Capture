@@ -124,18 +124,11 @@ namespace RHDCAutomation
                                 //Reset Algorithm settings
                                 await _algorithmService.AdjustAlgorithmSettings(activeAlgorithm.active_batch.Value, activeAlgorithm);
 
-                                var coursesForThisBatch = await _algorithmService.GetSequenceCourseAccuracy(activeAlgorithm.active_batch.Value);
-                                var validCourses = coursesForThisBatch.Where(x => x.percentage_correct >= 60).Select(x => x.course_id).ToList();
                                 var eventEntities = await _eventService.GetEventsFromDatabase();
                                 foreach (var even in eventEntities)
                                 {
                                     var races = await _eventService.GetRacesFromDatabaseForAlgorithm(even.event_id);
 
-                                    //filter events down so that we only analyse those which are accurate enough for this batch
-                                    if (!validCourses.Contains(even.course_id))
-                                    {
-                                        continue;
-                                    }
                                     foreach (var race in races)
                                     {
                                         var prediction = new List<FormResultModel>();
