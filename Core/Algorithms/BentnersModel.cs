@@ -505,7 +505,7 @@ namespace Core.Algorithms
 
             if (racesAtCourse.Count() > 0)
             {
-                var pointsForEachC1 = FormatHelper.ToTwoPlaces((pointsForEachCondition / racesAtCourse.Count()));
+                var pointsForEachC1 = pointsForEachCondition;
 
                 foreach (var condition1 in racesAtCourse)
                 {
@@ -518,6 +518,7 @@ namespace Core.Algorithms
                         tracker.GetHorsePreferencesDescription += $"--plus {FormatHelper.ToTwoPlaces((pointsForEachC1))} for placing race at Track--";
                         result += FormatHelper.ToTwoPlaces((pointsForEachC1));
                     }
+                    pointsForEachC1 = pointsForEachC1 * 0.75M;
                 }
             }
 
@@ -526,7 +527,7 @@ namespace Core.Algorithms
 
             if (racesAtDistanceGroup.Count() > 0)
             {
-                var pointsForEachC2 = FormatHelper.ToTwoPlaces((pointsForEachCondition / racesAtDistanceGroup.Count()));
+                var pointsForEachC2 = pointsForEachCondition;
 
                 foreach (var condition2 in racesAtDistanceGroup)
                 {
@@ -539,6 +540,8 @@ namespace Core.Algorithms
                         tracker.GetHorsePreferencesDescription += $"--plus {FormatHelper.ToTwoPlaces((pointsForEachC2))} for placing race at Distance--";
                         result += FormatHelper.ToTwoPlaces((pointsForEachC2));
                     }
+
+                    pointsForEachC2 = pointsForEachC2 * 0.75M;
                 }
             }
 
@@ -549,7 +552,7 @@ namespace Core.Algorithms
 
                 if (racesAtRaceType.Count() > 0)
                 {
-                    var pointsForEachC3 = FormatHelper.ToTwoPlaces((pointsForEachCondition / racesAtRaceType.Count()));
+                    var pointsForEachC3 = pointsForEachCondition;
 
                     foreach (var condition3 in racesAtRaceType)
                     {
@@ -563,6 +566,8 @@ namespace Core.Algorithms
                             tracker.GetHorsePreferencesDescription += $"--plus {FormatHelper.ToTwoPlaces((pointsForEachC3))} for placing race at Race Type--";
                             result += FormatHelper.ToTwoPlaces((pointsForEachC3));
                         }
+
+                        pointsForEachC3 = pointsForEachC3 * 0.75M;
                     }
                 }
             }
@@ -572,7 +577,7 @@ namespace Core.Algorithms
 
             if (racesAtGoingGroup.Count() > 0)
             {
-                var pointsForEachC4 = FormatHelper.ToTwoPlaces((pointsForEachCondition / racesAtGoingGroup.Count()));
+                var pointsForEachC4 = pointsForEachCondition;
                 foreach (var condition4 in racesAtGoingGroup)
                 {
                     var cRace = condition4.Race;
@@ -584,6 +589,8 @@ namespace Core.Algorithms
                         tracker.GetHorsePreferencesDescription += $"--plus {FormatHelper.ToTwoPlaces((pointsForEachC4))} for placing race at Going--";
                         result += FormatHelper.ToTwoPlaces((pointsForEachC4));
                     }
+
+                    pointsForEachC4 = pointsForEachC4 * 0.75M;
                 }
             }
 

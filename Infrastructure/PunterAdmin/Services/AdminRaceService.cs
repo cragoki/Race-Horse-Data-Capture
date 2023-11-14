@@ -359,10 +359,13 @@ namespace Infrastructure.PunterAdmin.Services
                         Horses = BuildRaceHorseViewModel(race.RaceHorses, race.Event)
                     };
 
-                    var horsesOrdered = toAdd.Horses.OrderByDescending(x => x.Points).ToList();
-                    toAdd.TotalPoints = toAdd.Horses.Sum(x => x.Points) ?? 0;
-                    toAdd.PointGap = (horsesOrdered[0].Points - horsesOrdered[1].Points) ?? 0;
-                    toAdd.AveragePoints = toAdd.Horses.Average(x => x.Points) ?? 0;
+                    if (toAdd.Horses.Count() > 0)
+                    {
+                        var horsesOrdered = toAdd.Horses.OrderByDescending(x => x.Points).ToList();
+                        toAdd.TotalPoints = toAdd.Horses.Sum(x => x.Points) ?? 0;
+                        toAdd.PointGap = (horsesOrdered[0].Points - horsesOrdered[1].Points) ?? 0;
+                        toAdd.AveragePoints = toAdd.Horses.Average(x => x.Points) ?? 0;
+                    }
 
                     result.Add(toAdd);
                 }
