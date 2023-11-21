@@ -127,7 +127,7 @@ namespace Infrastructure.PunterAdmin.Services
                         Position = race.position,
                         Description = race.description,
                         RaceType = race.Race.Event.MeetingType.meeting_type,
-                        Weather = race.Race.Weather.weather_type,
+                        Weather = race.Race.Weather?.weather_type ?? "",
                         Going = race.Race.Going.going_type,
                         Distance = race.Race.Distance.distance_type,
                         RaceUrl = race.Race.race_url,

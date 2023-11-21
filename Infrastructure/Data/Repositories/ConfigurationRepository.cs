@@ -75,7 +75,7 @@ namespace Infrastructure.Data.Repositories
             switch (job) 
             {
                 case JobEnum.rhdcautomation:
-                    jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 06, 00, 00);
+                    jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 07, 00, 00);
                     break;
                 case JobEnum.rhdccleaner:
                     jobDb.next_execution = DateTime.Now.AddMinutes(30);
