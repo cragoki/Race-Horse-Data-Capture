@@ -70,7 +70,7 @@ namespace Infrastructure.Data.Repositories
 
         public async Task UpdateNextExecution(JobEnum job)
         {
-            var jobDb = _context.tb_job.Where(x => x.job_id == (int)job).ToList().FirstOrDefault();
+            var jobDb = GetJobInfo(job);
             var tomorrow = DateTime.Now.AddDays(1);
             switch (job) 
             {
@@ -89,7 +89,6 @@ namespace Infrastructure.Data.Repositories
             }
             jobDb.last_execution = DateTime.Now;
 
-            _context.tb_job.Update(jobDb);
             await _context.SaveChangesAsync();
         }
 

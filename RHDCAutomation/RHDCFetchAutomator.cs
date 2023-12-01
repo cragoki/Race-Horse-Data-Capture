@@ -94,10 +94,12 @@ namespace RHDCAutomation
                         };
 
                         //Get todays Events
+                        Console.WriteLine("Retrieving Todays Events");
                         var events = await _eventService.GetTodaysEvents(_batch);
-
+                        Console.WriteLine("Retrieved Todays Events");
                         foreach (var even in events)
                         {
+                            Console.WriteLine($"Getting Event Race for event id: {even.EventId}");
                             //Retrieve and store races
                             await _raceService.GetEventRaces(even.EventId);
 
@@ -216,18 +218,9 @@ namespace RHDCAutomation
                         Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
-                        if (!await _configService.UpdateJob(JobEnum.rhdcautomation))
-                        {
-                            //Send Error Email and stop service as the service will be broken
-                            var email = new MailModel()
-                            {
-                                ToEmail = "craigrodger1@hotmail.com",
-                                Subject = "Error in the RHDCBacklogAutomator",
-                                Body = "Failed to update the job schedule, shutting down Job. This will need to be repaired manually"
-                            };
+                        Console.WriteLine($"Updating Job Next Execution Time");
+                        await _configService.UpdateJob(JobEnum.rhdcautomation);
 
-                            await _mailService.SendEmailAsync(email);
-                        }
 
                         //TEMPORARY - To test the service is executing as expected
                         var success = new MailModel()
@@ -252,15 +245,6 @@ namespace RHDCAutomation
                 {
                     Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
                     Thread.Sleep((int)TimeSpan.FromMinutes(10).TotalMilliseconds);
-
-                    var email = new MailModel()
-                    {
-                        ToEmail = "craigrodger1@hotmail.com",
-                        Subject = "Critical Error in the RHDCFetchAutomater",
-                        Body = $"Critical Error in Fetch Automator, {ex.Message} shutting down Job. This will need to be repaired manually"
-                    };
-
-                    await _mailService.SendEmailAsync(email);
                 }
             }
         }

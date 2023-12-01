@@ -114,18 +114,7 @@ namespace RHDCResultRetriever
                         Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
-                        if (!await _configService.UpdateJob(JobEnum.rhdcresultretriever))
-                        {
-                            //Send Error Email and stop service as the service will be broken
-                            var email = new MailModel()
-                            {
-                                ToEmail = "craigrodger1@hotmail.com",
-                                Subject = "Error in the RHDCBacklogAutomator",
-                                Body = "Failed to update the job schedule, shutting down Job. This will need to be repaired manually"
-                            };
-
-                            _mailService.SendEmailAsync(email);
-                        }
+                        await _configService.UpdateJob(JobEnum.rhdcresultretriever);
                     }
                     else
                     {
