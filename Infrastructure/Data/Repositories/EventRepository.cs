@@ -217,10 +217,15 @@ namespace Infrastructure.Data.Repositories
         {
             return _context.tb_event.Where(x => x.course_id == courseId).ToList();
         }
+
+        public EventEntity GetEventByCourseAndBatch(int courseId, Guid batch_id)
+        {
+            return _context.tb_event.FirstOrDefault(x => x.course_id == courseId && x.batch_id == batch_id);
+        }
         public async Task<int> AddEvent(EventEntity eventToAdd)
         {
             _context.tb_event.Add(eventToAdd);
-            await SaveChanges();
+            await _context.SaveChangesAsync();
             return eventToAdd.event_id;
         }
         public async Task AddCourse(CourseEntity courseToAdd)

@@ -37,5 +37,6 @@ namespace Core.Interfaces.Data.Repositories
         IEnumerable<RaceEntity> GetRacesForEventSimple(int eventId);
         BatchEntity GetRandomBatch();
         IQueryable<EventEntity> GetLastTwoMonthsEvents();
+        EventEntity GetEventByCourseAndBatch(int courseId, Guid batch_id);
     }
 }
