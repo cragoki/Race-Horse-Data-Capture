@@ -53,7 +53,7 @@ namespace Infrastructure.Data.Repositories
         }
         public async Task UpdateBacklogDate(DateTime date)
         {
-            var toUpdate = new BacklogDateEntity() { backlog_date = date};
+            var toUpdate = new BacklogDateEntity() { backlog_date = date };
             _context.tb_backlog_date.Update(toUpdate);
             await _context.SaveChangesAsync();
         }
@@ -70,9 +70,10 @@ namespace Infrastructure.Data.Repositories
 
         public async Task UpdateNextExecution(JobEnum job)
         {
-            var jobDb = GetJobInfo(job);
+            var jobDb = _context.tb_job.First(x => x.job_id == (int)job);
+
             var tomorrow = DateTime.Now.AddDays(1);
-            switch (job) 
+            switch (job)
             {
                 case JobEnum.rhdcautomation:
                     jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 07, 00, 00);
@@ -88,7 +89,8 @@ namespace Infrastructure.Data.Repositories
                     break;
             }
             jobDb.last_execution = DateTime.Now;
-
+            _context.Update(jobDb);
+            _context.Entry(jobDb).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
@@ -124,7 +126,7 @@ namespace Infrastructure.Data.Repositories
         }
 
 
-        public async Task AddFailedResult(FailedResultEntity entity) 
+        public async Task AddFailedResult(FailedResultEntity entity)
         {
             _context.tb_failed_result.Add(entity);
             await _context.SaveChangesAsync();

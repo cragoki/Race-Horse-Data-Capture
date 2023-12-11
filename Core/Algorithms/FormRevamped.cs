@@ -3,13 +3,11 @@ using Core.Enums;
 using Core.Helpers;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
-using Core.Interfaces.Services;
 using Core.Models.Algorithm;
 using Infrastructure.PunterAdmin.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Core.Algorithms
@@ -275,7 +273,7 @@ namespace Core.Algorithms
             return result;
         }
 
-        private async Task<string> CalculateHorsePredictability(int horseId, DateTime dateOfRace, RaceEntity race, GoingGroupModel goingGroup, DistanceGroupModel distanceGroup) 
+        private async Task<string> CalculateHorsePredictability(int horseId, DateTime dateOfRace, RaceEntity race, GoingGroupModel goingGroup, DistanceGroupModel distanceGroup)
         {
             var result = 0M;
 
@@ -285,12 +283,12 @@ namespace Core.Algorithms
                 var predictionResults = _algorithmRepository.GetAlgorithmPredictionForHorse(horseId).Where(x => x.RaceHorse.Race.race_class == race.race_class && goingGroup.ElementIds.Contains(x.RaceHorse.Race.going ?? 0) && distanceGroup.DistanceIds.Contains(x.RaceHorse.Race.distance ?? 0) && x.RaceHorse.Race.race_id != race.race_id).ToList();
                 var correctPrediction = 0;
 
-                if(predictionResults.Count() == 0)
+                if (predictionResults.Count() == 0)
                 {
                     return "No Data";
                 }
                 //foreach prediction result
-                foreach (var predictionResult in predictionResults.Where(x => x.RaceHorse.Race.Event.created < dateOfRace)) 
+                foreach (var predictionResult in predictionResults.Where(x => x.RaceHorse.Race.Event.created < dateOfRace))
                 {
                     //Get place for number of horses
                     var placed = SharedCalculations.GetTake(predictionResult.RaceHorse.Race.no_of_horses ?? 0);
@@ -299,7 +297,7 @@ namespace Core.Algorithms
                     {
                         correctPrediction = correctPrediction + 1;
                     }
-                    else if (predictionResult.RaceHorse.position != 0 && predictionResult.predicted_position > placed && predictionResult.RaceHorse.position > placed) 
+                    else if (predictionResult.RaceHorse.position != 0 && predictionResult.predicted_position > placed && predictionResult.RaceHorse.position > placed)
                     {
                         correctPrediction = correctPrediction + 1;
                     }
@@ -308,7 +306,7 @@ namespace Core.Algorithms
                 //get the % of number of predictions vs number of predictions where predicted result <= place positions
                 result = ((decimal)correctPrediction / (decimal)predictionResults.Count()) * 100;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -329,12 +327,12 @@ namespace Core.Algorithms
             var reliablitygoing = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.reliablitygoing.ToString()).FirstOrDefault().setting_value.ToString());
             var courseMultiplier = Decimal.Parse(settings.Where(x => x.setting_name == AlgorithmSettingEnum.courseMultiplier.ToString()).FirstOrDefault().setting_value.ToString());
 
-            foreach (var horse in race.RaceHorses) 
+            foreach (var horse in race.RaceHorses)
             {
 
                 //if (horse.horse_id == 26186) // Makin your mind up
                 //{ 
-                
+
                 //}
 
                 var toAdd = new FormResultModel();
@@ -391,7 +389,7 @@ namespace Core.Algorithms
                                 pointsForThisRace += (placePoints);
                                 hasWonAtDistance += placePoints;
                             }
-                            else 
+                            else
                             {
                                 placePoints = placePoints - 0.20M;
                                 pointsForThisRace += (placePoints);
@@ -433,7 +431,7 @@ namespace Core.Algorithms
                         //NUMBER OF HORSES IN FIELD
                         if (race.no_of_horses > 8)
                         {
-                            if (previousRace.Race.no_of_horses > 8) 
+                            if (previousRace.Race.no_of_horses > 8)
                             {
                                 if (previousRace.position <= positionToPlace)
                                 {
@@ -442,7 +440,7 @@ namespace Core.Algorithms
                                 }
                             }
                         }
-                        else if(race.no_of_horses < 8)
+                        else if (race.no_of_horses < 8)
                         {
                             if (previousRace.position <= positionToPlace)
                             {
@@ -452,7 +450,7 @@ namespace Core.Algorithms
                         }
 
                         //GOING
-                        if (goingGroup.ElementIds.Contains(previousRace.Race.going ?? 0)) 
+                        if (goingGroup.ElementIds.Contains(previousRace.Race.going ?? 0))
                         {
                             if (previousRace.position == 1)
                             {
@@ -468,7 +466,7 @@ namespace Core.Algorithms
 
 
                         //COURSE
-                        if (previousRace.Race.Event.course_id == race.Event.course_id) 
+                        if (previousRace.Race.Event.course_id == race.Event.course_id)
                         {
                             if (previousRace.position == 1)
                             {
@@ -485,7 +483,7 @@ namespace Core.Algorithms
 
                         //Class and distance
                         decimal classAndDistancePoints = (formMultiplierSetting * 2);
-                        if (previousRace.Race.race_class <= race.race_class && distanceGroup.DistanceIds.Contains(previousRace.Race.distance ?? 0)) 
+                        if (previousRace.Race.race_class <= race.race_class && distanceGroup.DistanceIds.Contains(previousRace.Race.distance ?? 0))
                         {
                             if (previousRace.position == 1)
                             {
@@ -578,11 +576,11 @@ namespace Core.Algorithms
                 consecutivePlacementMultiplier = multiplier;
                 toAdd.Points += multiplier;
 
-                if (hasWonAtDistance != 0) 
+                if (hasWonAtDistance != 0)
                 {
                     toAdd.PointsDescription += $"Gained {hasWonAtDistance} for form at distance.\n";
                 }
-                if (classMultiplierTotal != 0) 
+                if (classMultiplierTotal != 0)
                 {
                     toAdd.PointsDescription += $"Gained {classMultiplierTotal} for performances at a lower class.\n";
                 }

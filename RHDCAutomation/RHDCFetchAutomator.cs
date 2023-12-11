@@ -59,17 +59,7 @@ namespace RHDCAutomation
                     var job = await _configService.GetJobInfo(JobEnum.rhdcautomation);
                     Console.WriteLine("No errors, DB connection successful.");
 
-                    var adjuster = await _configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
-                    bool wait = false;
-
-                    if (job.next_execution < DateTime.Now && adjuster.start == true) 
-                    {
-                        await _configService.UpdateJob(JobEnum.rhdcalgorithmadjuster);
-                    }
-
-
-
-                    if (job.next_execution < DateTime.Now && !wait)
+                    if (job.next_execution < DateTime.Now)
                     {
                         Console.WriteLine($"Beginning Batch at {DateTime.Now}");
                         _batch = Guid.NewGuid();
@@ -197,7 +187,7 @@ namespace RHDCAutomation
                         }
 
 
-                        Console.WriteLine($"Completed Algorithm Checks");
+                     Console.WriteLine($"Completed Algorithm Checks");
 
                         //Complete Diagnostics
                         diagnostics.EventsFiltered = eventsFiltered;

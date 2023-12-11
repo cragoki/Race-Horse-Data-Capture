@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace RHDCResultRetriever
 {
-    public class RHDCResultRetriever: BackgroundService
+    public class RHDCResultRetriever : BackgroundService
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static Guid _batch;
@@ -38,21 +38,14 @@ namespace RHDCResultRetriever
             Console.WriteLine("Initializing RHDCResultRetriever");
 
             while (!stoppingToken.IsCancellationRequested)
-            { 
+            {
                 try
                 {
                     var job = await _configService.GetJobInfo(JobEnum.rhdcresultretriever);
 
                     Console.WriteLine("No errors, DB connection successful.");
-                    var adjuster = await _configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
-                    bool wait = false;
 
-                    if (job.next_execution < DateTime.Now && adjuster.start == true)
-                    {
-                        await _configService.UpdateJob(JobEnum.rhdcalgorithmadjuster);
-                    }
-
-                    if (job.next_execution < DateTime.Now && !wait)
+                    if (job.next_execution < DateTime.Now)
                     {
                         Console.WriteLine($"Beginning Batch at {DateTime.Now}");
                         _batch = Guid.NewGuid();
@@ -90,7 +83,7 @@ namespace RHDCResultRetriever
                                 Logger.Info($"Getting race results for {race.race_id}");
                                 try
                                 {
-                                    if (race.RaceHorses != null && race.RaceHorses.Count() > 0) 
+                                    if (race.RaceHorses != null && race.RaceHorses.Count() > 0)
                                     {
                                         await _raceService.GetRaceResults(race);
                                     }

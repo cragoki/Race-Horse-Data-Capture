@@ -259,13 +259,13 @@ namespace Core.Services
                 var horsesWithTrackers = trackers.Where(x => x != null).Select(x => x.race_horse_id);
                 var placedHorses = race.RaceHorses.Where(x => x.position != 0 && horsesWithTrackers.Contains(x.race_horse_id)).OrderBy(x => x.position).Take(placedPositions);
 
-                if (placedHorses == null || placedHorses.Count() == 0) 
+                if (placedHorses == null || placedHorses.Count() == 0)
                 {
                     return result;
                 }
                 var predictedPlacer = predictions.FirstOrDefault(x => (x.predicted_position == 1 && race.RaceHorses.FirstOrDefault(y => y.race_horse_id == x.race_horse_id).position != 0) || (x.predicted_position == 2 && race.RaceHorses.FirstOrDefault(y => y.race_horse_id == x.race_horse_id).position != 0) || (x.predicted_position == 3 && race.RaceHorses.FirstOrDefault(y => y.race_horse_id == x.race_horse_id).position != 0));
 
-                if (predictedPlacer == null) 
+                if (predictedPlacer == null)
                 {
                     return result;
                 }
@@ -288,7 +288,7 @@ namespace Core.Services
                     foreach (var placedHorse in placedHorses.Where(x => x.Horse.Races.Count() >= 2))
                     {
                         var placedHorseTracker = trackers.Where(x => x.race_horse_id == placedHorse.race_horse_id).FirstOrDefault();
-                        if (placedHorseTracker == null) 
+                        if (placedHorseTracker == null)
                         {
                             continue;
                         }
@@ -315,7 +315,7 @@ namespace Core.Services
                             accumulatedTracker.points_rf_dgc += placedHorseTracker.points_rf_dgc;
                             accumulatedTracker.points_rf_surface += placedHorseTracker.points_rf_surface;
                         }
-                        else 
+                        else
                         {
                             accumulatedTracker.total_points_for_get_current_condition += placedHorseTracker.total_points_for_get_current_condition;
                             accumulatedTracker.total_points_for_past_performance += placedHorseTracker.total_points_for_past_performance;
@@ -341,23 +341,23 @@ namespace Core.Services
         }
 
 
-        public async Task<bool> AlgorithmSettingsAreUnique(List<AlgorithmSettingsEntity> settings) 
+        public async Task<bool> AlgorithmSettingsAreUnique(List<AlgorithmSettingsEntity> settings)
         {
             var result = true;
             var archives = await GetArchivedSettingsForAlgorithm();
 
-            foreach(var archive in archives.GroupBy(x => x.batch_id))
+            foreach (var archive in archives.GroupBy(x => x.batch_id))
             {
                 bool isIdentical = true;
-                foreach (var setting in settings) 
+                foreach (var setting in settings)
                 {
-                    if (archive.FirstOrDefault(x => x.setting_name == setting.setting_name).setting_value != setting.setting_value) 
+                    if (archive.FirstOrDefault(x => x.setting_name == setting.setting_name).setting_value != setting.setting_value)
                     {
                         isIdentical = false;
                         continue;
                     }
                 }
-                if (isIdentical) 
+                if (isIdentical)
                 {
                     result = false;
                 }
@@ -366,13 +366,13 @@ namespace Core.Services
             return result;
         }
 
-        public async Task<List<SequenceAnalysisEntity>> GetSequenceAnalysis() 
+        public async Task<List<SequenceAnalysisEntity>> GetSequenceAnalysis()
         {
-            try 
+            try
             {
                 return _algorithmRepository.GetSequenceAnalysis();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -439,7 +439,7 @@ namespace Core.Services
             }
         }
 
-        public async Task AdjustAlgorithmSettings(Guid batch_id, AlgorithmEntity activeAlgorithm ) 
+        public async Task AdjustAlgorithmSettings(Guid batch_id, AlgorithmEntity activeAlgorithm)
         {
             var settings = await GetArchivedSettingsForBatch(batch_id);
 
@@ -468,7 +468,7 @@ namespace Core.Services
                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_dgc.ToString()).setting_value;
                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.rf_surface.ToString()).setting_value;
             }
-            else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel) 
+            else if (activeAlgorithm.algorithm_id == (int)AlgorithmEnum.BentnersModel)
             {
                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityCurrentCondition.ToString()).setting_value;
                 algorithmSettings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityPastPerformance.ToString()).setting_value = settings.FirstOrDefault(x => x.setting_name == AlgorithmSettingEnum.reliabilityPastPerformance.ToString()).setting_value;

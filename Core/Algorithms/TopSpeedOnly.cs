@@ -1,16 +1,16 @@
 ﻿
 using Core.Entities;
 using Core.Enums;
+using Core.Helpers;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
 using Core.Models.Algorithm;
 using Core.Variables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Interfaces.Services;
-using Core.Helpers;
 
 namespace Core.Algorithms
 {
@@ -20,7 +20,7 @@ namespace Core.Algorithms
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IRaceService _raceService;
 
-        public TopSpeedOnly(IConfigurationRepository configRepository, IRaceService raceService) 
+        public TopSpeedOnly(IConfigurationRepository configRepository, IRaceService raceService)
         {
             _configRepository = configRepository;
             _raceService = raceService;
@@ -33,11 +33,11 @@ namespace Core.Algorithms
                 List<double> runningTotal = new List<double>();
                 int raceCounter = 0;
 
-                foreach (var race in races) 
+                foreach (var race in races)
                 {
                     var predictionResult = await TopSpeedVariable(race);
 
-                    if(predictionResult != -1)
+                    if (predictionResult != -1)
                     {
                         raceCounter++;
                         runningTotal.Add(predictionResult);
@@ -48,7 +48,7 @@ namespace Core.Algorithms
                 result.Accuracy = (decimal)runningTotal.Average();
                 result.RacesFiltered = raceCounter;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Error in Algorithm Service...{ex.Message}");
             }
@@ -59,7 +59,7 @@ namespace Core.Algorithms
         public async Task<double> TopSpeedVariable(RaceEntity race)
         {
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.TopSpeedOnly);
-            var total = SharedCalculations.GetTake(race.no_of_horses ?? 0); 
+            var total = SharedCalculations.GetTake(race.no_of_horses ?? 0);
             var counter = 0;
             var listOfHorses = new List<HorseEntity>();
 

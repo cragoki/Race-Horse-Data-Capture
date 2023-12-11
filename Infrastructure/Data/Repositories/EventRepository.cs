@@ -182,7 +182,7 @@ namespace Infrastructure.Data.Repositories
 
         public IQueryable<EventEntity> GetLastTwoMonthsEvents()
         {
-            return _context.tb_event.Where(x =>x.created < DateTime.Now && x.created >= DateTime.Now.AddMonths(-2))
+            return _context.tb_event.Where(x => x.created < DateTime.Now && x.created >= DateTime.Now.AddMonths(-2))
                 .Include(x => x.Course)
                 .Include(x => x.MeetingType)
                 .Include(x => x.Surface)
@@ -243,7 +243,7 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_race.Where(x => x.Event.created.Date == DateTime.Now.Date).AsNoTracking();
         }
 
-        public IEnumerable<RaceEntity> GetRacesForEvent(int eventId)
+        public async Task<IEnumerable<RaceEntity>> GetRacesForEvent(int eventId)
         {
             return _context.tb_race.Where(x => x.event_id == eventId)
                 .Include(x => x.RaceHorses)

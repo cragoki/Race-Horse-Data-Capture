@@ -4,7 +4,7 @@ namespace AlgorithmUnitTests.Helpers
 {
     public static class MappingEntityHelper
     {
-        public static WeatherType GetWeather() 
+        public static WeatherType GetWeather()
         {
             return new WeatherType()
             {
@@ -13,7 +13,7 @@ namespace AlgorithmUnitTests.Helpers
             };
         }
 
-        public static DistanceType GetDistance() 
+        public static DistanceType GetDistance()
         {
             return new DistanceType()
             {
@@ -22,7 +22,7 @@ namespace AlgorithmUnitTests.Helpers
             };
         }
 
-        public static AgeType GetAgeType() 
+        public static AgeType GetAgeType()
         {
             return new AgeType()
             {
@@ -31,7 +31,7 @@ namespace AlgorithmUnitTests.Helpers
             };
         }
 
-        public static GoingType GetGoingType() 
+        public static GoingType GetGoingType()
         {
             return new GoingType()
             {

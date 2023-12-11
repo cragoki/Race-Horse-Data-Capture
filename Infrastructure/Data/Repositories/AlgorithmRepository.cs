@@ -148,12 +148,12 @@ namespace Infrastructure.Data.Repositories
                 .Where(x => x.RaceHorse.Horse.horse_id == horse_id).ToList();
         }
 
-        public List<SequenceAnalysisEntity> GetSequenceAnalysis() 
+        public List<SequenceAnalysisEntity> GetSequenceAnalysis()
         {
             return _context.tb_sequence_analysis.ToList();
         }
 
-        public async Task AddSequenceAnalysis(SequenceAnalysisEntity entity) 
+        public async Task AddSequenceAnalysis(SequenceAnalysisEntity entity)
         {
             _context.tb_sequence_analysis.Add(entity);
             await SaveChanges();

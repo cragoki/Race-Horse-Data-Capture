@@ -1,7 +1,6 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Models.Algorithm;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 
@@ -9,10 +8,10 @@ namespace Core.Helpers
 {
     public class VariableGroupings
     {
-        public static List<DistanceGroupModel> GetDistanceGroupings(IEnumerable<DistanceType> distances) 
+        public static List<DistanceGroupModel> GetDistanceGroupings(IEnumerable<DistanceType> distances)
         {
             var result = new List<DistanceGroupModel>();
-            var sprints = new DistanceGroupModel() {GroupType = DistanceGroupType.Sprint, DistanceIds = new List<int>() };
+            var sprints = new DistanceGroupModel() { GroupType = DistanceGroupType.Sprint, DistanceIds = new List<int>() };
             var specialist = new DistanceGroupModel() { GroupType = DistanceGroupType.Specialist, DistanceIds = new List<int>() };
             var middle = new DistanceGroupModel() { GroupType = DistanceGroupType.Middle, DistanceIds = new List<int>() };
             var staying = new DistanceGroupModel() { GroupType = DistanceGroupType.Staying, DistanceIds = new List<int>() };
@@ -59,7 +58,7 @@ namespace Core.Helpers
                             }
                         }
                     }
-                    catch (Exception ex) 
+                    catch (Exception ex)
                     {
                         //Ignore those with incorrect format
                     }
@@ -77,7 +76,7 @@ namespace Core.Helpers
             return result;
         }
 
-        public static List<FavourGroupModel> GetWeatherGroupings(IEnumerable<WeatherType> weathers) 
+        public static List<FavourGroupModel> GetWeatherGroupings(IEnumerable<WeatherType> weathers)
         {
             var result = new List<FavourGroupModel>();
             var noGo = new FavourGroupModel() { FavourType = FavorGroupType.NoGo, ElementIds = new List<int>() };
@@ -87,7 +86,7 @@ namespace Core.Helpers
 
             try
             {
-                foreach (var weather in weathers) 
+                foreach (var weather in weathers)
                 {
                     if (weather.weather_type_id == 10 || weather.weather_type_id == 18 || weather.weather_type_id == 11)
                     {
@@ -101,7 +100,7 @@ namespace Core.Helpers
                     {
                         bad.ElementIds.Add(weather.weather_type_id);
                     }
-                    else 
+                    else
                     {
                         rare.ElementIds.Add(weather.weather_type_id);
                     }
@@ -119,7 +118,7 @@ namespace Core.Helpers
 
             return result;
         }
-        public static List<GoingGroupModel> GetGoingGroupings(IEnumerable<GoingType> goings) 
+        public static List<GoingGroupModel> GetGoingGroupings(IEnumerable<GoingType> goings)
         {
             var result = new List<GoingGroupModel>();
             var heavy = new GoingGroupModel() { GoingType = GoingGroupType.Heavy, ElementIds = new List<int>() };
@@ -128,7 +127,7 @@ namespace Core.Helpers
             var msc = new GoingGroupModel() { GoingType = GoingGroupType.Misc, ElementIds = new List<int>() };
             try
             {
-                foreach (var going in goings) 
+                foreach (var going in goings)
                 {
                     if (going.going_type.ToLower().Contains("heavy"))
                     {
@@ -199,7 +198,7 @@ namespace Core.Helpers
             return result;
         }
 
-        private static int ExtractNumbers(char[] distanceArray, char character) 
+        private static int ExtractNumbers(char[] distanceArray, char character)
         {
             var index = Array.IndexOf(distanceArray, character);
             var numberString = "";
@@ -212,7 +211,7 @@ namespace Core.Helpers
                 }
                 numberString += distanceArray[i].ToString();
 
-                if (i == 0) 
+                if (i == 0)
                 {
                     break;
                 }

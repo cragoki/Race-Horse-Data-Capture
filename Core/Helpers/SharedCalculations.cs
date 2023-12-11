@@ -1,10 +1,8 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Models.Algorithm;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Core.Helpers
 {
@@ -24,18 +22,18 @@ namespace Core.Helpers
             {
                 return 3;
             }
-            else 
+            else
             {
                 return 4;
             }
         }
 
-        public static ReliabilityType GetRaceReliablility(RaceEntity race, int places, DistanceGroupModel distanceGroup, GoingGroupModel goingGroup, decimal going, decimal distance) 
+        public static ReliabilityType GetRaceReliablility(RaceEntity race, int places, DistanceGroupModel distanceGroup, GoingGroupModel goingGroup, decimal going, decimal distance)
         {
             var result = ReliabilityType.Unusable;
             var reliabilityRatings = new List<ReliabilityType>();
 
-            foreach (var horse in race.RaceHorses) 
+            foreach (var horse in race.RaceHorses)
             {
                 reliabilityRatings.Add(GetHorseReliablility(horse.Horse, race, distanceGroup, goingGroup, going, distance));
             }
@@ -65,7 +63,7 @@ namespace Core.Helpers
             {
                 result = ReliabilityType.Low;
             }
-            else 
+            else
             {
                 result = ReliabilityType.Unusable;
             }
@@ -78,7 +76,7 @@ namespace Core.Helpers
             var result = ReliabilityType.Unusable;
             decimal counter = 0;
 
-            if (horse.Races == null || horse.Races.Count() == 0 || horse.Races.All(x => x.Race.Event.created < currentRace.Event.created.AddMonths(-6))) 
+            if (horse.Races == null || horse.Races.Count() == 0 || horse.Races.All(x => x.Race.Event.created < currentRace.Event.created.AddMonths(-6)))
             {
                 return ReliabilityType.Unusable;
             }
@@ -86,7 +84,7 @@ namespace Core.Helpers
             //Get all races before the current race
             foreach (var race in horse.Races.Where(x => x.Race.Event.created < currentRace.Event.created))
             {
-                if (distanceGroup.DistanceIds.Contains(race.Race.distance ?? 0)) 
+                if (distanceGroup.DistanceIds.Contains(race.Race.distance ?? 0))
                 {
                     counter = counter + distance;
                 }
@@ -103,7 +101,7 @@ namespace Core.Helpers
             {
                 result = ReliabilityType.High;
             }
-            else if (value >= 50) 
+            else if (value >= 50)
             {
                 result = ReliabilityType.Medium;
             }

@@ -98,7 +98,7 @@ namespace Core.Algorithms
             //Race wide factors
             // Get a list of horses who have won at the D&G Group, after analysis, inspect winning times of those races
 
-            if (horses.Count() == 0) 
+            if (horses.Count() == 0)
             {
                 return result;
             }
@@ -263,7 +263,7 @@ namespace Core.Algorithms
             var currentRaceDate = race.Event.created;
             var firstRace = races.FirstOrDefault();
 
-            if (firstRace == null) 
+            if (firstRace == null)
             {
                 return tracker;
             }

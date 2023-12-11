@@ -21,10 +21,10 @@ namespace Core.Variables
                 foreach (var horse in horses)
                 {
                     league.Add(horse, 0);
-                    foreach (var race in races.Where(x => x.HorseId == horse).OrderByDescending(x => x.Date).Take(take)) 
+                    foreach (var race in races.Where(x => x.HorseId == horse).OrderByDescending(x => x.Date).Take(take))
                     {
 
-                        if (race.NoOfHorses != null && race.NoOfHorses > 0) 
+                        if (race.NoOfHorses != null && race.NoOfHorses > 0)
                         {
                             var placedPosition = SharedCalculations.GetTake(race.NoOfHorses);
 

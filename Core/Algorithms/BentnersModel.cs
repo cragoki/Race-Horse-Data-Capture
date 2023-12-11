@@ -96,7 +96,7 @@ namespace Core.Algorithms
             var result = new List<HorsePredictionModel>();
             var raceTracker = new RaceHorseStatisticsTracker();
             var presentRaceFactors = await GetPresentRaceFactors(race, raceTracker);
-            var topJockeys = raceTracker.JockeyRankings.OrderBy(x => x.Value).Take(2); 
+            var topJockeys = raceTracker.JockeyRankings.OrderBy(x => x.Value).Take(2);
             var topTrainers = raceTracker.JockeyRankings.OrderBy(x => x.Value).Take(2);
             foreach (var horse in horses)
             {
@@ -295,7 +295,7 @@ namespace Core.Algorithms
             {
                 return tracker;
             }
-            
+
             var pastRaces = GetBaseRaces(horse, race).Where(x => distanceGroups.DistanceIds.Contains(x.Race.distance ?? 0) && x.Race.race_class <= race.race_class).Take(5);
 
             //Number of races placed vs number of races not placed. 75% + placed = +2, 60%+ = +1, 50%+ = +0.5, 0% = -2

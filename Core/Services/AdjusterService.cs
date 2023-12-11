@@ -2,10 +2,8 @@
 using Core.Enums;
 using Core.Interfaces.Algorithms;
 using Core.Interfaces.Services;
-using Core.Models.GetRace;
 using Core.Models.MachineLearning;
 using Infrastructure.PunterAdmin.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,10 +59,10 @@ namespace Core.Services
                         switch (activeAlgorithm.algorithm_id)
                         {
                             case (int)AlgorithmEnum.BentnersModel:
-                                    prediction = await _bentnersModel.RunModel(race);
+                                prediction = await _bentnersModel.RunModel(race);
                                 break;
                             case (int)AlgorithmEnum.MyModel:
-                                    prediction = await _myModel.RunModel(race);
+                                prediction = await _myModel.RunModel(race);
                                 break;
                         }
 
@@ -141,26 +139,26 @@ namespace Core.Services
                 var bottomTier = new List<AlgorithmSettingEnum>();
 
 
-                switch (activeAlgorithm.algorithm_id) 
+                switch (activeAlgorithm.algorithm_id)
                 {
                     case (int)AlgorithmEnum.MyModel:
-                            topTier = aggregatedRankings.Take(3).Select(x => x.AlgorithmVariable).ToList(); //Plus 0.25
-                            secondTier = aggregatedRankings.Skip(3).Take(4).Select(x => x.AlgorithmVariable).ToList();//Plus 0.1
-                            noChange = aggregatedRankings.Skip(7).Take(5).Select(x => x.AlgorithmVariable).ToList();//No Change
-                            lowerTier = aggregatedRankings.Skip(12).Take(5).Select(x => x.AlgorithmVariable).ToList();//Minus 0.1
-                            bottomTier = aggregatedRankings.Skip(17).Take(2).Select(x => x.AlgorithmVariable).ToList(); //Minus 0.25
-                    break;
+                        topTier = aggregatedRankings.Take(3).Select(x => x.AlgorithmVariable).ToList(); //Plus 0.25
+                        secondTier = aggregatedRankings.Skip(3).Take(4).Select(x => x.AlgorithmVariable).ToList();//Plus 0.1
+                        noChange = aggregatedRankings.Skip(7).Take(5).Select(x => x.AlgorithmVariable).ToList();//No Change
+                        lowerTier = aggregatedRankings.Skip(12).Take(5).Select(x => x.AlgorithmVariable).ToList();//Minus 0.1
+                        bottomTier = aggregatedRankings.Skip(17).Take(2).Select(x => x.AlgorithmVariable).ToList(); //Minus 0.25
+                        break;
                     case (int)AlgorithmEnum.BentnersModel:
                         topTier = aggregatedRankings.Take(1).Select(x => x.AlgorithmVariable).ToList(); //Plus 0.25
                         secondTier = aggregatedRankings.Skip(1).Take(1).Select(x => x.AlgorithmVariable).ToList();//Plus 0.1
                         noChange = aggregatedRankings.Skip(2).Take(1).Select(x => x.AlgorithmVariable).ToList();//No Change
                         lowerTier = aggregatedRankings.Skip(3).Take(1).Select(x => x.AlgorithmVariable).ToList();//Minus 0.1
                         bottomTier = aggregatedRankings.Skip(4).Take(1).Select(x => x.AlgorithmVariable).ToList(); //Minus 0.25
-                    break;
+                        break;
                 }
 
 
-                var algorithmSettings =  await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
+                var algorithmSettings = await _algorithmService.GetSettingsForAlgorithm(activeAlgorithm.algorithm_id);
 
 
 
@@ -213,9 +211,9 @@ namespace Core.Services
         }
 
 
-        public async Task AnalyseAlgorithmSettings() 
+        public async Task AnalyseAlgorithmSettings()
         {
-            try 
+            try
             {
                 var activeAlgorithm = _algorithmService.GetActiveAlgorithm();
                 var rankings = new List<VariableAnalysisModel>();
@@ -248,7 +246,7 @@ namespace Core.Services
                     sequence.algorithm_id = activeAlgorithm.algorithm_id;
                 }
 
-                if (isCourseAnalysis) 
+                if (isCourseAnalysis)
                 {
                     //If we are doing course analysis, run predictions against only the courses with a greater than 50% accuracy
                     var courseAccuracyBatch = await _algorithmService.GetSequenceCourseAccuracy(sequence.batch_id);
@@ -256,18 +254,18 @@ namespace Core.Services
                     events = events.Where(x => coursesToUse.Contains(x.course_id)).ToList();
                 }
 
-                foreach (var e in events) 
+                foreach (var e in events)
                 {
                     //If all racehorses have position 0, then the event is abandoned, so we can continue
                     if (e.Races.All(race => race.RaceHorses.All(horse => horse.position == 0)))
                     {
                         continue;
                     }
-                    foreach (var race in e.Races) 
+                    foreach (var race in e.Races)
                     {
                         var prediction = new List<FormResultModel>();
 
-                        if (race.RaceHorses.All(x => x.position == 0)) 
+                        if (race.RaceHorses.All(x => x.position == 0))
                         {
                             continue;
                         }
@@ -279,10 +277,10 @@ namespace Core.Services
                         switch (activeAlgorithm.algorithm_id)
                         {
                             case (int)AlgorithmEnum.MyModel:
-                                    prediction = await _myModel.RunModel(race);
+                                prediction = await _myModel.RunModel(race);
                                 break;
                             case (int)AlgorithmEnum.BentnersModel:
-                                    prediction = await _bentnersModel.RunModel(race);
+                                prediction = await _bentnersModel.RunModel(race);
                                 break;
                         }
 
@@ -340,12 +338,12 @@ namespace Core.Services
                     //Update Sequence
                     await _algorithmService.UpdateSequenceAnalysis(sequence);
                 }
-                else 
+                else
                 {
                     var courseAnalysis = new List<SequenceCourseAccuracyEntity>();
                     var coursesGrouped = rankings.GroupBy(x => x.CourseId);
 
-                    foreach (var group in coursesGrouped) 
+                    foreach (var group in coursesGrouped)
                     {
                         courseAnalysis.Add(new SequenceCourseAccuracyEntity()
                         {

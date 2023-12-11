@@ -1,7 +1,6 @@
 ﻿using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Data;
-using Core.Models.GetRace;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace AlgorithmUnitTests.Helpers
     public static class DbSetMockHelper
     {
 
-        public static Mock<IDbContextData> GenerateContextMock() 
+        public static Mock<IDbContextData> GenerateContextMock()
         {
             var contextMock = new Mock<IDbContextData>();
 
@@ -26,7 +25,7 @@ namespace AlgorithmUnitTests.Helpers
             return contextMock;
         }
 
-        public static Mock<DbSet<AlgorithmTrackerEntity>> GetAlgorithmTracker() 
+        public static Mock<DbSet<AlgorithmTrackerEntity>> GetAlgorithmTracker()
         {
             var mockAlgorithmTrackers = new List<AlgorithmTrackerEntity>
             {
@@ -81,7 +80,7 @@ namespace AlgorithmUnitTests.Helpers
         {
             var mockAlgorithmTrackers = new List<RaceHorseEntity>
             {
-            }; 
+            };
 
             var mockAlgorithmTrackerDbSet = new Mock<DbSet<RaceHorseEntity>>();
             mockAlgorithmTrackerDbSet.As<IQueryable<RaceHorseEntity>>().Setup(m => m.Provider).Returns(mockAlgorithmTrackers.AsQueryable().Provider);

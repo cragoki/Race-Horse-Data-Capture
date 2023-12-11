@@ -1,13 +1,7 @@
-﻿using Core.Entities;
-using Core.Enums;
-using Core.Interfaces.Algorithms;
+﻿using Core.Enums;
 using Core.Interfaces.Services;
-using Core.Models.MachineLearning;
-using Infrastructure.PunterAdmin.ViewModels;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,39 +30,39 @@ namespace RHDCMachineLearning
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             bool isFirstInSequence = true;
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    var job = await _configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var job = await _configService.GetJobInfo(JobEnum.rhdcalgorithmadjuster);
 
-                    if (job.start ?? false)
+                if (job.start ?? false)
+                {
+                    Console.WriteLine($"Beginning Batch at {DateTime.Now}");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("-----------------------------------Machine Learning Inilializing---------------------------------");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                    Console.WriteLine("-------------------------------------------------------------------------------------------------");
+                    try
                     {
-                        Console.WriteLine($"Beginning Batch at {DateTime.Now}");
-                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("-----------------------------------Machine Learning Inilializing---------------------------------");
-                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                        Console.WriteLine("-------------------------------------------------------------------------------------------------");
-                        try
+                        if (job.mode == AlgorithmModeEnum.Adjust)
                         {
-                            if (job.mode == AlgorithmModeEnum.Adjust)
-                            {
-                                Console.WriteLine($"Running in Adjust Mode");
-                                await _adjusterService.AdjustAlgorithmSettings(isFirstInSequence);
-                                isFirstInSequence = false;
-                            }
-                            else if (job.mode == AlgorithmModeEnum.Analyse)
-                            {
-                                Console.WriteLine($"Running in Analyse Mode");
-                                await _adjusterService.AnalyseAlgorithmSettings();
-                            }
+                            Console.WriteLine($"Running in Adjust Mode");
+                            await _adjusterService.AdjustAlgorithmSettings(isFirstInSequence);
+                            isFirstInSequence = false;
                         }
-                        catch (Exception ex)
+                        else if (job.mode == AlgorithmModeEnum.Analyse)
                         {
-                            Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
-                            Thread.Sleep((int)TimeSpan.FromMinutes(10).TotalMilliseconds);
+                            Console.WriteLine($"Running in Analyse Mode");
+                            await _adjusterService.AnalyseAlgorithmSettings();
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error! {ex.Message} Inner Exception: {ex.InnerException}");
+                        Thread.Sleep((int)TimeSpan.FromMinutes(10).TotalMilliseconds);
+                    }
                     Console.WriteLine($"Completed Algorithm Checks");
 
                     //Store Batch in the database

@@ -1,15 +1,15 @@
 ﻿using Core.Entities;
 using Core.Enums;
+using Core.Helpers;
+using Core.Interfaces.Algorithms;
 using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
 using Core.Models.Algorithm;
 using Core.Variables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Core.Interfaces.Algorithms;
-using Core.Interfaces.Services;
-using Core.Helpers;
 
 namespace Core.Algorithms
 {
@@ -60,7 +60,7 @@ namespace Core.Algorithms
         public async Task<double> TSRpRCalculation(RaceEntity race, List<AlgorithmVariableEntity> variables)
         {
             var settings = _configRepository.GetAlgorithmSettings((int)AlgorithmEnum.TsRPR);
-            var take = SharedCalculations.GetTake(race.no_of_horses ?? 0); 
+            var take = SharedCalculations.GetTake(race.no_of_horses ?? 0);
             var counter = 0;
             var listOfHorses = new List<HorseEntity>();
 
@@ -72,7 +72,7 @@ namespace Core.Algorithms
                 var rpr = await _raceService.GetRprForHorseRace(h.Horse.Archive, even.created);
                 var ts = await _raceService.GetTsForHorseRace(h.Horse.Archive, even.created);
 
-                if (rpr != -1) 
+                if (rpr != -1)
                 {
                     horse.rpr = rpr;
                 }
@@ -142,7 +142,7 @@ namespace Core.Algorithms
             return (double)counter / take * 100;
         }
 
-        public async Task<List<HorseEntity>> TSRpRCalculationPredictions(RaceEntity race, List<AlgorithmVariableEntity> variables ,List<AlgorithmSettingsEntity> settings) 
+        public async Task<List<HorseEntity>> TSRpRCalculationPredictions(RaceEntity race, List<AlgorithmVariableEntity> variables, List<AlgorithmSettingsEntity> settings)
         {
             var result = new List<HorseEntity>();
             var placed = SharedCalculations.GetTake(race.no_of_horses ?? 0);

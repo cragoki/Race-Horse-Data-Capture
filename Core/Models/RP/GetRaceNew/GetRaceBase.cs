@@ -5,7 +5,7 @@ namespace Core.Models.RP.GetRaceNew
     public class GetRaceBase
     {
         [JsonProperty("meetings")]
-        public Meeting Meetings { get; set;}
+        public Meeting Meetings { get; set; }
         [JsonProperty("races")]
         public Races Races { get; set; }
         [JsonProperty("error")]

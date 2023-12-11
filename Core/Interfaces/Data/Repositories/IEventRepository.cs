@@ -24,7 +24,7 @@ namespace Core.Interfaces.Data.Repositories
         Task<int> AddEvent(EventEntity eventToAdd);
         List<CourseEntity> GetCourses();
         List<RaceEntity> GetAllRaces();
-        IEnumerable<RaceEntity> GetRacesForEvent(int eventId);
+        Task<IEnumerable<RaceEntity>> GetRacesForEvent(int eventId);
         Task AddRace(RaceEntity raceToUpdate);
         Task UpdateRace(RaceEntity raceToUpdate);
         RaceEntity GetRaceById(int raceId);

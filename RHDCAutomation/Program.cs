@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using Microsoft.Extensions.Configuration;
-using Stashbox;
-using Infrastructure.Config.IoC;
-using Microsoft.Extensions.DependencyInjection;
-using NLog.Extensions.Logging;
+﻿using Infrastructure.Config.IoC;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using Stashbox;
+using System;
 
 
 namespace RHDCAutomation
@@ -16,10 +16,10 @@ namespace RHDCAutomation
     {
         static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();          
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) 
+        public static IHostBuilder CreateHostBuilder(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args);
             IConfiguration config;
@@ -53,7 +53,7 @@ namespace RHDCAutomation
                 services.AddDbContextPool<DbContextData>(option =>
                     option.UseSqlServer(hostContext.Configuration.GetConnectionString("DefaultConnection"),
                     sqlServerOptions => sqlServerOptions.CommandTimeout(120)).EnableSensitiveDataLogging());
-                });
+            });
 
             return host;
 

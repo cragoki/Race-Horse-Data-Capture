@@ -1,13 +1,13 @@
-﻿using Core.Models.Settings;
-using Microsoft.Extensions.Configuration;
-using Core.Interfaces.Services;
-using System;
-using Core.Entities;
-using Core.Interfaces.Data.Repositories;
-using System.Threading.Tasks;
+﻿using Core.Entities;
 using Core.Enums;
+using Core.Interfaces.Data.Repositories;
+using Core.Interfaces.Services;
+using Core.Models.Settings;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Core.Services
 {
@@ -31,7 +31,7 @@ namespace Core.Services
             };
         }
 
-        public MailSettings GetMailSettings() 
+        public MailSettings GetMailSettings()
         {
             return new MailSettings()
             {
@@ -48,7 +48,7 @@ namespace Core.Services
             return _config.GetValue<bool>("AppSettings:SaveData");
         }
 
-        public async Task AddBatch(Guid batchId, string diagnostics) 
+        public async Task AddBatch(Guid batchId, string diagnostics)
         {
             var batchEntity = new BatchEntity()
             {
@@ -67,12 +67,12 @@ namespace Core.Services
             return result.backlog_date;
         }
 
-        public async Task UpdateBackfillDate(DateTime newDate) 
+        public async Task UpdateBackfillDate(DateTime newDate)
         {
             await _repository.UpdateBacklogDate(newDate);
         }
 
-        public async Task<bool> UpdateJob(JobEnum job) 
+        public async Task<bool> UpdateJob(JobEnum job)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace Core.Services
 
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -91,7 +91,7 @@ namespace Core.Services
             return _repository.GetJobInfo(job);
         }
 
-        public List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId) 
+        public List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId)
         {
             return _repository.GetAlgorithmSettings(algorithmId).ToList();
         }

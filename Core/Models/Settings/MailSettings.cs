@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Core.Models.Settings
+﻿namespace Core.Models.Settings
 {
     public class MailSettings
     {

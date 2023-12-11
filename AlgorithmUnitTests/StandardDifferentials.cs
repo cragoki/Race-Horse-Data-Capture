@@ -20,7 +20,7 @@ namespace AlgorithmUnitTests
 
             //Add 4 horses with the exact same history, other than the fact that horses 1 and 4's jockeys have better average position
             var raceHorses = new List<RaceHorseEntity>();
-            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(1, 2, 1, 0, race)); 
+            raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(1, 2, 1, 0, race));
             raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(2, 2, 1, 0, race));
             raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(3, 2, 1, 0, race));
             raceHorses.Add(RaceHorseEntityHelper.GenerateRaceHorse(4, 2, 1, 0, race));
@@ -131,10 +131,10 @@ namespace AlgorithmUnitTests
 
             var contextMock = DbSetMockHelper.GenerateContextMock();
 
-            foreach (var r in race.RaceHorses.Where(x => x.horse_id == 1).FirstOrDefault().Horse.Races) 
+            foreach (var r in race.RaceHorses.Where(x => x.horse_id == 1).FirstOrDefault().Horse.Races)
             {
                 r.Race.Event.course_id = race.Event.course_id + 1;
-            } 
+            }
 
             var bentnersAlgorithm = new BentnersModel(contextMock.Object);
 

@@ -37,7 +37,7 @@ namespace Infrastructure.Config.IoC
             container.RegisterScoped<IConfigurationRepository, ConfigurationRepository>();
             container.RegisterScoped<IAlgorithmRepository, AlgorithmRepository>();
             container.RegisterScoped<IMappingTableRepository, MappingTableRepository>();
-            container.RegisterScoped<IDbContextData, DbContextData>();
+            container.Register<IDbContextData, DbContextData>();
 
             //Algorithms
             container.RegisterScoped<ITopSpeedOnly, TopSpeedOnly>();

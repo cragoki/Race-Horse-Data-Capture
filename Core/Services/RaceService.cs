@@ -1,12 +1,9 @@
 ﻿using Core.Entities;
-using Core.Helpers;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -34,17 +31,17 @@ namespace Core.Services
             {
                 var even = _eventRepository.GetEventById(EventId);
 
-                if (even != null) 
+                if (even != null)
                 {
                     Logger.Info($"Fetching Races for event {even.name}.");
 
                     //Get all of the raceUrls/Weather/course Url for this event
-                    var races = _eventRepository.GetRacesForEvent(EventId).ToList(); // PULL INTO MEM TO PREVENT TRACKING ERROR
-
+                    var races = await _eventRepository.GetRacesForEvent(EventId); // PULL INTO MEM TO PREVENT TRACKING ERROR
+                    var racesList = races.ToList();
                     //Add Each race
-                    foreach (var race in races) 
+                    foreach (var race in racesList)
                     {
-                        try 
+                        try
                         {
                             //Now use the race URL to fetch the Horses/Trainers/Owners
                             var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
@@ -58,7 +55,7 @@ namespace Core.Services
                         }
                         catch (Exception ex)
                         {
-                            FailedRace(race, ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message);
+                            await FailedRace(race, ex.InnerException?.Message == null ? ex.Message : ex.InnerException.Message);
                         }
                     }
 
@@ -80,7 +77,7 @@ namespace Core.Services
             {
                 result = _eventRepository.GetRacesForEventSimple(EventId).ToList();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Error attempting to retrieve todays races from the database.  {ex.InnerException}");
             }
@@ -88,7 +85,7 @@ namespace Core.Services
             return result;
         }
 
-        public async Task GetRaceResults(RaceEntity race) 
+        public async Task GetRaceResults(RaceEntity race)
         {
             try
             {
@@ -132,7 +129,7 @@ namespace Core.Services
 
                 var invalidResults = raceHorses.Where(x => String.IsNullOrEmpty(x.description) && x.position == 0).ToList();
                 var results = new List<RaceHorseEntity>();
-                foreach (var result in invalidResults) 
+                foreach (var result in invalidResults)
                 {
                     try
                     {
@@ -177,7 +174,7 @@ namespace Core.Services
                 Logger.Info($"Finding next race...");
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 if (race.RaceHorses.Count() > 0)
                 {
@@ -190,7 +187,7 @@ namespace Core.Services
                     await _configRepo.AddFailedResult(failedResult);
                     Logger.Error($"Error attempting to retrieve race results.  {ex.Message}");
                 }
-                else 
+                else
                 {
                     var failedResult = new FailedRaceEntity()
                     {
@@ -205,7 +202,7 @@ namespace Core.Services
             }
         }
 
-        public async Task<List<RaceHorseEntity>> GetIncompleteRaces() 
+        public async Task<List<RaceHorseEntity>> GetIncompleteRaces()
         {
             var results = new List<RaceHorseEntity>();
             try
@@ -255,17 +252,17 @@ namespace Core.Services
             return results;
         }
 
-        public async Task<int> GetRprForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate) 
+        public async Task<int> GetRprForHorseRace(List<HorseArchiveEntity> archive, DateTime raceDate)
         {
-            if (archive != null && archive.Count() != 0) 
+            if (archive != null && archive.Count() != 0)
             {
                 //set the race date to equal that distance group
                 var rpr = archive.Where(x => x.field_changed == "rpr" && x.date < raceDate)
                     .OrderByDescending(x => x.date).FirstOrDefault()?.new_value;
 
-                if (rpr != "-") 
+                if (rpr != "-")
                 {
-                    if (Int32.TryParse(rpr, out int result)) 
+                    if (Int32.TryParse(rpr, out int result))
                     {
                         return result;
                     }
@@ -284,7 +281,7 @@ namespace Core.Services
 
                 if (ts != "-")
                 {
-                    if (Int32.TryParse(ts, out int result)) 
+                    if (Int32.TryParse(ts, out int result))
                     {
                         return result;
                     }
@@ -294,7 +291,7 @@ namespace Core.Services
             return -1;
         }
 
-        public async Task<int> GetMissingRaceData() 
+        public async Task<int> GetMissingRaceData()
         {
             var result = 0;
 
@@ -302,7 +299,7 @@ namespace Core.Services
             {
                 var racesToRetry = _eventRepository.GetRacesWithMissingRaceHorses();
 
-                foreach (var race in racesToRetry) 
+                foreach (var race in racesToRetry)
                 {
                     try
                     {
@@ -324,7 +321,7 @@ namespace Core.Services
                     result++;
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -332,14 +329,14 @@ namespace Core.Services
             return result;
         }
 
-        private async Task FailedRace(RaceEntity race, string exception) 
+        private async Task FailedRace(RaceEntity race, string exception)
         {
             var existing = _configRepo.GetFailedRace(race.race_id);
             if (existing == null)
             {
                 var failedResult = new FailedRaceEntity()
                 {
-                    race_id = race.race_id,   
+                    race_id = race.race_id,
                     error_message = exception
                 };
 

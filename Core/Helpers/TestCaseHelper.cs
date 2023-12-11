@@ -1,6 +1,4 @@
-﻿using Core.Models.GetRace;
-using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 
 namespace Core.Helpers
 {

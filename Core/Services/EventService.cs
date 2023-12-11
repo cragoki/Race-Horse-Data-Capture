@@ -83,7 +83,7 @@ namespace Core.Services
 
         public async Task<IEnumerable<RaceEntity>> GetRacesFromDatabaseForAlgorithm(int event_id)
         {
-            return _eventRepository.GetRacesForEvent(event_id);
+            return await _eventRepository.GetRacesForEvent(event_id);
         }
 
         public async Task<IEnumerable<RaceEntity>> GetRacesForTodayToTest()
@@ -137,18 +137,18 @@ namespace Core.Services
 
                 int eventId = await _eventRepository.AddEvent(ev);
 
-                if (eventId == 0) 
+                if (eventId == 0)
                 {
                     eventId = _eventRepository.GetEventByCourseAndBatch(ev.course_id, ev.batch_id).event_id;
                 }
-                if (eventId == 0) 
+                if (eventId == 0)
                 {
                     throw new Exception($"Failed to retrieve event {eventId} - {even.Name}");
                 }
 
                 await CheckAndAddCourse(course);
 
-                if (even.Races.Count() == 0) 
+                if (even.Races.Count() == 0)
                 {
                     throw new Exception($"Failed to retrieve races for event {eventId} - {even.Name}");
                 }

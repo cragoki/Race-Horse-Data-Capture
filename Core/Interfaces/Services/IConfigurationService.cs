@@ -18,5 +18,5 @@ namespace Core.Interfaces.Services
         Task<bool> UpdateJob(JobEnum job);
         Task<JobEntity> GetJobInfo(JobEnum job);
         List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
-     }
+    }
 }

@@ -1,8 +1,8 @@
-using Stashbox;
+using Blazored.Modal;
 using Infrastructure.Config.IoC;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Blazored.Modal;
+using Stashbox;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -2,7 +2,6 @@
 using Core.Interfaces.Services;
 using Core.Models;
 using Core.Models.Mail;
-using Core.Models.RP.GetRaceNew;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using System;
@@ -38,7 +37,7 @@ namespace RHDCBackLog
             Console.WriteLine("Initializing RHDCBackLogAutomator");
 
             while (!stoppingToken.IsCancellationRequested)
-            { 
+            {
                 try
                 {
                     var job = await _configService.GetJobInfo(JobEnum.rhdccleaner);
@@ -121,7 +120,7 @@ namespace RHDCBackLog
                     //Get the Interval_Minutes from the DB to set the interval time
                     Thread.Sleep((int)TimeSpan.FromMinutes(job.interval_check_minutes).TotalMilliseconds);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     var email = new MailModel()
                     {

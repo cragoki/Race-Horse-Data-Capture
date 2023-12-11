@@ -3,10 +3,8 @@ using Core.Models.Mail;
 using Core.Models.Settings;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.Extensions.Options;
 using MimeKit;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Core.Services
@@ -44,7 +42,7 @@ namespace Core.Services
             catch (Exception ex)
             {
                 var a = ex;
-            } 
+            }
         }
     }
 }

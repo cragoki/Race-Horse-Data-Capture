@@ -3,13 +3,9 @@ using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.Data.Repositories;
 using Core.Interfaces.Services;
-using Core.Models.GetRace;
-using Infrastructure.Data;
 using Infrastructure.PunterAdmin.ViewModels;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -40,16 +36,16 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var batch = new BatchEntity();
 
-                switch (retrievalType) 
+                switch (retrievalType)
                 {
                     case RaceRetrievalType.Current:
-                            batch = _configRepo.GetMostRecentBatch();
+                        batch = _configRepo.GetMostRecentBatch();
                         break;
                     case RaceRetrievalType.Next:
-                            batch = _configRepo.GetNextBatch(batchId ?? new Guid());
+                        batch = _configRepo.GetNextBatch(batchId ?? new Guid());
                         break;
                     case RaceRetrievalType.Previous:
-                            batch = _configRepo.GetPreviousBatch(batchId ?? new Guid());
+                        batch = _configRepo.GetPreviousBatch(batchId ?? new Guid());
                         break;
                 }
 
@@ -69,7 +65,7 @@ namespace Infrastructure.PunterAdmin.Services
                         MeetingURL = $"https://www.racingpost.com/{ev.meeting_url}",
                         MeetingType = ev.MeetingType?.meeting_type,
                         SurfaceType = String.IsNullOrEmpty(ev.Surface?.surface_type) ? "Unknown" : ev.Surface?.surface_type,
-                        EventRaces =  BuildTodaysRaceViewModel(ev.Races, ev.created), 
+                        EventRaces = BuildTodaysRaceViewModel(ev.Races, ev.created),
                         NumberOfRaces = ev.Races.Count(),
                         IsMostRecent = checkIfLast,
                         IsFirst = checkIfFirst == null ? true : false,
@@ -104,7 +100,7 @@ namespace Infrastructure.PunterAdmin.Services
                 result.HorseRaces = new List<RaceViewModel>();//GetRacesForHorse(raceHorse.HorseId); //Would be better to just return the Race URL, position etc....
                 result.Tracker = GetTrackerData(raceHorse.RaceHorseId);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -120,9 +116,9 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var races = _horseRepository.GetHorseRaces(horseId).Where(x => x.race_id != raceId).OrderByDescending(x => x.Race.Event.created);
 
-                foreach (var race in races) 
+                foreach (var race in races)
                 {
-                    result.Add(new RaceStatisticViewModel() 
+                    result.Add(new RaceStatisticViewModel()
                     {
                         Position = race.position,
                         Description = race.description,
@@ -143,7 +139,7 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        public RaceHorseTrackerViewModel GetTrackerData(int race_horse_id) 
+        public RaceHorseTrackerViewModel GetTrackerData(int race_horse_id)
         {
             var result = new RaceHorseTrackerViewModel();
 
@@ -151,7 +147,7 @@ namespace Infrastructure.PunterAdmin.Services
             {
                 var algoTracker = _algorithmRepository.GetAlgorithmTracker(race_horse_id);
 
-                if (algoTracker != null) 
+                if (algoTracker != null)
                 {
                     result = new RaceHorseTrackerViewModel()
                     {
@@ -189,7 +185,7 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        public async Task<bool> RetryRaceRetrieval(FailedRacesViewModel failedRace) 
+        public async Task<bool> RetryRaceRetrieval(FailedRacesViewModel failedRace)
         {
             //After Adding Event Id to Failed Race entity
             try
@@ -238,7 +234,7 @@ namespace Infrastructure.PunterAdmin.Services
         public async Task<bool> ProcessResult(FailedResultsViewModel failedResult)
         {
             var result = false;
-            try 
+            try
             {
                 var raceHorse = _horseRepository.GetRaceHorseById(failedResult.RaceHorseId);
                 raceHorse.position = failedResult.Position;
@@ -250,7 +246,7 @@ namespace Infrastructure.PunterAdmin.Services
                 var existing = _configRepo.GetFailedResult(failedResult.Id);
                 await _configRepo.DeleteFailedResult(existing);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -270,7 +266,7 @@ namespace Infrastructure.PunterAdmin.Services
                 {
                     horses = _horseRepository.GetRaceHorseWithNoPosition();
                 }
-                else 
+                else
                 {
                     var removeSpaces = raceHorseIds.Replace(" ", "");
                     var raceHorseIdsParsed = removeSpaces.Split(',').Select(int.Parse).ToList();
@@ -330,7 +326,7 @@ namespace Infrastructure.PunterAdmin.Services
             return processed;
         }
 
-        private List<RaceViewModel> BuildTodaysRaceViewModel(List<RaceEntity> races, DateTime date) 
+        private List<RaceViewModel> BuildTodaysRaceViewModel(List<RaceEntity> races, DateTime date)
         {
             var result = new List<RaceViewModel>();
 
@@ -378,10 +374,10 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        private List<RaceHorseViewModel> BuildRaceHorseViewModel(List<RaceHorseEntity> raceHorses, EventEntity even) 
+        private List<RaceHorseViewModel> BuildRaceHorseViewModel(List<RaceHorseEntity> raceHorses, EventEntity even)
         {
             var result = new List<RaceHorseViewModel>();
-            if (raceHorses.Count() == 0) 
+            if (raceHorses.Count() == 0)
             {
                 return result;
             }
@@ -396,7 +392,7 @@ namespace Infrastructure.PunterAdmin.Services
                 var predictedPositions = _algorithmRepository.GetAlgorithmPrediction(raceHorse.race_horse_id);
                 var predictedPosition = predictedPositions.Where(x => x.Algorithm.active).FirstOrDefault();
 
-                if (predictedPosition != null) 
+                if (predictedPosition != null)
                 {
                     racePredictedPosition = predictedPosition.predicted_position;
                     racePoints = predictedPosition.points;
@@ -426,7 +422,7 @@ namespace Infrastructure.PunterAdmin.Services
             return result;
         }
 
-        private int? ConfigureRPR(RaceHorseEntity raceHorse, DateTime created) 
+        private int? ConfigureRPR(RaceHorseEntity raceHorse, DateTime created)
         {
             var result = 0;
 

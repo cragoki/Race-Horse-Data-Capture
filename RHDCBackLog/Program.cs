@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using Microsoft.Extensions.Configuration;
-using Stashbox;
-using Infrastructure.Config.IoC;
-using Microsoft.Extensions.DependencyInjection;
-using NLog.Extensions.Logging;
+﻿using Infrastructure.Config.IoC;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using Stashbox;
+using System;
 
 namespace RHDCBackLog
 {

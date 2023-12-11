@@ -92,7 +92,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.TopSpeedOnly:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId);
+                            var races = await _eventRepository.GetRacesForEvent(even.EventId);
 
                             foreach (var race in even.EventRaces)
                             {
@@ -125,7 +125,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.TsRPR:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId);
+                            var races = await _eventRepository.GetRacesForEvent(even.EventId);
 
                             foreach (var race in even.EventRaces)
                             {
@@ -158,7 +158,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.FormOnly:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
+                            var races = await _eventRepository.GetRacesForEvent(even.EventId);
                             var distances = _mappingRepository.GetDistanceTypes();
                             var goings = _mappingRepository.GetGoingTypes();
 
@@ -194,7 +194,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.FormRevamp:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
+                            var races = await _eventRepository.GetRacesForEvent(even.EventId);
                             var distances = _mappingRepository.GetDistanceTypes();
                             var goings = _mappingRepository.GetGoingTypes();
 
@@ -231,7 +231,7 @@ namespace Infrastructure.PunterAdmin.Services
                     case (int)AlgorithmEnum.BentnersModel:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
+                            var races = await _eventRepository.GetRacesForEvent(even.EventId);
 
                             foreach (var race in even.EventRaces)
                             {
@@ -260,10 +260,10 @@ namespace Infrastructure.PunterAdmin.Services
                             }
                         }
                         break;
-                    case (int)AlgorithmEnum.MyModel:                       
+                    case (int)AlgorithmEnum.MyModel:
                         foreach (var even in events)
                         {
-                            var races = _eventRepository.GetRacesForEvent(even.EventId).ToList();
+                            var races = await _eventRepository.GetRacesForEvent(even.EventId);
 
                             foreach (var race in even.EventRaces)
                             {

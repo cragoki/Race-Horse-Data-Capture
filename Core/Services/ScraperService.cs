@@ -8,7 +8,6 @@ using Core.Models.GetRace;
 using Core.Models.RP.GetRaceNew;
 using Core.Models.Settings;
 using HtmlAgilityPack;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -90,7 +89,7 @@ namespace Core.Services
 
                 var resultDivs = htmlDoc.DocumentNode.SelectNodes("//section[contains(@class,'rp-raceCourse__meetingContainer')]");
 
-                foreach (var section in resultDivs) 
+                foreach (var section in resultDivs)
                 {
                     var toAdd = new Course();
 
@@ -161,7 +160,7 @@ namespace Core.Services
             return result;
         }
 
-        public async Task<List<RaceHorseEntity>> GetResultsForRace(RaceEntity race, List<RaceHorseEntity> raceHorses) 
+        public async Task<List<RaceHorseEntity>> GetResultsForRace(RaceEntity race, List<RaceHorseEntity> raceHorses)
         {
             var result = new List<RaceHorseEntity>();
 
@@ -197,7 +196,7 @@ namespace Core.Services
                 //    }
                 //}
 
-                for (int i = 0; i < resultDivs.Count; i++) 
+                for (int i = 0; i < resultDivs.Count; i++)
                 {
                     //Horse
                     //div class rp-horseTable__horse
@@ -206,7 +205,7 @@ namespace Core.Services
                     var rpHorseurl = horseDiv.SelectSingleNode(".//a[contains(@class,'rp-horseTable__horse__name')]")?.Attributes["href"].Value ?? "";
                     var horseId = await ExtractHorseIdFromUrl(rpHorseurl);
 
-                    if (horseId == -1) 
+                    if (horseId == -1)
                     {
                         continue;
                     }
@@ -222,9 +221,9 @@ namespace Core.Services
                     {
                         formattedPos = Regex.Match(position, @"\d+").Value;
                     }
-                    else 
+                    else
                     {
-                         formattedPos = Regex.Match(position, @"\d+").Value;
+                        formattedPos = Regex.Match(position, @"\d+").Value;
                     }
                     //Comment
                     //tr class rp-horseTable__commentRow
@@ -279,7 +278,7 @@ namespace Core.Services
 
                             toUpdate.finished = true;
                         }
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -288,7 +287,7 @@ namespace Core.Services
                         toUpdate.finished = false;
                     }
 
-                    if (toUpdate.position == 0 && String.IsNullOrEmpty(toUpdate.description)) 
+                    if (toUpdate.position == 0 && String.IsNullOrEmpty(toUpdate.description))
                     {
                         toUpdate.position = -1;
                         toUpdate.description = "Unknown Error";
@@ -299,7 +298,7 @@ namespace Core.Services
                 }
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Logger.Error($"Failed to retrieve results for race {race.race_id} ... {ex.Message}");
             }
@@ -322,7 +321,7 @@ namespace Core.Services
 
                 var resultDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__mainRow')]");
                 var commentDivs = htmlDoc.DocumentNode.SelectNodes("//tr[contains(@class,'rp-horseTable__commentRow')]");
-                
+
                 for (int i = 0; i < resultDivs.Count; i++)
                 {
                     //Horse
@@ -354,7 +353,7 @@ namespace Core.Services
 
                     var horse = await _horseRepository.GetHorseByRpId(horseId);
 
-                    if (horse != null && horse.horse_id == raceHorse.horse_id) 
+                    if (horse != null && horse.horse_id == raceHorse.horse_id)
                     {
                         try
                         {
@@ -382,13 +381,13 @@ namespace Core.Services
                                 {
                                     raceHorse.description = "RO";
                                 }
-                                else 
+                                else
                                 {
                                     raceHorse.description = position;
 
                                 }
                             }
-                            else 
+                            else
                             {
                                 raceHorse.position = Int32.Parse(formattedPos);
                                 if (raceHorse.position == 0)
@@ -406,10 +405,10 @@ namespace Core.Services
                             //Could log errors to a seperate table to review and maybe manually input?
                         }
 
-                        if (raceHorse.position == 0 && String.IsNullOrEmpty(raceHorse.description)) 
+                        if (raceHorse.position == 0 && String.IsNullOrEmpty(raceHorse.description))
                         {
                             raceHorse.position = -1;
-                            raceHorse.description ="Unknown Error";
+                            raceHorse.description = "Unknown Error";
                         }
                         return raceHorse;
                     }
@@ -429,7 +428,7 @@ namespace Core.Services
                     raceHorse.description = "ABANDONED";
                     raceHorse.finished = false;
                 }
-                else 
+                else
                 {
                     raceHorse.position = -1;
                     raceHorse.description = ex.Message;
@@ -521,7 +520,7 @@ namespace Core.Services
                 //Look for a with class RC-runnerInfo__name => Inner Text = name, href = url
                 var jockey = new JockeyEntity()
                 {
-                    jockey_name = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.InnerText.Replace(" ","") ?? "",
+                    jockey_name = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.InnerText.Replace(" ", "") ?? "",
                     jockey_url = jockeyContainer.SelectSingleNode(".//a[contains(@class, 'RC-runnerInfo__name')]")?.Attributes["href"].Value ?? ""
                 };
 
@@ -617,7 +616,7 @@ namespace Core.Services
 
                 }
             }
-            else 
+            else
             {
                 result.HorseId = await _horseRepository.AddHorse(horse);
             }
@@ -626,7 +625,7 @@ namespace Core.Services
             {
                 result.JockeyId = existingJockey.jockey_id;
             }
-            else 
+            else
             {
                 result.JockeyId = await _horseRepository.AddJockey(jockey);
             }
@@ -635,7 +634,7 @@ namespace Core.Services
             {
                 result.TrainerId = existingTrainer.trainer_id;
             }
-            else 
+            else
             {
                 result.TrainerId = await _horseRepository.AddTrainer(trainer);
             }
@@ -684,7 +683,7 @@ namespace Core.Services
             }
         }
 
-        private async Task<string> ExtractJson(string strSource, string strStart, string strEnd, int trimStart, int trimEnd) 
+        private async Task<string> ExtractJson(string strSource, string strStart, string strEnd, int trimStart, int trimEnd)
         {
             var result = "";
 
@@ -700,7 +699,7 @@ namespace Core.Services
                     result = result.Substring(trimStart);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -708,7 +707,7 @@ namespace Core.Services
             return result;
         }
 
-        private async Task<int> ExtractHorseIdFromUrl(string horseUrl) 
+        private async Task<int> ExtractHorseIdFromUrl(string horseUrl)
         {
             if (horseUrl.Length >= 15)
             {
@@ -716,13 +715,13 @@ namespace Core.Services
                 var horseIdIndex = rpHorseIdSubstr.IndexOf("/");
                 return Int32.Parse(rpHorseIdSubstr.Remove(horseIdIndex));
             }
-            else 
+            else
             {
                 return -1;
             }
         }
 
-        private async Task<DailyRaces> ConvertNewRPStructureToOld(string page) 
+        private async Task<DailyRaces> ConvertNewRPStructureToOld(string page)
         {
             var result = new DailyRaces();
             result.Courses = new List<Course>();
@@ -740,11 +739,11 @@ namespace Core.Services
                     events.Add(JsonConvert.DeserializeObject<SubMeeting>(eventData));
                 }
 
-                foreach (var even in events) 
+                foreach (var even in events)
                 {
                     var races = new List<NewRaceModel>();
 
-                    foreach (var raceId in even.RaceIds) 
+                    foreach (var raceId in even.RaceIds)
                     {
                         var raceData = await ExtractJson(page, $"\"{raceId.ToString()}\":", ",\"startScheduledDatetimeUTC\"", 0, 0);
                         raceData = FormatJsonString(raceData);
@@ -753,7 +752,7 @@ namespace Core.Services
 
                     var racesToAdd = new List<Race>();
 
-                    foreach (var race in races) 
+                    foreach (var race in races)
                     {
                         racesToAdd.Add(new Race()
                         {
@@ -793,7 +792,7 @@ namespace Core.Services
                     });
                 }
 
-               
+
             }
             catch (Exception ex)
             {
@@ -803,7 +802,7 @@ namespace Core.Services
             return result;
         }
 
-        private string FormatJsonString(string jsonString) 
+        private string FormatJsonString(string jsonString)
         {
             if (jsonString.Last().ToString() != "}")
             {

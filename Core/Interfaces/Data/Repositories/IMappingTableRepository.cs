@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Core.Interfaces.Data.Repositories
-{ 
+{
     public interface IMappingTableRepository
     {
         string GetAgeType(int age);

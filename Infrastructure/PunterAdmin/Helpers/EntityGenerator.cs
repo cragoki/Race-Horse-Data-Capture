@@ -1,8 +1,5 @@
 ﻿using Core.Entities;
 using Core.Helpers;
-using Core.Models.GetRace;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
 

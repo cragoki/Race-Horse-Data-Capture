@@ -7,7 +7,7 @@ namespace AlgorithmUnitTests.Helpers
 {
     public static class RaceHorseEntityHelper
     {
-        public static RaceHorseEntity GenerateRaceHorse(int index, int races, int wins, int places, RaceEntity race) 
+        public static RaceHorseEntity GenerateRaceHorse(int index, int races, int wins, int places, RaceEntity race)
         {
             return new RaceHorseEntity()
             {
@@ -19,7 +19,7 @@ namespace AlgorithmUnitTests.Helpers
                 jockey_id = index,
                 trainer_id = index,
                 weight = " 10. 12",
-                Horse = new HorseEntity() 
+                Horse = new HorseEntity()
                 {
                     horse_id = index,
                     horse_name = $"Horse {index}",
@@ -32,11 +32,11 @@ namespace AlgorithmUnitTests.Helpers
                     Races = GenerateRaceHorseHistory(races, wins, places, race, index)
                 },
                 race_id = race.race_id,
-                Race = new RaceEntity() 
+                Race = new RaceEntity()
                 {
                     race_id = 1000 + index,
                     event_id = 1000 + index,
-                    Event = new EventEntity() 
+                    Event = new EventEntity()
                     {
                         course_id = race.Event.course_id
                     },
@@ -60,9 +60,9 @@ namespace AlgorithmUnitTests.Helpers
             // 4. Race.distance which is different or the same as current
             // 5. Race.Event.meeting_type which is different or the same as current
             // 6. Race.going which is different or the same as current
-            for (int i = 0; i <= noOfRaces; i++) 
+            for (int i = 0; i <= noOfRaces; i++)
             {
-                if (currentWins < wins) 
+                if (currentWins < wins)
                 {
                     // Add a win
                     result.Add(new RaceHorseEntity()
@@ -139,11 +139,11 @@ namespace AlgorithmUnitTests.Helpers
                     top_speed = null
                 },
                 race_id = 1000 + index,
-                Race = new RaceEntity() 
+                Race = new RaceEntity()
                 {
                     race_id = 1000 + index,
                     event_id = 1000 + index,
-                    Event = new EventEntity() 
+                    Event = new EventEntity()
                     {
                         created = DateTime.Now.AddMonths(-3)
                     }
