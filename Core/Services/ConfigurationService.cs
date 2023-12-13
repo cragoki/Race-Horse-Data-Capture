@@ -72,11 +72,11 @@ namespace Core.Services
             await _repository.UpdateBacklogDate(newDate);
         }
 
-        public async Task<bool> UpdateJob(JobEnum job)
+        public async Task<bool> UpdateJob(JobEntity job)
         {
             try
             {
-                await _repository.UpdateNextExecution(job);
+                await _repository.UpdateJob(job);
 
                 return true;
             }

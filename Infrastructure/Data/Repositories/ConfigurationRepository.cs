@@ -60,7 +60,7 @@ namespace Infrastructure.Data.Repositories
 
         public JobEntity GetJobInfo(JobEnum job)
         {
-            return _context.tb_job.Where(x => x.job_id == (int)job).ToList().FirstOrDefault();
+            return _context.tb_job.Where(x => x.job_id == (int)job).FirstOrDefault();
         }
 
         public IEnumerable<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId)
@@ -68,29 +68,9 @@ namespace Infrastructure.Data.Repositories
             return _context.tb_algorithm_settings.Where(x => x.algorithm_id == algorithmId);
         }
 
-        public async Task UpdateNextExecution(JobEnum job)
+        public async Task UpdateJob(JobEntity job)
         {
-            var jobDb = _context.tb_job.First(x => x.job_id == (int)job);
-
-            var tomorrow = DateTime.Now.AddDays(1);
-            switch (job)
-            {
-                case JobEnum.rhdcautomation:
-                    jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 07, 00, 00);
-                    break;
-                case JobEnum.rhdccleaner:
-                    jobDb.next_execution = DateTime.Now.AddMinutes(30);
-                    break;
-                case JobEnum.rhdcresultretriever:
-                    jobDb.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 21, 00, 00);
-                    break;
-                case JobEnum.rhdcalgorithmadjuster:
-                    jobDb.start = !jobDb.start;
-                    break;
-            }
-            jobDb.last_execution = DateTime.Now;
-            _context.Update(jobDb);
-            _context.Entry(jobDb).State = EntityState.Modified;
+            _context.Update(job);
             await _context.SaveChangesAsync();
         }
 

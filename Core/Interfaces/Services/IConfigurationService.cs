@@ -15,7 +15,7 @@ namespace Core.Interfaces.Services
         DateTime GetLastBackfillDate();
         Task UpdateBackfillDate(DateTime newDate);
         MailSettings GetMailSettings();
-        Task<bool> UpdateJob(JobEnum job);
+        Task<bool> UpdateJob(JobEntity job);
         Task<JobEntity> GetJobInfo(JobEnum job);
         List<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
     }

@@ -209,7 +209,11 @@ namespace RHDCAutomation
 
                         //Update Job Info
                         Console.WriteLine($"Updating Job Next Execution Time");
-                        await _configService.UpdateJob(JobEnum.rhdcautomation);
+                        var tomorrow = DateTime.Now.AddDays(1);
+                        job.last_execution = DateTime.Now;
+                        job.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 07, 00, 00);
+                        
+                        await _configService.UpdateJob(job);
 
 
                         //TEMPORARY - To test the service is executing as expected

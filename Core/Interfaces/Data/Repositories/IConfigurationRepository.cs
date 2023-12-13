@@ -16,7 +16,7 @@ namespace Core.Interfaces.Data.Repositories
         Task UpdateBacklogDate(DateTime date);
         JobEntity GetJobInfo(JobEnum job);
         IEnumerable<AlgorithmSettingsEntity> GetAlgorithmSettings(int algorithmId);
-        Task UpdateNextExecution(JobEnum job);
+        Task UpdateJob(JobEntity job);
         Task DeleteFailedResult(FailedResultEntity entity);
         IEnumerable<FailedResultEntity> GetFailedResults();
         Task AddFailedResult(FailedResultEntity entity);

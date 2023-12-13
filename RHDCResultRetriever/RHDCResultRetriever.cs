@@ -107,7 +107,11 @@ namespace RHDCResultRetriever
                         Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
-                        await _configService.UpdateJob(JobEnum.rhdcresultretriever);
+                        var tomorrow = DateTime.Now.AddDays(1);
+                        job.last_execution = DateTime.Now;
+                        job.next_execution = new DateTime(tomorrow.Year, tomorrow.Month, tomorrow.Day, 21, 00, 00);
+
+                        await _configService.UpdateJob(job);
                     }
                     else
                     {
