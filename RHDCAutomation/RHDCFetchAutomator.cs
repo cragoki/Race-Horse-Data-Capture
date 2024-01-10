@@ -86,6 +86,7 @@ namespace RHDCAutomation
                         //Get todays Events
                         Console.WriteLine("Retrieving Todays Events");
                         var events = await _eventService.GetTodaysEvents(_batch);
+                        //var events = await _eventService.GetEventsFromDatabase();
                         Console.WriteLine("Retrieved Todays Events");
                         foreach (var even in events)
                         {
@@ -114,7 +115,7 @@ namespace RHDCAutomation
 
                                 var settings = await _algorithmService.GetArchivedSettingsForBatch(activeAlgorithm.active_batch.Value);
                                 //Reset Algorithm settings
-                                await _algorithmService.AdjustAlgorithmSettings(activeAlgorithm.active_batch.Value, activeAlgorithm);
+                                //await _algorithmService.AdjustAlgorithmSettings(activeAlgorithm.active_batch.Value, activeAlgorithm); < - This is preventing tb_job from updating
 
                                 var eventEntities = await _eventService.GetEventsFromDatabase();
                                 foreach (var even in eventEntities)
