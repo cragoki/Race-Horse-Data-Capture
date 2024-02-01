@@ -261,6 +261,10 @@ namespace Core.Services
                                 {
                                     toUpdate.description = "RO";
                                 }
+                                else if (position.Contains("SU"))
+                                {
+                                    toUpdate.description = "SU";
+                                }
                             }
                             else
                             {
@@ -438,6 +442,111 @@ namespace Core.Services
             }
 
             return raceHorse;
+        }
+ 
+
+        public async Task<List<EventEntity>> GetEvents(string url)
+        {
+            var result = new List<EventEntity>();
+
+            try
+            {
+                var page = await CallUrl(url);
+                HtmlDocument htmlDoc = new HtmlDocument();
+                htmlDoc.LoadHtml(page);
+
+
+                var courses = htmlDoc.DocumentNode.SelectNodes("//section[contains(@class,'rp-raceCourse__meetingContainer')]");
+
+                foreach (var course in courses)
+                {
+                    try
+                    {
+                        var even = await GetEvent(course);
+                        result.Add(even);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return result;
+        }
+
+        public async Task<EventEntity> GetEvent(HtmlNode course)
+        {
+            var result = new EventEntity();
+
+            //Defaults
+            result.abandoned = false;
+            result.meeting_url = "";
+            var rpCourseId = GetRPCourseId(course);
+            var courseName = GetCourseName(course);
+            var races = course.SelectNodes(".//div[contains(@class, 'rp-raceCourse__panel__container')]");
+            var eventInfo = course.SelectNodes(".//div[contains(@class, 'rp-raceCourse__panel__detailsWrapper')]");
+            //Check if rp course Id exists in our DB, if it does, add the event, if it doesnt, sack it.
+
+            result.hash_name = courseName;
+            result.races = races.Count();
+            result.name = courseName + "_BACKFILL";
+            var info = eventInfo[0].SelectNodes(".//div[contains(@class, 'rp-raceCourse__panel__details__content__info')]");
+
+            var surfaceType = info[0].SelectSingleNode(".//span[contains(@class, 'rp-raceCourse__panel__details__content__info__text')]").InnerText;
+            var weatherType = info[1].SelectSingleNode(".//span[contains(@class, 'rp-raceCourse__panel__details__content__info__text')]").InnerText;
+            var meetingType = GetMeetingType(races);
+            //batch_id -> create new batch
+            result.Course = new CourseEntity()
+            {
+                rp_course_id = rpCourseId
+            };
+            result.Surface = new SurfaceType()
+            {
+                surface_type = surfaceType
+            };
+            result.MeetingType = new MeetingType()
+            {
+                meeting_type = meetingType
+            };
+
+            return result;
+        }
+
+        private int GetRPCourseId(HtmlNode course)
+        {
+            return Int32.Parse(course.Attributes["data-course-id"].Value);
+        }
+
+        private string GetCourseName(HtmlNode course)
+        {
+            return course.Attributes["data-diffusion-coursename"].Value.ToLower();
+        }
+
+        private string GetMeetingType(HtmlNodeCollection races)
+        {
+            int jumps = 0;
+            int flat = 0;
+
+            foreach (var race in races)
+            {
+                var name = race.SelectSingleNode(".//a[contains(@class, 'rp-raceCourse__panel__race__info__title__link')]").InnerText;
+
+                if (name != null && name.Contains("Hurdle"))
+                {
+                    jumps++;
+                }
+                else
+                {
+                    flat++;
+                }
+            }
+
+            return jumps == 0 ? "Flat" : flat == 0 ? "Jumps" : "Mixed";
         }
 
         private async Task<string> ExtractCourseUrl(HtmlDocument htmlDoc)

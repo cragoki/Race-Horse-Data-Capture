@@ -69,7 +69,7 @@ namespace Core.Algorithms
             {
                 //BEGIN CALCULATING PREDICTED RESULTS
                 var horsePoints = await GetHorsePoints(race.RaceHorses, race);
-                //TURN THIS INTO List<FormResultModel>
+
                 foreach (var horsePoint in horsePoints)
                 {
                     result.Add(new FormResultModel()
@@ -193,7 +193,7 @@ namespace Core.Algorithms
 
             foreach (var lastRace in lastTwo)
             {
-                var placePosition = SharedCalculations.GetTake(lastRace.Race.no_of_horses ?? 0);
+                var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
                 if (lastRace.position <= placePosition)
                 {
                     placed++;
@@ -250,7 +250,7 @@ namespace Core.Algorithms
                     //Find the closest period of time to this race and do the position check
                     var closest = historicDaysSinceLastRace.Aggregate((x, y) => Math.Abs(x.DaysSinceLastRace - Convert.ToInt32(daysSinceLastRace)) < Math.Abs(y.DaysSinceLastRace - Convert.ToInt32(daysSinceLastRace)) ? x : y);
                     var closestRace = racesOrdered.Where(x => x.race_id == closest.RaceId).FirstOrDefault();
-                    var pPos = SharedCalculations.GetTake(closestRace.Race.no_of_horses ?? 0);
+                    var pPos = SharedCalculations.GetTake(race.no_of_horses ?? 0);
 
                     if (closestRace.position <= pPos)
                     {
@@ -303,7 +303,7 @@ namespace Core.Algorithms
             {
                 //Reduce this value slightly for each iteration
                 var pointsForPlace = 1M;
-                var placePosition = SharedCalculations.GetTake(pastRace.Race.no_of_horses ?? 0);
+                var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
 
                 //Check if class is lower and if it is, multiply points to add
                 var difference = race.race_class - pastRace.Race.race_class;
@@ -410,7 +410,7 @@ namespace Core.Algorithms
                     {
                         foreach (var raceWithJockey in racesWithJockey)
                         {
-                            var placePosition = SharedCalculations.GetTake(raceWithJockey.Race.no_of_horses ?? 0);
+                            var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
                             if (raceWithJockey.position <= placePosition)
                             {
                                 placedWithJockey = placedWithJockey + 1;
@@ -510,7 +510,7 @@ namespace Core.Algorithms
                 foreach (var condition1 in racesAtCourse)
                 {
                     var cRace = condition1.Race;
-                    var placePosition = SharedCalculations.GetTake(cRace.no_of_horses ?? 0);
+                    var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
 
                     if (condition1.position <= placePosition)
                     {
@@ -532,7 +532,7 @@ namespace Core.Algorithms
                 foreach (var condition2 in racesAtDistanceGroup)
                 {
                     var cRace = condition2.Race;
-                    var placePosition = SharedCalculations.GetTake(cRace.no_of_horses ?? 0);
+                    var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
 
                     if (condition2.position <= placePosition)
                     {
@@ -557,7 +557,7 @@ namespace Core.Algorithms
                     foreach (var condition3 in racesAtRaceType)
                     {
                         var cRace = condition3.Race;
-                        var placePosition = SharedCalculations.GetTake(cRace.no_of_horses ?? 0);
+                        var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
 
 
                         if (condition3.position <= placePosition)
@@ -581,7 +581,7 @@ namespace Core.Algorithms
                 foreach (var condition4 in racesAtGoingGroup)
                 {
                     var cRace = condition4.Race;
-                    var placePosition = SharedCalculations.GetTake(cRace.no_of_horses ?? 0);
+                    var placePosition = SharedCalculations.GetTake(race.no_of_horses ?? 0);
 
                     if (condition4.position <= placePosition)
                     {

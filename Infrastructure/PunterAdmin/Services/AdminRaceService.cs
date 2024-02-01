@@ -326,6 +326,18 @@ namespace Infrastructure.PunterAdmin.Services
             return processed;
         }
 
+        public async Task GetRaceDataForDate(string date) 
+        {
+            var url = $"https://www.racingpost.com/results/{date}";
+
+            var events = await _scraperService.GetEvents(url);
+
+            foreach (var even in events) 
+            {
+                //Add to database and return list of events with Ids
+            }
+        }
+
         private List<RaceViewModel> BuildTodaysRaceViewModel(List<RaceEntity> races, DateTime date)
         {
             var result = new List<RaceViewModel>();

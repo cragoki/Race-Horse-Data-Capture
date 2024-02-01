@@ -24,14 +24,24 @@
         </div>
     </div>
 }
+
 <div class="row">
-    <div class="col-lg-12">
-        <input value="Get Missing Data" type="button" class="btn btn-primary" @onclick="@(e => @GetMissingData())" />
+    <h3> Missing Data </h3>
+    <div class="col-lg-10">
+        <input class="form-attr" type="date"  @bind="@missingDataDate" />
+    </div>
+    <div class="col-lg-2">
+        <input value="Get Missing Data" type="button" class="btn btn-primary form-attr-btn" @onclick="@(e => @GetMissingData())" />
     </div>
 </div>
+
 <div class="row">
-    <div class="col-lg-12">
-        <input class="form-attr" placeholder="Race Horse Ids" @bind="@raceHorseIds"/>
+    <h3> Missing Results </h3>
+    <div class="col-lg-10">
+        <input class="form-attr-xl" placeholder="Race Horse Ids" @bind="@raceHorseIds" />
+    </div>
+    <div class="col-lg-2">
+        <input value="Get Missing Results" type="button" class="btn btn-primary form-attr-btn" @onclick="@(e => @GetMissingResults())" />
     </div>
 </div>
 
@@ -106,6 +116,7 @@
     private List<FailedResultsViewModel> FailedResults;
     private List<FailedRacesViewModel> FailedRaces;
     string raceHorseIds = "";
+    DateTime missingDataDate = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,6 +125,16 @@
     }
 
     private async Task GetMissingData()
+    {
+        isLoading = true;
+        var url = $"https://www.racingpost.com/results/{missingDataDate.Date.ToString("yyyy-MM-dd")}";
+        //var processed = await adminRaceService.RunResultRetrieval(raceHorseIds);
+        FailedResults = algorithmService.GetFailedResultsTable();
+        error = $"Done";
+        isLoading = false;
+    }
+
+    private async Task GetMissingResults()
     {
         isLoading = true;
         var processed = await adminRaceService.RunResultRetrieval(raceHorseIds);

@@ -99,7 +99,7 @@ namespace RHDCBackLog
                         Console.WriteLine($"completing Batch at {DateTime.Now}");
 
                         //Update Job Info
-                        if (!await _configService.UpdateJob(JobEnum.rhdccleaner))
+                        if (!await _configService.UpdateJob(job))
                         {
                             //Send Error Email and stop service as the service will be broken
                             var email = new MailModel()

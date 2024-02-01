@@ -361,6 +361,17 @@ span {
     padding: 20px;
 }
 
+.form-attr-xl {
+    width: 100%;
+    padding: 20px;
+}
+
+.form-attr-btn {
+    height: 100%;
+    padding: 20px;
+    font-size:18px;
+}
+
 .search-btn {
     margin-bottom:20px;
 }
