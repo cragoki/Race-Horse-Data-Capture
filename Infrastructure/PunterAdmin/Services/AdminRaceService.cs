@@ -124,7 +124,7 @@ namespace Infrastructure.PunterAdmin.Services
                         Description = race.description,
                         RaceType = race.Race.Event.MeetingType.meeting_type,
                         Weather = race.Race.Weather?.weather_type ?? "",
-                        Going = race.Race.Going.going_type,
+                        Going = race.Race.Going?.going_type ?? "",
                         Distance = race.Race.Distance.distance_type,
                         RaceUrl = race.Race.race_url,
                         Class = race.Race.race_class ?? 0
@@ -191,7 +191,7 @@ namespace Infrastructure.PunterAdmin.Services
             try
             {
                 var race = _eventRepository.GetRaceById(failedRace.RaceId);
-                race.race_url = failedRace.RaceUrl;
+                race.race_url = failedRace.RaceUrl.Replace("https://www.racingpost.com/", "");
                 //Now use the race URL to fetch the Horses/Trainers/Owners
                 var horses = await _scraperService.RetrieveHorseDetailsForRace(race);
 
@@ -264,7 +264,7 @@ namespace Infrastructure.PunterAdmin.Services
 
                 if (String.IsNullOrEmpty(raceHorseIds))
                 {
-                    horses = _horseRepository.GetRaceHorseWithNoPosition();
+                    horses = await _horseRepository.GetRaceHorseWithNoPosition();
                 }
                 else
                 {

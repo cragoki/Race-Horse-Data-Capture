@@ -171,9 +171,9 @@ namespace Infrastructure.Data.Repositories
                 .Where(x => x.horse_id == horse_id).ToList();
         }
 
-        public IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition()
+        public async Task<IEnumerable<RaceHorseEntity>> GetRaceHorseWithNoPosition()
         {
-            return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event).Include(x => x.Race).ThenInclude(x => x.RaceHorses).Where(x => x.Race.Event.created >= DateTime.Now.AddMonths(-4) && x.Race.Event.created.Date < DateTime.Now.Date && x.position == 0 && String.IsNullOrEmpty(x.description)).OrderByDescending(x => x.Race.Event.created).Take(200);
+            return _context.tb_race_horse.Include(x => x.Race).ThenInclude(x => x.Event).Include(x => x.Race).ThenInclude(x => x.RaceHorses).Where(x => x.Race.Event.created >= DateTime.Now.AddMonths(-4) && x.Race.Event.created.Date < DateTime.Now.Date && x.position == 0 && String.IsNullOrEmpty(x.description)).OrderByDescending(x => x.Race.Event.created).Take(400);
         }
 
         public IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition(List<int> raceHorseIds)

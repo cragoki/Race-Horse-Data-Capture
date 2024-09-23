@@ -26,7 +26,7 @@ namespace Core.Interfaces.Data.Repositories
         TrainerEntity GetTrainerById(int id);
         IEnumerable<RaceEntity> GetNoResultRaces();
         IEnumerable<RaceHorseEntity> GetAllRacesForHorse(int horse_id);
-        IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition();
+        Task<IEnumerable<RaceHorseEntity>> GetRaceHorseWithNoPosition();
         RaceHorseEntity GetRaceHorseById(int id);
         IEnumerable<RaceHorseEntity> GetHorseRaces(int horse_id);
         IEnumerable<RaceHorseEntity> GetRaceHorseWithNoPosition(List<int> raceHorseIds);

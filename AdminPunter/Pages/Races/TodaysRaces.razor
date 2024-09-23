@@ -11,6 +11,10 @@
 {
     <p><em>Loading...</em></p>
 }
+@if (!events.Any())
+{
+    <p><em>No Events Found</em></p>
+}
 else
 {
     <div class="row">
@@ -142,7 +146,7 @@ else
             events = await adminRaceService.GetTodaysRaces(type, ActiveBatch);
         }
 
-        if (events != null)
+        if (events != null && events.Any())
         {
             ActiveBatch = events.FirstOrDefault().BatchId;
             IsMostRecent = events.FirstOrDefault().IsMostRecent;

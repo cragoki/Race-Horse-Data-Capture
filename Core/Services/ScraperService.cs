@@ -385,6 +385,10 @@ namespace Core.Services
                                 {
                                     raceHorse.description = "RO";
                                 }
+                                else if (position.Contains("SU"))
+                                {
+                                    raceHorse.description = "SU";
+                                }
                                 else
                                 {
                                     raceHorse.description = position;

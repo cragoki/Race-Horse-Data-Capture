@@ -7,6 +7,41 @@
     <div class="row">
             <PlotlyChart @bind-Config="config" @bind-Layout="layout" @bind-Data="data" @ref="chart" />      
     </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>CC - Last Two Races</td>
+                    <td>CC - Time Since Last Race</td>
+                    <td>Past Performance</td>
+                    <td>APP - Strength Of Competition</td>
+                    <td>APP - Weight</td>
+                    <td>APP - Jockey Contribution</td>
+                    <td>PRF - Jockey</td>
+                    <td>PRF - Trainer</td>
+                    <td>Pref - Track</td>
+                    <td>Pref - Distance</td>
+                    <td>Pref - Race Type</td>
+                    <td>Pref - Going</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Tracker.TotalPointsForLastTwoRaces</td>
+                    <td>@Tracker.TotalPointsForTimeSinceLastRace</td>
+                    <td>@Tracker.TotalPointsForPastPerformance</td>
+                    <td>@Tracker.TotalPointsForStrengthOfCompetition</td>
+                    <td>@Tracker.TotalPointsForWeight</td>
+                    <td>@Tracker.TotalPointsForJockeyContribution</td>
+                    <td>@Tracker.PointsGivenForJockey</td>
+                    <td>@Tracker.PointsGivenForTrainer</td>
+                    <td>@Tracker.TotalPointsForSpecificTrack</td>
+                    <td>@Tracker.TotalPointsForDistance</td>
+                    <td>@Tracker.TotalPointsForRaceType</td>
+                    <td>@Tracker.TotalPointsForGoing</td>
+                </tr>
+            </tbody>
+        </table>
     <div class="row">
         <ul>
             <li>@Tracker.GetPresentRaceFactorsDescription</li>

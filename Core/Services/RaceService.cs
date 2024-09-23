@@ -207,7 +207,7 @@ namespace Core.Services
             var results = new List<RaceHorseEntity>();
             try
             {
-                var horses = _horseRepository.GetRaceHorseWithNoPosition();
+                var horses = await _horseRepository.GetRaceHorseWithNoPosition();
 
                 foreach (var horse in horses)
                 {
